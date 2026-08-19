@@ -1,0 +1,206 @@
+# prime — ACC Configuration
+#
+# This file configures ACC for the Prime research project.
+# Prime is a research project investigating how software repositories
+# can be transformed into compact, language-agnostic knowledge artifacts.
+#
+# All keys are optional. When absent, ACC uses sensible defaults.
+# See docs/03-repository-structure.md in the ACC project.
+#
+# Configuration schema version. Increment on breaking changes.
+schema_version: 1
+
+# -----------------------------------------------------------------------------
+# Language Analyzers
+# -----------------------------------------------------------------------------
+# Language analyzers improve discovered-edge accuracy by parsing imports.
+# When an analyzer is disabled or unavailable, ACC falls back to declared
+# edges from AGENTS.md and filesystem structure.
+language_analyzers:
+  rust: true
+  typescript: true
+  go: true
+  python: true
+  javascript: true
+  # java: false
+  # csharp: false
+  # cpp: false
+  # swift: false
+  # kotlin: false
+  # ruby: false
+  # php: false
+
+# -----------------------------------------------------------------------------
+# Ignore Patterns
+# -----------------------------------------------------------------------------
+# Paths excluded from graph derivation and search. Globs are matched
+# relative to the project root. These are in addition to built-in defaults
+# (.git/, target/, node_modules/, *.lock, dist/, build/).
+ignore:
+  - "target/"
+  - "node_modules/"
+  - "*.lock"
+  - ".git/"
+  - "dist/"
+  - "build/"
+  - "coverage/"
+  - ".next/"
+  - ".nuxt/"
+  - "vendor/"
+  - "__pycache__/"
+  - "*.pyc"
+  # Prime research artifacts (SPECS, docs) are Markdown — no analyzable source
+  - "SPECS/"
+  - "docs/"
+  # ACC configuration and memory — not analyzable source
+  - ".acc/"
+  - ".acc-memory.md"
+  # init-promt.md is the source document, not analyzable code
+  - "init-promt.md"
+
+# -----------------------------------------------------------------------------
+# Diagnostic Tuning
+# -----------------------------------------------------------------------------
+# The canonical severity of a code is fixed by docs/07-diagnostic-codes.md.
+# `warn_only` MAY downgrade a code from error to warn for this project only.
+diagnostics:
+  # Downgrade broken reference errors in template placeholders to warnings
+  # since Prime's AGENTS.md uses template placeholders intentionally
+  warn_only: ["ACC010"]
+
+# -----------------------------------------------------------------------------
+# Forbidden Dependencies
+# -----------------------------------------------------------------------------
+# Dependency rules the repository must never have. Each rule is a
+# { from, to } pair (directory prefixes, relative to the project root).
+forbidden_deps:
+  # Prime SPECS and docs should not depend on implementation code
+  # - from: "SPECS/"
+  #   to: "."
+  # - from: "docs/"
+  #   to: "."
+
+# -----------------------------------------------------------------------------
+# Ownership Configuration
+# -----------------------------------------------------------------------------
+ownership:
+  # strict: true → duplicate ownership (ACC030) is an error and fails `acc check`.
+  # strict: false → ACC030 is still emitted as an error per the code's canonical
+  # severity; this flag only controls whether ACC stops on the first ownership
+  # conflict or continues to collect them all.
+  strict: false
+
+# -----------------------------------------------------------------------------
+# Templates
+# -----------------------------------------------------------------------------
+# The system uses templates from .acc/config/templates/ to create and
+# modify ACC files. Edit the .md files there to customize generated
+# output. Override per-command with --template <path>.
+templates:
+  # agents_md: .acc/config/templates/agents.md  # AGENTS.md template
+  # memory: .acc/config/templates/memory.md      # .acc-memory.md template
+  # warn: .acc/config/templates/warn.md          # ACC_WARN.md template
+
+# -----------------------------------------------------------------------------
+# Engine (AI-powered, token-gated)
+# -----------------------------------------------------------------------------
+# The engine keeps the ACC files in sync with the codebase. Its AI phase
+# only runs when the trigger fires — that is the token budget control.
+engine:
+  trigger:
+    # mode: commits | changes | always
+    #   commits → count git commits since the last triggered run.
+    #   changes → keep a content-hash snapshot and count changed files.
+    mode: commits
+    # How many commits (or changed files) the engine waits for before
+    # running the token-consuming AI phase. Default: 3.
+    threshold: 3
+  supervisor:
+    # Second AI pass that scores the engine's proposed changes against
+    # ACC rules and compliance (0-100) before anything is written.
+    # Below the threshold, the engine iterates on its own proposals with
+    # the supervisor's feedback until compliant or max_iterations is hit.
+    enabled: false
+    threshold: 85
+    max_iterations: 3
+  ai:
+    # How the engine's AI phase handles failing providers:
+    retries: 3
+    retry_delay_ms: 1000
+    fallback: true
+    max_consecutive_failures: 3
+
+# -----------------------------------------------------------------------------
+# AI Providers (optional, AI SDK v5)
+# -----------------------------------------------------------------------------
+ai:
+  enabled: false
+  # default: main
+  # providers:
+  #   - id: main
+  #     provider: openai
+  #     model: gpt-4o
+  #     api_key_env: OPENAI_API_KEY
+
+# -----------------------------------------------------------------------------
+# Multi-Agent Orchestration
+# -----------------------------------------------------------------------------
+multi_agent:
+  enabled: false
+  max_concurrency: 4
+  max_depth: 1
+  task_timeout: 300
+  resource_limits:
+    cpu_percent: 80
+    memory_mb: 4096
+    token_budget: 1000000
+  isolation_mode: "git_worktree"
+  conflict_policy: "sequentialize"
+
+# -----------------------------------------------------------------------------
+# Context Engine Defaults
+# -----------------------------------------------------------------------------
+context:
+  default_depth: 1
+  default_max_bytes: 65536
+  default_include:
+    - "hierarchy"
+    - "contract"
+    - "dependencies"
+    - "constraints"
+    - "implementations"
+  # Memory excluded by default; use --include memory to include.
+
+# -----------------------------------------------------------------------------
+# Graph Defaults
+# -----------------------------------------------------------------------------
+graph:
+  default_format: "json"
+  default_provenance: true
+
+# -----------------------------------------------------------------------------
+# Memory Defaults
+# -----------------------------------------------------------------------------
+memory:
+  warn_bytes: 65536
+  timestamp_format: "rfc3339"
+
+# -----------------------------------------------------------------------------
+# Discovery Defaults
+# -----------------------------------------------------------------------------
+discover:
+  default_kinds:
+    - "missing-contract"
+    - "missing-dependency"
+    - "stale-dependency"
+    - "unknown-owner"
+    - "orphan-code"
+
+# -----------------------------------------------------------------------------
+# Tooling Subsystem
+# -----------------------------------------------------------------------------
+tools:
+  auto_discover: true
+  plugins:
+    enabled: true
+    directory: ".acc/config/tools"
