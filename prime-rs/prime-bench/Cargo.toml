@@ -1,0 +1,20 @@
+[package]
+name = "prime-bench"
+version = "0.1.0"
+edition = "2021"
+
+[[bench]]
+name = "benchmarks"
+path = "src/main.rs"
+
+[dependencies]
+prime-core = { path = "../prime-core" }
+prime-parser = { path = "../prime-parser" }
+prime-index = { path = "../prime-index" }
+anyhow = { workspace = true }
+criterion = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+walkdir = "2.5"
+rayon = { workspace = true }

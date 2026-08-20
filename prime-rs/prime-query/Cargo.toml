@@ -1,0 +1,12 @@
+[package]
+name = "prime-query"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+prime-core = { path = "../prime-core" }
+prime-index = { path = "../prime-index" }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+rayon = { workspace = true }

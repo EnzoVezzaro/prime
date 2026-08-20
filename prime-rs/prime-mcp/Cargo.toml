@@ -1,0 +1,18 @@
+[package]
+name = "prime-mcp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+prime-core = { path = "../prime-core" }
+prime-index = { path = "../prime-index" }
+prime-parser = { path = "../prime-parser" }
+prime-query = { path = "../prime-query" }
+
+rmcp = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

@@ -1,0 +1,416 @@
+{
+  "version": "2.0.0",
+  "description": "Prime Knowledge Benchmark Corpus - Structured questions with ground truth for source-free evaluation",
+  "categories": [
+    "architecture",
+    "symbols",
+    "relationships",
+    "dependencies",
+    "impact",
+    "dataflow",
+    "entrypoints",
+    "configuration",
+    "testing",
+    "polyglot"
+  ],
+  "questions": [
+    {
+      "id": "arch-001",
+      "category": "architecture",
+      "question": "What is the main entry point of the project?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_match"
+    },
+    {
+      "id": "arch-002",
+      "category": "architecture",
+      "question": "What are the top-level modules or packages?",
+      "search_query": "mod module package",
+      "expected_entities": [],
+      "expected_relationships": [["contains", "mod"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "arch-003",
+      "category": "architecture",
+      "question": "What external dependencies does the project use?",
+      "search_query": "use import require dependency",
+      "expected_entities": [],
+      "expected_relationships": [["imports", "depends_on"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "arch-004",
+      "category": "architecture",
+      "question": "What is the project's module hierarchy?",
+      "search_query": "mod module package",
+      "expected_entities": [],
+      "expected_relationships": [["contains"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "arch-005",
+      "category": "architecture",
+      "question": "What are the public APIs exposed by the project?",
+      "search_query": "pub public export",
+      "expected_entities": [],
+      "expected_relationships": [["exports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "sym-001",
+      "category": "symbols",
+      "question": "List all public functions in the project",
+      "search_query": "fn function",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "function"
+    },
+    {
+      "id": "sym-002",
+      "category": "symbols",
+      "question": "What public structs or classes are defined?",
+      "search_query": "struct class",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "struct"
+    },
+    {
+      "id": "sym-003",
+      "category": "symbols",
+      "question": "What enums or union types are defined?",
+      "search_query": "enum union",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "enum"
+    },
+    {
+      "id": "sym-004",
+      "category": "symbols",
+      "question": "What traits, interfaces, or protocols are defined?",
+      "search_query": "trait interface protocol",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "trait"
+    },
+    {
+      "id": "sym-005",
+      "category": "symbols",
+      "question": "What type aliases or type definitions exist?",
+      "search_query": "type typealias",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "type_alias"
+    },
+    {
+      "id": "sym-006",
+      "category": "symbols",
+      "question": "What constants or static variables are defined?",
+      "search_query": "const static",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "constant"
+    },
+    {
+      "id": "sym-007",
+      "category": "symbols",
+      "question": "What modules or namespaces are defined?",
+      "search_query": "mod module namespace",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "module"
+    },
+    {
+      "id": "rel-001",
+      "category": "relationships",
+      "question": "What functions does the main function call?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_precision"
+    },
+    {
+      "id": "rel-002",
+      "category": "relationships",
+      "question": "What calls the main function?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["called_by"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "rel-003",
+      "category": "relationships",
+      "question": "What types implement a given trait or interface?",
+      "search_query": "impl implement",
+      "expected_entities": [],
+      "expected_relationships": [["implements", "extends"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "rel-004",
+      "category": "relationships",
+      "question": "What modules import a given module?",
+      "search_query": "use import",
+      "expected_entities": [],
+      "expected_relationships": [["imports", "depends_on"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "rel-005",
+      "category": "relationships",
+      "question": "What is the call graph depth from main?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["calls", "called_by"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "dep-001",
+      "category": "dependencies",
+      "question": "What are the direct dependencies of the main module?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["depends_on", "imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "dep-002",
+      "category": "dependencies",
+      "question": "What are the transitive dependencies of the main module?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["depends_on", "imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "dep-003",
+      "category": "dependencies",
+      "question": "Which modules have no dependents (leaf modules)?",
+      "search_query": "mod module",
+      "expected_entities": [],
+      "expected_relationships": [["depended_by"]],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "dep-004",
+      "category": "dependencies",
+      "question": "What are the circular dependencies in the project?",
+      "search_query": "depends_on",
+      "expected_entities": [],
+      "expected_relationships": [["depends_on"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "dep-005",
+      "category": "dependencies",
+      "question": "What external crates/packages are directly imported?",
+      "search_query": "use import extern crate",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "imp-001",
+      "category": "impact",
+      "question": "If the main function changes, what is directly affected?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["called_by", "depends_on"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "imp-002",
+      "category": "impact",
+      "question": "What files would be affected by changing the core data structure?",
+      "search_query": "struct class",
+      "expected_entities": [],
+      "expected_relationships": [["contains", "has_field", "uses"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "imp-003",
+      "category": "impact",
+      "question": "What is the transitive impact of changing a public API function?",
+      "search_query": "pub public fn",
+      "expected_entities": [],
+      "expected_relationships": [["called_by", "depends_on"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "imp-004",
+      "category": "impact",
+      "question": "What configuration changes would break the build?",
+      "search_query": "config",
+      "expected_entities": [],
+      "expected_relationships": [["depends_on", "imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "imp-005",
+      "category": "impact",
+      "question": "What tests would need updating if a core type changes?",
+      "search_query": "test mock fixture",
+      "expected_entities": [],
+      "expected_relationships": [["tests", "depends_on"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "df-001",
+      "category": "dataflow",
+      "question": "Where does data flow from the entry point?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["calls", "passes_to", "returns"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "df-002",
+      "category": "dataflow",
+      "question": "Where are error types defined and propagated?",
+      "search_query": "error Result Err",
+      "expected_entities": [],
+      "expected_relationships": [["returns", "throws"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "df-003",
+      "category": "dataflow",
+      "question": "What async operations are performed and where?",
+      "search_query": "async await Future",
+      "expected_entities": [],
+      "expected_relationships": [["calls", "returns"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "ep-001",
+      "category": "entrypoints",
+      "question": "What are all the entry points (main, tests, benches)?",
+      "search_query": "main test bench",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "ep-002",
+      "category": "entrypoints",
+      "question": "What CLI commands or HTTP endpoints are exposed?",
+      "search_query": "clap actix axum warp rocket handler route",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "cfg-001",
+      "category": "configuration",
+      "question": "What configuration options does the project accept?",
+      "search_query": "config Config config",
+      "expected_entities": [],
+      "expected_relationships": [["contains", "has_field"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "cfg-002",
+      "category": "configuration",
+      "question": "What environment variables does the project read?",
+      "search_query": "env var environment",
+      "expected_entities": [],
+      "expected_relationships": [["reads"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "tst-001",
+      "category": "testing",
+      "question": "What test utilities and helpers are available?",
+      "search_query": "test mock fixture bench",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "function"
+    },
+    {
+      "id": "tst-002",
+      "category": "testing",
+      "question": "What integration tests exist?",
+      "search_query": "test integration",
+      "expected_entities": [],
+      "expected_relationships": [["tests"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "tst-003",
+      "category": "testing",
+      "question": "What are the benchmark functions?",
+      "search_query": "bench benchmark",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "poly-001",
+      "category": "polyglot",
+      "question": "What languages are used in this repository?",
+      "search_query": "",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "poly-002",
+      "category": "polyglot",
+      "question": "What cross-language boundaries exist (e.g., FFI, gRPC, HTTP)?",
+      "search_query": "extern ffi grpc http proto",
+      "expected_entities": [],
+      "expected_relationships": [["calls", "depends_on"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    }
+  ]
+}

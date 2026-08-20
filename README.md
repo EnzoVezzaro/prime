@@ -10,6 +10,43 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 **Research into a universal, language-agnostic representation that lets next-generation agents understand and operate on codebases without retrieving the underlying source.**
+</div>
+
+---
+
+## ⚠️ Work in Progress
+
+Still figuring itself out. We're just building, experimenting, chasing weird ideas, and seeing where they take us. Thanks for sticking around.
+
+This project is still very much alive and under active development. Some parts work. Some parts don't. Some parts work until they suddenly don't.
+
+Expect:
+
+🧪 Experimental ideas  
+🛠️ Things being rebuilt from scratch  
+💥 Occasional breakage  
+🌀 Features that may change direction  
+✨ Unexpectedly good ideas  
+🤷 The occasional "well, that wasn't supposed to happen"
+
+The goal right now isn't to make everything look finished.
+
+It's to build, experiment, break things, learn, and keep making it better.
+
+If you're looking for something polished and predictable... this might be a little early. 😄
+
+---
+
+---
+
+# Prime
+
+### The smallest useful representation of a codebase for agents.
+
+[![Status: Research](https://img.shields.io/badge/status-research-red?style=for-the-badge)](#status)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
+**Research into a universal, language-agnostic representation that lets next-generation agents understand and operate on codebases without retrieving the underlying source.**
 
 </div>
 
@@ -1430,3 +1467,53 @@ Not more search results.
 More understanding achieved.**
 
 That is Prime.
+
+---
+
+# Performance
+
+<!-- PRIME_BENCHMARK_START -->
+Latest benchmark:
+
+| Metric | Result |
+|--------|-------:|
+| Derivation | 1.26 s |
+| Artifact size | 8.2 MB |
+| Artifact/Source ratio | 0.894 |
+| Retrieval p50 (warm) | 5.8 ms |
+| Retrieval p95 (warm) | 6.9 ms |
+| Accuracy | 5.9% |
+| Source-free accuracy | 5.9% |
+| Entity precision | 0.25 |
+| Entity recall | 0.29 |
+| Entity F1 | 0.27 |
+| Relationship precision | 0.00 |
+| Relationship recall | 0.00 |
+| Relationship F1 | 0.00 |
+| MRR | 0.29 |
+| Recall@1 | 0.1% |
+| Recall@3 | 0.1% |
+| Recall@5 | 0.1% |
+| Recall@10 | 0.1% |
+
+Repository: `ripgrep` (rust, medium)
+Repository: `rich` (python, medium)
+Repository: `fastapi` (python, medium)
+Repository: `fastjson` (java, medium)
+Repository: `redis` (c, medium)
+Repository: `vapor` (swift, medium)
+Repository: `ktor` (kotlin, medium)
+
+Integrity: ✅ Valid
+Repos: 7/7 completed
+Warnings: ripgrep: source savings not measured (requires controlled baseline), rich: source savings not measured (requires controlled baseline), fastapi: source savings not measured (requires controlled baseline), fastjson: source savings not measured (requires controlled baseline), redis: source savings not measured (requires controlled baseline), vapor: source savings not measured (requires controlled baseline), ktor: source savings not measured (requires controlled baseline)
+
+Commit: `c1470f620444`
+Benchmark version: 1.0.0
+
+Environment: macos / aarch64 / Apple M2
+
+Full machine-readable result: [`benchmarks/results/latest.json`](benchmarks/results/latest.json)
+<!-- PRIME_BENCHMARK_END -->
+
+Full machine-readable result: [`benchmarks/results/latest.json`](benchmarks/results/latest.json)

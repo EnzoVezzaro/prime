@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Prime API Server
+  prime-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PRIME_STORAGE_PATH=/data/prime
+      - PRIME_LOG_LEVEL=info
+      - RUST_LOG=info
+    volumes:
+      - prime-data:/data/prime
+      - ./examples:/workspace:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: Redis for caching (if needed)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    profiles:
+      - with-cache
+
+  # Optional: PostgreSQL for persistent storage (if needed)
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: prime
+      POSTGRES_USER: prime
+      POSTGRES_PASSWORD: prime
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    profiles:
+      - with-db
+
+volumes:
+  prime-data:
+  redis-data:
+  postgres-data:
+
+networks:
+  default:
+    name: prime-network

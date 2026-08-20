@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Prime Benchmark Result",
+  "description": "Canonical result format for Prime benchmark executions. Every value must come from an actual benchmark run — never fabricated.",
+  "type": "object",
+  "required": ["schema", "schema_version", "benchmark", "prime", "environment", "corpus", "benchmarks", "bmf", "status"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "prime-benchmark-result"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "benchmark": {
+      "type": "object",
+      "required": ["name", "version", "timestamp", "git_commit", "dirty"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "git_commit": { "type": "string", "minLength": 7, "maxLength": 40 },
+        "dirty": { "type": "boolean" }
+      }
+    },
+    "prime": {
+      "type": "object",
+      "required": ["version", "git_commit"],
+      "properties": {
+        "version": { "type": "string" },
+        "git_commit": { "type": "string", "minLength": 7, "maxLength": 40 }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": ["os", "arch", "cpu", "cpu_cores", "memory_bytes", "runtime", "runtime_version"],
+      "properties": {
+        "os": { "type": "string" },
+        "arch": { "type": "string" },
+        "cpu": { "type": "string" },
+        "cpu_cores": { "type": "integer", "minimum": 1 },
+        "memory_bytes": { "type": "integer", "minimum": 0 },
+        "runtime": { "type": "string" },
+        "runtime_version": { "type": "string" },
+        "compiler_version": { "type": "string" },
+        "kernel_version": { "type": "string" }
+      }
+    },
+    "corpus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "language", "commit", "files", "source_bytes", "lines_of_code"],
+        "properties": {
+          "name": { "type": "string" },
+          "language": { "type": "string" },
+          "size_category": { "type": "string", "enum": ["small", "medium", "large", "very_large"] },
+          "commit": { "type": "string", "minLength": 7, "maxLength": 40 },
+          "url": { "type": "string", "format": "uri" },
+          "files": { "type": "integer", "minimum": 0 },
+          "source_bytes": { "type": "integer", "minimum": 0 },
+          "lines_of_code": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "benchmarks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "repo_name": { "type": "string" },
+          "status": { "$ref": "#/definitions/benchmark_status" },
+          "derivation": { "$ref": "#/definitions/derivation_metrics" },
+          "artifact": { "$ref": "#/definitions/artifact_metrics" },
+          "retrieval": { "$ref": "#/definitions/retrieval_metrics" },
+          "knowledge": { "$ref": "#/definitions/knowledge_metrics" },
+          "source_savings": { "$ref": "#/definitions/source_savings_metrics" }
+        }
+      }
+    },
+    "bmf": {
+      "type": "object",
+      "description": "Bencher Metric Format compatible metrics derived from benchmark results",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "number" },
+          "unit": { "type": "string" }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["complete", "partial", "not_run", "failed"]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Required when status is not 'complete'"
+    }
+  },
+  "definitions": {
+    "benchmark_status": {
+      "type": "string",
+      "enum": ["complete", "partial", "not_run", "failed", "skipped"]
+    },
+    "latency_stats": {
+      "type": "object",
+      "properties": {
+        "min": { "type": "number", "minimum": 0 },
+        "mean": { "type": "number", "minimum": 0 },
+        "median": { "type": "number", "minimum": 0 },
+        "p95": { "type": "number", "minimum": 0 },
+        "p99": { "type": "number", "minimum": 0 },
+        "max": { "type": "number", "minimum": 0 },
+        "unit": { "type": "string", "enum": ["ms", "us", "ns"] }
+      }
+    },
+    "latency_stats_us": {
+      "type": "object",
+      "properties": {
+        "min": { "type": "number", "minimum": 0 },
+        "mean": { "type": "number", "minimum": 0 },
+        "median": { "type": "number", "minimum": 0 },
+        "p95": { "type": "number", "minimum": 0 },
+        "p99": { "type": "number", "minimum": 0 },
+        "max": { "type": "number", "minimum": 0 }
+      }
+    },
+    "derivation_metrics": {
+      "type": "object",
+      "properties": {
+        "time_ms": { "type": "number", "minimum": 0 },
+        "files": { "type": "integer", "minimum": 0 },
+        "source_bytes": { "type": "integer", "minimum": 0 },
+        "entities": { "type": "integer", "minimum": 0 },
+        "relations": { "type": "integer", "minimum": 0 },
+        "files_per_second": { "type": "number", "minimum": 0 },
+        "loc_per_second": { "type": "number", "minimum": 0 },
+        "symbols_per_second": { "type": "number", "minimum": 0 },
+        "relationships_per_second": { "type": "number", "minimum": 0 },
+        "peak_memory_bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "artifact_metrics": {
+      "type": "object",
+      "properties": {
+        "source_bytes": { "type": "integer", "minimum": 0 },
+        "artifact_bytes": { "type": "integer", "minimum": 0 },
+        "derived_representation_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "artifact_bytes_per_kloc": { "type": "number", "minimum": 0 }
+      }
+    },
+    "retrieval_metrics": {
+      "type": "object",
+      "properties": {
+        "cold": { "$ref": "#/definitions/latency_stats_us" },
+        "warm": { "$ref": "#/definitions/latency_stats_us" },
+        "search": { "$ref": "#/definitions/latency_stats_us" },
+        "lookup": { "$ref": "#/definitions/latency_stats_us" },
+        "context": { "$ref": "#/definitions/latency_stats_us" },
+        "repeated": { "$ref": "#/definitions/latency_stats_us" }
+      }
+    },
+    "knowledge_metrics": {
+      "type": "object",
+      "properties": {
+        "total_questions": { "type": "integer", "minimum": 0 },
+        "correct": { "type": "integer", "minimum": 0 },
+        "incorrect": { "type": "integer", "minimum": 0 },
+        "source_free_correct": { "type": "integer", "minimum": 0 },
+        "source_required_correct": { "type": "integer", "minimum": 0 },
+        "accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "source_free_accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "entity_precision": { "type": "number", "minimum": 0, "maximum": 1 },
+        "entity_recall": { "type": "number", "minimum": 0, "maximum": 1 },
+        "entity_f1": { "type": "number", "minimum": 0, "maximum": 1 },
+        "relationship_precision": { "type": "number", "minimum": 0, "maximum": 1 },
+        "relationship_recall": { "type": "number", "minimum": 0, "maximum": 1 },
+        "relationship_f1": { "type": "number", "minimum": 0, "maximum": 1 },
+        "mrr": { "type": "number", "minimum": 0 },
+        "recall_at_1": { "type": "number", "minimum": 0, "maximum": 1 },
+        "recall_at_3": { "type": "number", "minimum": 0, "maximum": 1 },
+        "recall_at_5": { "type": "number", "minimum": 0, "maximum": 1 },
+        "recall_at_10": { "type": "number", "minimum": 0, "maximum": 1 },
+        "by_category": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "total": { "type": "integer", "minimum": 0 },
+              "correct": { "type": "integer", "minimum": 0 },
+              "source_free_correct": { "type": "integer", "minimum": 0 },
+              "source_required_correct": { "type": "integer", "minimum": 0 },
+              "accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+              "source_free_accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+              "entity_precision": { "type": "number", "minimum": 0, "maximum": 1 },
+              "entity_recall": { "type": "number", "minimum": 0, "maximum": 1 },
+              "entity_f1": { "type": "number", "minimum": 0, "maximum": 1 },
+              "relationship_precision": { "type": "number", "minimum": 0, "maximum": 1 },
+              "relationship_recall": { "type": "number", "minimum": 0, "maximum": 1 },
+              "relationship_f1": { "type": "number", "minimum": 0, "maximum": 1 },
+              "mrr": { "type": "number", "minimum": 0 },
+              "recall_at_1": { "type": "number", "minimum": 0, "maximum": 1 },
+              "recall_at_3": { "type": "number", "minimum": 0, "maximum": 1 },
+              "recall_at_5": { "type": "number", "minimum": 0, "maximum": 1 },
+              "recall_at_10": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "source_savings_metrics": {
+      "type": "object",
+      "properties": {
+        "source_files_retrieved_baseline": { "type": "integer", "minimum": 0 },
+        "source_files_retrieved_prime": { "type": "integer", "minimum": 0 },
+        "source_bytes_retrieved_baseline": { "type": "integer", "minimum": 0 },
+        "source_bytes_retrieved_prime": { "type": "integer", "minimum": 0 },
+        "reduction_ratio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}

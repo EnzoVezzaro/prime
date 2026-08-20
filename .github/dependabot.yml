@@ -1,0 +1,94 @@
+version: 2
+updates:
+  # Cargo dependencies
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "cargo"
+    commit-message:
+      prefix: "[deps] "
+      prefix-development: "[deps] "
+      include: "scope"
+    groups:
+      rust-std:
+        patterns:
+          - "std*"
+        update-types:
+          - "minor"
+          - "patch"
+      tokio:
+        patterns:
+          - "tokio*"
+        update-types:
+          - "minor"
+          - "patch"
+      serde:
+        patterns:
+          - "serde*"
+        update-types:
+          - "minor"
+          - "patch"
+      clap:
+        patterns:
+          - "clap*"
+        update-types:
+          - "minor"
+          - "patch"
+      tree-sitter:
+        patterns:
+          - "tree-sitter*"
+        update-types:
+          - "minor"
+          - "patch"
+      compression:
+        patterns:
+          - "zstd*"
+          - "lz4*"
+        update-types:
+          - "minor"
+          - "patch"
+      database:
+        patterns:
+          - "sqlx*"
+          - "diesel*"
+          - "redis*"
+        update-types:
+          - "minor"
+          - "patch"
+      web:
+        patterns:
+          - "axum*"
+          - "actix*"
+          - "reqwest*"
+        update-types:
+          - "minor"
+          - "patch"
+      testing:
+        patterns:
+          - "criterion*"
+          - "proptest*"
+          - "mockall*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "[deps] "
+      include: "scope"

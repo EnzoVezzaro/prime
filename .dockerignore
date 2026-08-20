@@ -1,0 +1,67 @@
+# Git
+.git
+.gitignore
+
+# Cargo
+target/
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Test outputs
+coverage/
+*.profraw
+*.profdata
+
+# Documentation
+docs/target/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Prime specific
+.prime/
+.acc/
+.acc-memory.md
+
+# Benchmark outputs
+benchmarks/
+*.csv
+*.json
+
+# Distribution
+dist/
+*.crate

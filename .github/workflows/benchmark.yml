@@ -1,0 +1,95 @@
+name: Benchmark (PR)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-C opt-level=3"
+
+jobs:
+  benchmark:
+    name: Prime PR Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            prime-rs/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('prime-rs/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Build release
+        run: cargo build --release --workspace --manifest-path prime-rs/Cargo.toml
+
+      - name: Run PR benchmark
+        run: |
+          ./prime-rs/target/release/prime \
+            -s /tmp/prime-bench-storage \
+            benchmark \
+            --corpus pr \
+            --output benchmarks/results/latest.json
+
+      - name: Validate result
+        run: python3 benchmarks/scripts/validate-result.py benchmarks/results/latest.json
+
+      - name: Upload result artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-result-${{ github.sha }}
+          path: benchmarks/results/latest.json
+          retention-days: 30
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const result = JSON.parse(fs.readFileSync('benchmarks/results/latest.json', 'utf8'));
+            const benchmarks = result.benchmarks || {};
+
+            let body = '## Prime Benchmark Results\n\n';
+            body += '| Metric | Result |\n|--------|--------|\n';
+
+            if (benchmarks.derivation?.status === 'complete') {
+              const ms = benchmarks.derivation.time_ms?.mean || 0;
+              body += `| Derivation | ${ms < 1000 ? ms.toFixed(0) + ' ms' : (ms/1000).toFixed(2) + ' s'} |\n`;
+            }
+            if (benchmarks.artifact?.status === 'complete') {
+              const bytes = benchmarks.artifact.artifact_bytes || 0;
+              const kb = (bytes / 1024).toFixed(1);
+              body += `| Artifact | ${kb} KB |\n`;
+            }
+            if (benchmarks.retrieval?.status === 'complete') {
+              const warm = benchmarks.retrieval.warm || {};
+              body += `| Retrieval p50 | ${(warm.median || 0).toFixed(0)} µs |\n`;
+              body += `| Retrieval p95 | ${(warm.p95 || 0).toFixed(0)} µs |\n`;
+            }
+            if (benchmarks.knowledge?.status === 'complete') {
+              const rate = (benchmarks.knowledge.source_free_answer_rate || 0) * 100;
+              body += `| Source-free answers | ${rate.toFixed(0)}% |\n`;
+            }
+
+            body += `\nCommit: \`${result.benchmark?.git_commit || 'unknown'}\``;
+            body += `\n\n<details><summary>Full result</summary>\n\n\`\`\`json\n${JSON.stringify(result, null, 2)}\n\`\`\`\n</details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

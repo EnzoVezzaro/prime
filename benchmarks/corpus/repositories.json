@@ -1,0 +1,235 @@
+{
+  "version": "2.0.0",
+  "description": "Prime benchmark corpus with tiered repositories. Repositories are pinned to immutable commits for reproducibility.",
+  "language_matrix": {
+    "rust": {
+      "extensions": ["rs"],
+      "repositories": ["bat", "ripgrep", "fd"],
+      "size_distribution": {"small": 2, "medium": 1, "large": 0}
+    },
+    "python": {
+      "extensions": ["py"],
+      "repositories": ["httpx", "rich", "fastapi"],
+      "size_distribution": {"small": 1, "medium": 2, "large": 0}
+    },
+    "javascript": {
+      "extensions": ["js", "jsx"],
+      "repositories": ["express"],
+      "size_distribution": {"small": 1, "medium": 0, "large": 0}
+    },
+    "typescript": {
+      "extensions": ["ts", "tsx"],
+      "repositories": ["zod", "vitest", "esbuild"],
+      "size_distribution": {"small": 1, "medium": 1, "large": 0}
+    },
+    "go": {
+      "extensions": ["go"],
+      "repositories": ["gin", "echo"],
+      "size_distribution": {"small": 2, "medium": 0, "large": 0}
+    },
+    "java": {
+      "extensions": ["java"],
+      "repositories": ["fastjson"],
+      "size_distribution": {"small": 0, "medium": 1, "large": 0}
+    },
+    "cpp": {
+      "extensions": ["cpp", "hpp", "h", "c"],
+      "repositories": ["spdlog"],
+      "size_distribution": {"small": 1, "medium": 0, "large": 0}
+    },
+    "c": {
+      "extensions": ["c", "h"],
+      "repositories": ["redis"],
+      "size_distribution": {"small": 0, "medium": 1, "large": 0}
+    },
+    "typescript": {
+      "extensions": ["ts"],
+      "repositories": ["zod", "vitest", "esbuild"],
+      "size_distribution": {"small": 1, "medium": 1, "large": 0}
+    }
+  },
+  "repositories": [
+    {
+      "name": "bat",
+      "url": "https://github.com/sharkdp/bat.git",
+      "commit": "v0.24.0",
+      "language": "rust",
+      "size_category": "small",
+      "lines_of_code_estimate": 52570,
+      "file_count_estimate": 369
+    },
+    {
+      "name": "ripgrep",
+      "url": "https://github.com/BurntSushi/ripgrep.git",
+      "commit": "14.1.1",
+      "language": "rust",
+      "size_category": "medium",
+      "lines_of_code_estimate": 85000,
+      "file_count_estimate": 450
+    },
+    {
+      "name": "fd",
+      "url": "https://github.com/sharkdp/fd.git",
+      "commit": "v10.2.0",
+      "language": "rust",
+      "size_category": "small",
+      "lines_of_code_estimate": 25000,
+      "file_count_estimate": 200
+    },
+    {
+      "name": "httpx",
+      "url": "https://github.com/encode/httpx.git",
+      "commit": "0.27.0",
+      "language": "python",
+      "size_category": "small",
+      "lines_of_code_estimate": 23628,
+      "file_count_estimate": 98
+    },
+    {
+      "name": "rich",
+      "url": "https://github.com/Textualize/rich.git",
+      "commit": "v13.9.0",
+      "language": "python",
+      "size_category": "medium",
+      "lines_of_code_estimate": 65000,
+      "file_count_estimate": 350
+    },
+    {
+      "name": "fastapi",
+      "url": "https://github.com/fastapi/fastapi.git",
+      "commit": "0.115.0",
+      "language": "python",
+      "size_category": "medium",
+      "lines_of_code_estimate": 85000,
+      "file_count_estimate": 400
+    },
+    {
+      "name": "express",
+      "url": "https://github.com/expressjs/express.git",
+      "commit": "4.21.0",
+      "language": "javascript",
+      "size_category": "small",
+      "lines_of_code_estimate": 28941,
+      "file_count_estimate": 182
+    },
+    {
+      "name": "zod",
+      "url": "https://github.com/colinhacks/zod.git",
+      "commit": "v3.23.8",
+      "language": "typescript",
+      "size_category": "small",
+      "lines_of_code_estimate": 15000,
+      "file_count_estimate": 80
+    },
+    {
+      "name": "gin",
+      "url": "https://github.com/gin-gonic/gin.git",
+      "commit": "v1.10.0",
+      "language": "go",
+      "size_category": "small",
+      "lines_of_code_estimate": 23762,
+      "file_count_estimate": 111
+    },
+    {
+      "name": "echo",
+      "url": "https://github.com/labstack/echo.git",
+      "commit": "v4.12.0",
+      "language": "go",
+      "size_category": "small",
+      "lines_of_code_estimate": 45000,
+      "file_count_estimate": 250
+    },
+    {
+      "name": "fastjson",
+      "url": "https://github.com/alibaba/fastjson.git",
+      "commit": "1.2.83",
+      "language": "java",
+      "size_category": "medium",
+      "lines_of_code_estimate": 120000,
+      "file_count_estimate": 500
+    },
+    {
+      "name": "spdlog",
+      "url": "https://github.com/gabime/spdlog.git",
+      "commit": "v1.14.1",
+      "language": "cpp",
+      "size_category": "small",
+      "lines_of_code_estimate": 31931,
+      "file_count_estimate": 155
+    },
+    {
+      "name": "redis",
+      "url": "https://github.com/redis/redis.git",
+      "commit": "7.4.0",
+      "language": "c",
+      "size_category": "medium",
+      "lines_of_code_estimate": 250000,
+      "file_count_estimate": 800
+    },
+    {
+      "name": "vitest",
+      "url": "https://github.com/vitest-dev/vitest.git",
+      "commit": "v2.1.0",
+      "language": "typescript",
+      "size_category": "medium",
+      "lines_of_code_estimate": 60000,
+      "file_count_estimate": 300
+    },
+    {
+      "name": "esbuild",
+      "url": "https://github.com/evanw/esbuild.git",
+      "commit": "v0.23.5",
+      "language": "typescript",
+      "size_category": "small",
+      "lines_of_code_estimate": 45000,
+      "file_count_estimate": 200
+    },
+    {
+      "name": "ktor",
+      "url": "https://github.com/ktorio/ktor.git",
+      "commit": "2.3.8",
+      "language": "kotlin",
+      "size_category": "medium",
+      "lines_of_code_estimate": 150000,
+      "file_count_estimate": 600
+    },
+    {
+      "name": "Alamofire",
+      "url": "https://github.com/Alamofire/Alamofire.git",
+      "commit": "5.9.1",
+      "language": "swift",
+      "size_category": "small",
+      "lines_of_code_estimate": 25000,
+      "file_count_estimate": 150
+    },
+    {
+      "name": "vapor",
+      "url": "https://github.com/vapor/vapor.git",
+      "commit": "4.92.0",
+      "language": "swift",
+      "size_category": "medium",
+      "lines_of_code_estimate": 180000,
+      "file_count_estimate": 700
+    }
+  ],
+  "corpus_tiers": {
+    "pr": {
+      "description": "Small subset for PR benchmarks — fast enough for every CI run",
+      "size_category": "small",
+      "max_repos": 5,
+      "repositories": ["bat", "httpx", "express", "gin", "spdlog"]
+    },
+    "nightly": {
+      "description": "Full corpus for nightly regression tracking",
+      "size_category": ["small", "medium"],
+      "max_repos": 15,
+      "repositories": ["*"]
+    },
+    "stress": {
+      "description": "Large repositories for stress testing scaling limits",
+      "size_category": ["medium", "large"],
+      "max_repos": 10,
+      "repositories": ["ripgrep", "rich", "fastapi", "fastjson", "redis", "vapor", "ktor"]
+    }
+  }
+}

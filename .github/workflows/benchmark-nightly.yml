@@ -1,0 +1,79 @@
+name: Benchmark (Nightly)
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # 3 AM UTC daily
+  workflow_dispatch:
+    inputs:
+      corpus:
+        description: 'Benchmark corpus'
+        required: false
+        default: 'nightly'
+        type: choice
+        options:
+          - pr
+          - nightly
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-C opt-level=3"
+
+jobs:
+  benchmark:
+    name: Prime Nightly Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            prime-rs/target
+          key: ${{ runner.os }}-cargo-nightly-${{ hashFiles('prime-rs/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-nightly-
+
+      - name: Build release
+        run: cargo build --release --workspace --manifest-path prime-rs/Cargo.toml
+
+      - name: Run nightly benchmark
+        run: |
+          CORPUS="${{ inputs.corpus || 'nightly' }}"
+          ./prime-rs/target/release/prime \
+            -s /tmp/prime-bench-storage \
+            benchmark \
+            --corpus "$CORPUS" \
+            --output benchmarks/results/latest.json
+
+      - name: Validate result
+        run: python3 benchmarks/scripts/validate-result.py benchmarks/results/latest.json
+
+      - name: Upload result artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-benchmark-${{ github.run_id }}
+          path: benchmarks/results/latest.json
+          retention-days: 90
+
+      - name: Upload result to Bencher (optional)
+        if: env.BENCHER_API_TOKEN != ''
+        continue-on-error: true
+        run: |
+          if command -v bencher &> /dev/null; then
+            bencher run \
+              --adapter json \
+              --file benchmarks/results/latest.json \
+              --project prime \
+              --token "$BENCHER_API_TOKEN"
+          else
+            echo "Bencher CLI not installed, skipping upload"
+          fi
+        env:
+          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}

@@ -1,0 +1,38 @@
+# Prime Code Owners
+# These users/groups will be requested for review when changes are made to matching files.
+
+# Core team
+* @EnzoVezzaro
+
+# Prime Core
+/prime-rs/prime-core/ @EnzoVezzaro
+
+# Parser
+/prime-rs/prime-parser/ @EnzoVezzaro
+
+# Index/Storage
+/prime-rs/prime-index/ @EnzoVezzaro
+
+# Query API
+/prime-rs/prime-query/ @EnzoVezzaro
+
+# CLI
+/prime-rs/prime-cli/ @EnzoVezzaro
+
+# Benchmarks
+/prime-rs/prime-bench/ @EnzoVezzaro
+
+# Documentation
+/docs/ @EnzoVezzaro
+/SPECS/ @EnzoVezzaro
+/README.md @EnzoVezzaro
+
+# Configuration
+/.github/ @EnzoVezzaro
+/.acc/ @EnzoVezzaro
+/AGENTS.md @EnzoVezzaro
+/.acc-memory.md @EnzoVezzaro
+
+# Build/Release
+/Cargo.toml @EnzoVezzaro
+/prime-rs/Cargo.toml @EnzoVezzaro

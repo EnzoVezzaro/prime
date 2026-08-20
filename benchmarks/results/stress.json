@@ -1,0 +1,880 @@
+{
+  "schema": "prime-benchmark-result",
+  "schema_version": "1.0.0",
+  "benchmark": {
+    "name": "Prime Benchmark",
+    "version": "1.0.0",
+    "timestamp": "2026-08-20T13:11:21.689536+00:00",
+    "git_commit": "c1470f620444",
+    "dirty": false
+  },
+  "prime": {
+    "version": "0.1.0",
+    "git_commit": "c1470f620444"
+  },
+  "benchmark_version": "1.0.0",
+  "timestamp": "2026-08-20T13:11:21.689539+00:00",
+  "environment": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpu": "Apple M2",
+    "cpu_cores": 8,
+    "memory_bytes": 17179869184,
+    "runtime": "rustc",
+    "runtime_version": "1.97.1",
+    "compiler_version": "1.97.1",
+    "kernel_version": "25.5.0"
+  },
+  "corpus": [
+    {
+      "name": "ripgrep",
+      "path": "benchmarks/repos/ripgrep",
+      "language": "rust",
+      "size_category": "medium",
+      "commit": "14.1.1",
+      "url": "https://github.com/BurntSushi/ripgrep.git",
+      "files": 450,
+      "source_bytes": 4250000,
+      "lines_of_code": 85000
+    },
+    {
+      "name": "rich",
+      "path": "benchmarks/repos/rich",
+      "language": "python",
+      "size_category": "medium",
+      "commit": "v13.9.0",
+      "url": "https://github.com/Textualize/rich.git",
+      "files": 350,
+      "source_bytes": 3250000,
+      "lines_of_code": 65000
+    },
+    {
+      "name": "fastapi",
+      "path": "benchmarks/repos/fastapi",
+      "language": "python",
+      "size_category": "medium",
+      "commit": "0.115.0",
+      "url": "https://github.com/fastapi/fastapi.git",
+      "files": 400,
+      "source_bytes": 4250000,
+      "lines_of_code": 85000
+    },
+    {
+      "name": "fastjson",
+      "path": "benchmarks/repos/fastjson",
+      "language": "java",
+      "size_category": "medium",
+      "commit": "2.0.53",
+      "url": "https://github.com/alibaba/fastjson.git",
+      "files": 500,
+      "source_bytes": 6000000,
+      "lines_of_code": 120000
+    },
+    {
+      "name": "redis",
+      "path": "benchmarks/repos/redis",
+      "language": "c",
+      "size_category": "medium",
+      "commit": "7.4.0",
+      "url": "https://github.com/redis/redis.git",
+      "files": 800,
+      "source_bytes": 12500000,
+      "lines_of_code": 250000
+    },
+    {
+      "name": "vapor",
+      "path": "benchmarks/repos/vapor",
+      "language": "swift",
+      "size_category": "medium",
+      "commit": "4.92.0",
+      "url": "https://github.com/vapor/vapor.git",
+      "files": 700,
+      "source_bytes": 9000000,
+      "lines_of_code": 180000
+    },
+    {
+      "name": "ktor",
+      "path": "benchmarks/repos/ktor",
+      "language": "kotlin",
+      "size_category": "medium",
+      "commit": "2.3.8",
+      "url": "https://github.com/ktorio/ktor.git",
+      "files": 600,
+      "source_bytes": 7500000,
+      "lines_of_code": 150000
+    }
+  ],
+  "benchmarks": [
+    {
+      "repo_name": "ripgrep",
+      "status": "skipped",
+      "error": "Repository not found locally",
+      "derivation": {
+        "time_ms": 0.0,
+        "files": 0,
+        "source_bytes": 0,
+        "lines_of_code": 0,
+        "non_empty_lines": 0,
+        "entities": 0,
+        "symbols": 0,
+        "relations": 0,
+        "files_per_second": 0.0,
+        "loc_per_second": 0.0,
+        "symbols_per_second": 0.0,
+        "relationships_per_second": 0.0,
+        "peak_memory_bytes": 0,
+        "parse_time_us": 0.0,
+        "index_time_us": 0.0,
+        "serialization_time_us": 0.0
+      },
+      "artifact": {
+        "source_bytes": 0,
+        "artifact_bytes": 0,
+        "artifact_to_source_ratio": 0.0,
+        "source_reduction_ratio": 0.0,
+        "artifact_bytes_per_kloc": 0.0
+      },
+      "retrieval": {
+        "cold": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "warm": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "search": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "lookup": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "context": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "repeated": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "knowledge": {
+        "total_questions": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "source_free_correct": 0,
+        "source_required_correct": 0,
+        "accuracy": 0.0,
+        "source_free_accuracy": 0.0,
+        "entity_precision": 0.0,
+        "entity_recall": 0.0,
+        "entity_f1": 0.0,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
+        "mrr": 0.0,
+        "recall_at_1": 0.0,
+        "recall_at_3": 0.0,
+        "recall_at_5": 0.0,
+        "recall_at_10": 0.0,
+        "by_category": {}
+      },
+      "source_savings": null
+    },
+    {
+      "repo_name": "rich",
+      "status": "skipped",
+      "error": "Repository not found locally",
+      "derivation": {
+        "time_ms": 0.0,
+        "files": 0,
+        "source_bytes": 0,
+        "lines_of_code": 0,
+        "non_empty_lines": 0,
+        "entities": 0,
+        "symbols": 0,
+        "relations": 0,
+        "files_per_second": 0.0,
+        "loc_per_second": 0.0,
+        "symbols_per_second": 0.0,
+        "relationships_per_second": 0.0,
+        "peak_memory_bytes": 0,
+        "parse_time_us": 0.0,
+        "index_time_us": 0.0,
+        "serialization_time_us": 0.0
+      },
+      "artifact": {
+        "source_bytes": 0,
+        "artifact_bytes": 0,
+        "artifact_to_source_ratio": 0.0,
+        "source_reduction_ratio": 0.0,
+        "artifact_bytes_per_kloc": 0.0
+      },
+      "retrieval": {
+        "cold": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "warm": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "search": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "lookup": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "context": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "repeated": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "knowledge": {
+        "total_questions": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "source_free_correct": 0,
+        "source_required_correct": 0,
+        "accuracy": 0.0,
+        "source_free_accuracy": 0.0,
+        "entity_precision": 0.0,
+        "entity_recall": 0.0,
+        "entity_f1": 0.0,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
+        "mrr": 0.0,
+        "recall_at_1": 0.0,
+        "recall_at_3": 0.0,
+        "recall_at_5": 0.0,
+        "recall_at_10": 0.0,
+        "by_category": {}
+      },
+      "source_savings": null
+    },
+    {
+      "repo_name": "fastapi",
+      "status": "skipped",
+      "error": "Repository not found locally",
+      "derivation": {
+        "time_ms": 0.0,
+        "files": 0,
+        "source_bytes": 0,
+        "lines_of_code": 0,
+        "non_empty_lines": 0,
+        "entities": 0,
+        "symbols": 0,
+        "relations": 0,
+        "files_per_second": 0.0,
+        "loc_per_second": 0.0,
+        "symbols_per_second": 0.0,
+        "relationships_per_second": 0.0,
+        "peak_memory_bytes": 0,
+        "parse_time_us": 0.0,
+        "index_time_us": 0.0,
+        "serialization_time_us": 0.0
+      },
+      "artifact": {
+        "source_bytes": 0,
+        "artifact_bytes": 0,
+        "artifact_to_source_ratio": 0.0,
+        "source_reduction_ratio": 0.0,
+        "artifact_bytes_per_kloc": 0.0
+      },
+      "retrieval": {
+        "cold": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "warm": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "search": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "lookup": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "context": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "repeated": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "knowledge": {
+        "total_questions": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "source_free_correct": 0,
+        "source_required_correct": 0,
+        "accuracy": 0.0,
+        "source_free_accuracy": 0.0,
+        "entity_precision": 0.0,
+        "entity_recall": 0.0,
+        "entity_f1": 0.0,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
+        "mrr": 0.0,
+        "recall_at_1": 0.0,
+        "recall_at_3": 0.0,
+        "recall_at_5": 0.0,
+        "recall_at_10": 0.0,
+        "by_category": {}
+      },
+      "source_savings": null
+    },
+    {
+      "repo_name": "fastjson",
+      "status": "skipped",
+      "error": "Repository not found locally",
+      "derivation": {
+        "time_ms": 0.0,
+        "files": 0,
+        "source_bytes": 0,
+        "lines_of_code": 0,
+        "non_empty_lines": 0,
+        "entities": 0,
+        "symbols": 0,
+        "relations": 0,
+        "files_per_second": 0.0,
+        "loc_per_second": 0.0,
+        "symbols_per_second": 0.0,
+        "relationships_per_second": 0.0,
+        "peak_memory_bytes": 0,
+        "parse_time_us": 0.0,
+        "index_time_us": 0.0,
+        "serialization_time_us": 0.0
+      },
+      "artifact": {
+        "source_bytes": 0,
+        "artifact_bytes": 0,
+        "artifact_to_source_ratio": 0.0,
+        "source_reduction_ratio": 0.0,
+        "artifact_bytes_per_kloc": 0.0
+      },
+      "retrieval": {
+        "cold": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "warm": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "search": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "lookup": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "context": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "repeated": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "knowledge": {
+        "total_questions": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "source_free_correct": 0,
+        "source_required_correct": 0,
+        "accuracy": 0.0,
+        "source_free_accuracy": 0.0,
+        "entity_precision": 0.0,
+        "entity_recall": 0.0,
+        "entity_f1": 0.0,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
+        "mrr": 0.0,
+        "recall_at_1": 0.0,
+        "recall_at_3": 0.0,
+        "recall_at_5": 0.0,
+        "recall_at_10": 0.0,
+        "by_category": {}
+      },
+      "source_savings": null
+    },
+    {
+      "repo_name": "redis",
+      "status": "skipped",
+      "error": "Repository not found locally",
+      "derivation": {
+        "time_ms": 0.0,
+        "files": 0,
+        "source_bytes": 0,
+        "lines_of_code": 0,
+        "non_empty_lines": 0,
+        "entities": 0,
+        "symbols": 0,
+        "relations": 0,
+        "files_per_second": 0.0,
+        "loc_per_second": 0.0,
+        "symbols_per_second": 0.0,
+        "relationships_per_second": 0.0,
+        "peak_memory_bytes": 0,
+        "parse_time_us": 0.0,
+        "index_time_us": 0.0,
+        "serialization_time_us": 0.0
+      },
+      "artifact": {
+        "source_bytes": 0,
+        "artifact_bytes": 0,
+        "artifact_to_source_ratio": 0.0,
+        "source_reduction_ratio": 0.0,
+        "artifact_bytes_per_kloc": 0.0
+      },
+      "retrieval": {
+        "cold": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "warm": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "search": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "lookup": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "context": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "repeated": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "knowledge": {
+        "total_questions": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "source_free_correct": 0,
+        "source_required_correct": 0,
+        "accuracy": 0.0,
+        "source_free_accuracy": 0.0,
+        "entity_precision": 0.0,
+        "entity_recall": 0.0,
+        "entity_f1": 0.0,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
+        "mrr": 0.0,
+        "recall_at_1": 0.0,
+        "recall_at_3": 0.0,
+        "recall_at_5": 0.0,
+        "recall_at_10": 0.0,
+        "by_category": {}
+      },
+      "source_savings": null
+    },
+    {
+      "repo_name": "vapor",
+      "status": "skipped",
+      "error": "Repository not found locally",
+      "derivation": {
+        "time_ms": 0.0,
+        "files": 0,
+        "source_bytes": 0,
+        "lines_of_code": 0,
+        "non_empty_lines": 0,
+        "entities": 0,
+        "symbols": 0,
+        "relations": 0,
+        "files_per_second": 0.0,
+        "loc_per_second": 0.0,
+        "symbols_per_second": 0.0,
+        "relationships_per_second": 0.0,
+        "peak_memory_bytes": 0,
+        "parse_time_us": 0.0,
+        "index_time_us": 0.0,
+        "serialization_time_us": 0.0
+      },
+      "artifact": {
+        "source_bytes": 0,
+        "artifact_bytes": 0,
+        "artifact_to_source_ratio": 0.0,
+        "source_reduction_ratio": 0.0,
+        "artifact_bytes_per_kloc": 0.0
+      },
+      "retrieval": {
+        "cold": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "warm": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "search": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "lookup": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "context": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "repeated": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "knowledge": {
+        "total_questions": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "source_free_correct": 0,
+        "source_required_correct": 0,
+        "accuracy": 0.0,
+        "source_free_accuracy": 0.0,
+        "entity_precision": 0.0,
+        "entity_recall": 0.0,
+        "entity_f1": 0.0,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
+        "mrr": 0.0,
+        "recall_at_1": 0.0,
+        "recall_at_3": 0.0,
+        "recall_at_5": 0.0,
+        "recall_at_10": 0.0,
+        "by_category": {}
+      },
+      "source_savings": null
+    },
+    {
+      "repo_name": "ktor",
+      "status": "skipped",
+      "error": "Repository not found locally",
+      "derivation": {
+        "time_ms": 0.0,
+        "files": 0,
+        "source_bytes": 0,
+        "lines_of_code": 0,
+        "non_empty_lines": 0,
+        "entities": 0,
+        "symbols": 0,
+        "relations": 0,
+        "files_per_second": 0.0,
+        "loc_per_second": 0.0,
+        "symbols_per_second": 0.0,
+        "relationships_per_second": 0.0,
+        "peak_memory_bytes": 0,
+        "parse_time_us": 0.0,
+        "index_time_us": 0.0,
+        "serialization_time_us": 0.0
+      },
+      "artifact": {
+        "source_bytes": 0,
+        "artifact_bytes": 0,
+        "artifact_to_source_ratio": 0.0,
+        "source_reduction_ratio": 0.0,
+        "artifact_bytes_per_kloc": 0.0
+      },
+      "retrieval": {
+        "cold": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "warm": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "search": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "lookup": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "context": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "repeated": {
+          "samples": 0,
+          "min": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "knowledge": {
+        "total_questions": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "source_free_correct": 0,
+        "source_required_correct": 0,
+        "accuracy": 0.0,
+        "source_free_accuracy": 0.0,
+        "entity_precision": 0.0,
+        "entity_recall": 0.0,
+        "entity_f1": 0.0,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
+        "mrr": 0.0,
+        "recall_at_1": 0.0,
+        "recall_at_3": 0.0,
+        "recall_at_5": 0.0,
+        "recall_at_10": 0.0,
+        "by_category": {}
+      },
+      "source_savings": null
+    }
+  ],
+  "bmf": {},
+  "integrity": {
+    "valid": false,
+    "repositories_expected": 7,
+    "repositories_completed": 0,
+    "repositories_failed": 0,
+    "repositories_skipped": 7,
+    "metrics_valid": true,
+    "warnings": [
+      "7 repositories skipped (not found locally)"
+    ],
+    "errors": []
+  },
+  "status": "failed",
+  "reason": null
+}

@@ -1,2 +1,6 @@
+target/
 .acc-memory.md
 .acc/state/rollback/
+benchmarks/repos/
+prime-rs/benchmarks/repos/
+prime-rs/target/
