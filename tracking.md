@@ -10,20 +10,20 @@
 
 | Category | Total | Completed | In Progress | Remaining |
 |----------|-------|-----------|-------------|-----------|
-| Prior Art Research (17 repos) | 17 | 17 | 0 | 0 |
+| Prior Art Research (18 repos) | 18 | 18 | 0 | 0 |
 | Synthesis Documents | 6 | 6 | 0 | 0 |
 | Final Deliverable | 1 | 1 | 0 | 0 |
-| Implementation (Phases 1-2) | 12 | 11 | 0 | 1 |
+| Implementation (Phases 1-2) | 12 | 12 | 0 | 0 |
 | Research Artifacts (from spec) | 30 | 8 | 0 | 22 |
-| Benchmarking | 25 | 4 | 0 | 21 |
+| Benchmarking | 25 | 5 | 0 | 20 |
 | Architecture Investigation | 10 | 2 | 0 | 8 |
-| **Total** | **101** | **49** | **0** | **52** |
+| **Total** | **102** | **52** | **0** | **50** |
 
-**Overall Progress:** █████████░░░░░░░░░░░░ 49%
+**Overall Progress:** ██████████░░░░░░░░░░░ 51%
 
 ---
 
-## Part 1: Prior Art Research (17 Repos) ✅
+## Part 1: Prior Art Research (18 Repos) ✅
 
 | # | Repository | Status | File | Key Findings |
 |---|------------|--------|------|--------------|
@@ -44,6 +44,7 @@
 | 15 | CodeQL | ✅ | `research/prior-art/codeql.md` | Semantic databases, relational facts |
 | 16 | OpenGrok | ✅ | `research/prior-art/opengrok.md` | Large-scale source indexing |
 | 17 | Cognee | ✅ | `research/prior-art/cognee.md` | Knowledge lifecycle, enrichment, query routing |
+| 18 | OpenWiki | ✅ | `research/prior-art/openwiki.md` | Agent-generated knowledge, Grounded Claims, incremental maintenance |
 
 ---
 
@@ -156,16 +157,13 @@
 | gin (Go) | 1,411 | 33,958 | 0.0% | 0.000 |
 | spdlog (C++) | 1,040 | 50,110 | 0.0% | 0.000 |
 
-### Key Finding
+### Root Cause: Index Rebuild Fix ✅
 
 **Root cause of Relationship F1=0.00 was missing index rebuild after storage load.**
 
 Fixed by adding `build_indexes()` call in `StorageManager::load()` and `QueryEngine::new()`.
 
 Result: Relationship F1 improved from 0.00 to 0.14 (bat/httpx only).
-| Recall@10 | 0.1% | >80% | 🔴 Critical |
-| Retrieval p50 | 169µs | <200µs | ✅ Good |
-| Artifact size | 1.2MB | <2MB | ✅ Good |
 
 ### Priority Order (from spec)
 
@@ -187,71 +185,27 @@ latency
 
 ## Part 7: Benchmark Dataset (from Spec)
 
-### Symbol Questions ❌
+### Created Benchmark Questions ✅
 
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 1 | Where is X? | ⏳ | Need to create |
-| 2 | What is X? | ⏳ | Need to create |
-| 3 | What does X represent? | ⏳ | Need to create |
+| # | Question Type | Status | Notes |
+|---|---------------|--------|-------|
+| 1 | Symbol questions (5) | ✅ | "What is the main entry point?" etc. |
+| 2 | Call questions (3) | ✅ | "What functions call other functions?" etc. |
+| 3 | Import questions (3) | ✅ | "What modules import other modules?" etc. |
+| 4 | Export questions (2) | ✅ | "What public APIs are exposed?" etc. |
+| 5 | FlowsTo questions (2) | ✅ | "Where does data flow?" etc. |
+| 6 | Instantiate questions (2) | ✅ | "Where are objects created?" etc. |
+| 7 | Dependency questions (3) | ✅ | "What are the direct dependencies?" etc. |
+| 8 | Architecture questions (2) | ✅ | "What is the project structure?" etc. |
+| 9 | Impact questions (3) | ✅ | "What would be affected if a core type changes?" etc. |
 
-### Dependency Questions ❌
+**Total:** 25 questions across 9 categories
 
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 4 | What does X depend on? | ⏳ | Need to create |
-| 5 | What depends on X? | ⏳ | Need to create |
+### Ground Truth Status
 
-### Call Questions ❌
+The benchmark questions are **repo-agnostic** (generic queries), not **repo-specific** with ground truth answers. This is a significant limitation. The spec requires ground truth answers for every question.
 
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 6 | Who calls X? | ⏳ | Need to create |
-| 7 | What does X call? | ⏳ | Need to create |
-
-### Type Questions ❌
-
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 8 | What implements X? | ⏳ | Need to create |
-| 9 | What does X implement? | ⏳ | Need to create |
-| 10 | What inherits from X? | ⏳ | Need to create |
-
-### Reference Questions ❌
-
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 11 | Where is X referenced? | ⏳ | Need to create |
-| 12 | What uses X? | ⏳ | Need to create |
-
-### Architecture Questions ❌
-
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 13 | What module contains X? | ⏳ | Need to create |
-| 14 | What components communicate with X? | ⏳ | Need to create |
-| 15 | What is the dependency chain around X? | ⏳ | Need to create |
-
-### Test Questions ❌
-
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 16 | What tests X? | ⏳ | Need to create |
-| 17 | Which tests depend on X? | ⏳ | Need to create |
-
-### Impact Questions ❌
-
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 18 | What could break if X changes? | ⏳ | Need to create |
-
-### Contract Questions ❌
-
-| # | Question Type | Status | Ground Truth |
-|---|---------------|--------|--------------|
-| 19 | What does X return? | ⏳ | Need to create |
-| 20 | What can X throw? | ⏳ | Need to create |
-| 21 | What inputs does X require? | ⏳ | Need to create |
+**Next Step:** Create repo-specific benchmark questions with verified ground truth for each of the 5 benchmark repos.
 
 ---
 
@@ -465,14 +419,29 @@ latency
 
 ---
 
+## Part 18: OpenWiki Research ✅
+
+| Concept | Status | Prime Adaptation |
+|---------|--------|------------------|
+| Grounded Claims (evidence-backed propositions) | ✅ | Investigate per-fact evidence versioning |
+| Incremental knowledge maintenance via Git | ✅ | Model as Git-aware knowledge compiler |
+| Evidence versioning | ✅ | Content hash per fact for invalidation |
+| Two-level architecture (deterministic + agent) | ✅ | Deterministic base + optional agent enrichment |
+| OKF format (typed knowledge units) | ✅ | Investigate typed knowledge units with lifecycle metadata |
+| AGENTS.md integration | ✅ | MCP-based agent discovery (already implemented) |
+| Human-readable wiki output | ✅ | Not Prime's goal — Prime is machine-optimized |
+| LLM-based synthesis | ✅ | Not Prime's primary method — use static analysis |
+
+---
+
 ## Next Steps (Priority Order)
 
 ### Immediate (This Week)
 
-1. ✅ **Create benchmark dataset** with ground truth answers
-2. ✅ **Fix index rebuild** after storage load (root cause of Rel F1=0)
-3. **Improve entity extraction** for JS/Go (express=0 entities, gin=0% accuracy)
-4. **Increase Relationship F1** from 0.14 to >0.30
+1. **Fix entity extraction** for JS (express=0 entities) — tree-sitter query issues
+2. **Increase Relationship F1** from 0.14 to >0.30
+3. **Create repo-specific benchmark questions** with ground truth answers
+4. **Test incremental updates** at scale (10 files, 1%, 10%, branch switch)
 
 ### Short-term (Next 2 Weeks)
 
@@ -487,6 +456,7 @@ latency
 10. **Identity system** (SCIP symbols, stable IDs)
 11. **Provenance system** (revision IDs, Merkle structures)
 12. **Filesystem benchmark** (cold/warm scan, concurrent derivation)
+13. **OpenWiki-style incremental maintenance** (Git-aware knowledge compiler)
 
 ---
 
@@ -506,8 +476,8 @@ latency
 
 ---
 
-**Research Phase:** ✅ Complete (17/17 repos)
-**Implementation Phase:** 🔄 In Progress (11/16 tasks)
+**Research Phase:** ✅ Complete (18/18 repos)
+**Implementation Phase:** ✅ Complete (12/12 tasks)
 **Benchmarking Phase:** 🔄 In Progress (5/25 tasks)
 **Architecture Investigation:** ⏳ Not Started (2/10 tasks)
 
