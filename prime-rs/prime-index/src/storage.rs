@@ -294,7 +294,12 @@ impl StorageManager {
     }
 
     pub fn load(&mut self) -> Result<KnowledgeGraph> {
-        self.backend.load()
+        let mut graph = self.backend.load()?;
+        // Build indexes if they weren't serialized (they use #[serde(skip)])
+        if graph.name_index.is_none() || graph.relation_index.is_none() {
+            graph.build_indexes();
+        }
+        Ok(graph)
     }
 
     pub fn exists(&self) -> bool {

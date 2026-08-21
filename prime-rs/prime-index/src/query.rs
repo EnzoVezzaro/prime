@@ -85,7 +85,11 @@ pub struct QueryEngine {
 }
 
 impl QueryEngine {
-    pub fn new(graph: prime_core::KnowledgeGraph) -> Self {
+    pub fn new(mut graph: prime_core::KnowledgeGraph) -> Self {
+        // Build indexes if they weren't serialized
+        if graph.name_index.is_none() || graph.relation_index.is_none() {
+            graph.build_indexes();
+        }
         Self {
             graph: Arc::new(graph),
         }

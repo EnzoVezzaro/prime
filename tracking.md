@@ -10,20 +10,20 @@
 
 | Category | Total | Completed | In Progress | Remaining |
 |----------|-------|-----------|-------------|-----------|
-| Prior Art Research (16 repos) | 16 | 16 | 0 | 0 |
+| Prior Art Research (17 repos) | 17 | 17 | 0 | 0 |
 | Synthesis Documents | 6 | 6 | 0 | 0 |
 | Final Deliverable | 1 | 1 | 0 | 0 |
 | Implementation (Phases 1-2) | 12 | 11 | 0 | 1 |
 | Research Artifacts (from spec) | 30 | 8 | 0 | 22 |
 | Benchmarking | 25 | 4 | 0 | 21 |
 | Architecture Investigation | 10 | 2 | 0 | 8 |
-| **Total** | **100** | **48** | **0** | **52** |
+| **Total** | **101** | **49** | **0** | **52** |
 
-**Overall Progress:** █████████░░░░░░░░░░░░ 48%
+**Overall Progress:** █████████░░░░░░░░░░░░ 49%
 
 ---
 
-## Part 1: Prior Art Research (16 Repos) ✅
+## Part 1: Prior Art Research (17 Repos) ✅
 
 | # | Repository | Status | File | Key Findings |
 |---|------------|--------|------|--------------|
@@ -43,6 +43,7 @@
 | 14 | Kythe | ✅ | `research/prior-art/kythe.md` | Language-independent indexing, facts |
 | 15 | CodeQL | ✅ | `research/prior-art/codeql.md` | Semantic databases, relational facts |
 | 16 | OpenGrok | ✅ | `research/prior-art/opengrok.md` | Large-scale source indexing |
+| 17 | Cognee | ✅ | `research/prior-art/cognee.md` | Knowledge lifecycle, enrichment, query routing |
 
 ---
 
@@ -136,16 +137,32 @@
 
 ## Part 6: Critical Benchmark Problem
 
-### Current Benchmark Status
+### Current Benchmark Status (PR Corpus)
 
-| Metric | Current | Target | Status |
-|--------|---------|--------|--------|
-| Relationship F1 | 0.00 | >0.50 | 🔴 Critical |
-| Relationship Precision | 0.00 | >0.70 | 🔴 Critical |
-| Relationship Recall | 0.00 | >0.50 | 🔴 Critical |
-| Entity F1 | 0.37 | >0.80 | 🟡 Needs work |
-| Source-free Accuracy | 8.2% | >60% | 🔴 Critical |
-| Recall@1 | 0.1% | >50% | 🔴 Critical |
+| Metric | Before | After | Target | Status |
+|--------|--------|-------|--------|--------|
+| Relationship F1 | 0.00 | 0.14 | >0.50 | 🟡 Improving |
+| Entity F1 | 0.37 | 0.57 | >0.80 | 🟡 Improving |
+| Source-free Accuracy | 8.2% | 1.6% | >60% | 🔴 Needs work |
+| Accuracy | 0.0% | 1.6% | >60% | 🔴 Needs work |
+
+### Benchmark by Repo
+
+| Repo | Entities | Relations | Accuracy | Rel F1 |
+|------|----------|-----------|----------|--------|
+| bat (Rust) | 731 | 46,034 | 4.0% | 0.095 |
+| httpx (Python) | 1,075 | 38,453 | 4.0% | 0.182 |
+| express (JS) | 0 | 29,931 | 0.0% | 0.000 |
+| gin (Go) | 1,411 | 33,958 | 0.0% | 0.000 |
+| spdlog (C++) | 1,040 | 50,110 | 0.0% | 0.000 |
+
+### Key Finding
+
+**Root cause of Relationship F1=0.00 was missing index rebuild after storage load.**
+
+Fixed by adding `build_indexes()` call in `StorageManager::load()` and `QueryEngine::new()`.
+
+Result: Relationship F1 improved from 0.00 to 0.14 (bat/httpx only).
 | Recall@10 | 0.1% | >80% | 🔴 Critical |
 | Retrieval p50 | 169µs | <200µs | ✅ Good |
 | Artifact size | 1.2MB | <2MB | ✅ Good |
@@ -452,10 +469,10 @@ latency
 
 ### Immediate (This Week)
 
-1. **Create benchmark dataset** with ground truth answers
-2. **Implement baseline comparisons** (grep, ripgrep, LSP)
-3. **Measure relationship precision/recall** on real codebases
-4. **Fix Relationship F1** from 0.00 to >0.50
+1. ✅ **Create benchmark dataset** with ground truth answers
+2. ✅ **Fix index rebuild** after storage load (root cause of Rel F1=0)
+3. **Improve entity extraction** for JS/Go (express=0 entities, gin=0% accuracy)
+4. **Increase Relationship F1** from 0.14 to >0.30
 
 ### Short-term (Next 2 Weeks)
 
@@ -483,14 +500,15 @@ latency
 | Build Time | 4.79s | 4.19s | +14% | <5s |
 | Cold Query | 52µs | 209µs | -75% | <100µs |
 | Incremental Speedup | 70x | — | — | >50x |
-| Source-free Accuracy | 8.2% | 8.2% | 0% | >60% |
-| Relationship F1 | 0.00 | 0.00 | 0% | >0.50 |
+| Source-free Accuracy | 1.6% | 8.2% | -80% | >60% |
+| Relationship F1 | 0.14 | 0.00 | +∞ | >0.50 |
+| Entity F1 | 0.57 | 0.37 | +54% | >0.80 |
 
 ---
 
-**Research Phase:** ✅ Complete (16/16 repos)
+**Research Phase:** ✅ Complete (17/17 repos)
 **Implementation Phase:** 🔄 In Progress (11/16 tasks)
-**Benchmarking Phase:** ⏳ Not Started (0/25 tasks)
+**Benchmarking Phase:** 🔄 In Progress (5/25 tasks)
 **Architecture Investigation:** ⏳ Not Started (2/10 tasks)
 
 **Owner:** Research Team
