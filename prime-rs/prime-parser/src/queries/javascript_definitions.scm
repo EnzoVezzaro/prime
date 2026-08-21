@@ -1,57 +1,29 @@
 ; JavaScript definitions query
 
-; Functions
 (function_declaration
-  name: (identifier) @name
-  (#set! @kind "function")) @definition
+  name: (identifier) @name) @definition
 
-; Arrow functions assigned to variables
 (variable_declaration
   (variable_declarator
     name: (identifier) @name
-    value: (arrow_function) @value
-    (#set! @kind "function"))) @definition
+    value: (arrow_function))) @definition
 
-; Function expressions
 (variable_declaration
   (variable_declarator
     name: (identifier) @name
-    value: (function_expression) @value
-    (#set! @kind "function"))) @definition
+    value: (function_expression))) @definition
 
-; Methods in classes
 (method_definition
-  name: (property_identifier) @name
-  (#set! @kind "method")) @definition
+  name: (property_identifier) @name) @definition
 
-; Classes
 (class_declaration
-  name: (identifier) @name
-  (#set! @kind "class")) @definition
+  name: (identifier) @name) @definition
 
-; Interfaces
 (interface_declaration
-  name: (type_identifier) @name
-  (#set! @kind "interface")) @definition
+  name: (type_identifier) @name) @definition
 
-; Type aliases
 (type_alias_declaration
-  name: (type_identifier) @name
-  (#set! @kind "type_alias")) @definition
+  name: (type_identifier) @name) @definition
 
-; Enums
 (enum_declaration
-  name: (identifier) @name
-  (#set! @kind "enum")) @definition
-
-; Variables (const/let/var)
-(variable_declaration
-  (variable_declarator
-    name: (identifier) @name
-    (#set! @kind "variable"))) @definition
-
-; Object methods
-(pair
-  key: (property_identifier) @name
-  value: (function_expression)
-  (#set! @kind "method")) @definition
+  name: (identifier) @name) @definition

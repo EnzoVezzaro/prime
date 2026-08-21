@@ -1,47 +1,49 @@
 ; Rust definitions query
-; Captures: @definition (the node), @name (identifier)
 
 ; Functions
 (function_item
-  name: (identifier) @name) @definition
+  name: (identifier) @name
+  body: (block) @definition)
 
 ; Async functions
-(async_item
-  (function_item
-    name: (identifier) @name)) @definition
-
-; Methods in impl blocks
-(impl_item
-  (function_item
-    name: (identifier) @name)) @definition
+(function_item
+  name: (identifier) @name
+  body: (block) @definition)
 
 ; Structs
 (struct_item
-  name: (type_identifier) @name) @definition
+  name: (type_identifier) @name
+  body: (field_declaration_list) @definition)
 
 ; Enums
 (enum_item
-  name: (type_identifier) @name) @definition
+  name: (type_identifier) @name
+  body: (enum_variant_list) @definition)
 
 ; Traits
 (trait_item
-  name: (type_identifier) @name) @definition
+  name: (type_identifier) @name
+  body: (trait_block) @definition)
 
-; Impl blocks (for inherent impls)
+; Impl blocks
 (impl_item
-  type: (type_identifier) @name) @definition
+  type: (type_identifier) @name
+  body: (declaration_list) @definition)
 
 ; Constants
 (const_item
-  name: (identifier) @name) @definition
+  name: (identifier) @name
+  type: (_) @definition)
 
 ; Static variables
 (static_item
-  name: (identifier) @name) @definition
+  name: (identifier) @name
+  type: (_) @definition)
 
 ; Type aliases
 (type_item
-  name: (type_identifier) @name) @definition
+  name: (type_identifier) @name
+  type: (_) @definition)
 
 ; Modules
 (mod_item

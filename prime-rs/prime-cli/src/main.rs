@@ -50,6 +50,17 @@ enum Commands {
         progress: bool,
     },
 
+    /// Update the knowledge graph incrementally
+    Update {
+        /// Specific files to update (if empty, detects all changes)
+        #[arg(short, long)]
+        files: Vec<PathBuf>,
+
+        /// Show progress bar
+        #[arg(short, long, default_value = "true")]
+        progress: bool,
+    },
+
     /// Query the knowledge graph
     Query {
         /// Query string (symbol name, prefix, or search term)
@@ -174,6 +185,9 @@ fn main() -> anyhow::Result<()> {
         Commands::Build { force, languages, progress } => {
             cmd_build(&cli.root, &cli.storage, force, languages, progress, cli.verbose)
         }
+        Commands::Update { files, progress } => {
+            cmd_update(&cli.root, &cli.storage, &files, progress)
+        }
         Commands::Query { query, query_type, format, limit, relations, depth, confidence, token_budget } => {
             cmd_query(&cli.storage, &query, &query_type, &format, limit, relations, depth, &confidence, token_budget)
         }
@@ -252,6 +266,144 @@ fn cmd_build(root: &Path, storage: &Path, force: bool, _languages: Option<String
     println!("  Relations: {}", graph.project.relation_count);
     println!("  Languages: {:?}", graph.project.languages);
     println!("  Index size: {} MB", storage_mgr.size() as f64 / 1024.0 / 1024.0);
+
+    Ok(())
+}
+
+fn cmd_update(root: &Path, storage: &Path, files: &[PathBuf], progress: bool) -> anyhow::Result<()> {
+    use prime_index::IncrementalIndexer;
+    use prime_core::Language;
+    use prime_parser::ParserConfig;
+
+    let storage_path = storage.join("graph.bin");
+    if !storage_path.exists() {
+        println!("No existing index found. Run 'prime build' first.");
+        return Ok(());
+    }
+
+    let start = Instant::now();
+
+    let progress_bar = if progress {
+        Some(ProgressBar::new_spinner().with_style(
+            ProgressStyle::default_spinner()
+                .template("{spinner:.green} {msg}")
+                .unwrap()
+        ))
+    } else {
+        None
+    };
+
+    // Initialize incremental indexer
+    let mut indexer = IncrementalIndexer::new(root.to_path_buf());
+    indexer.init()?;
+
+    // Detect changes or use specified files
+    let changes = if files.is_empty() {
+        if let Some(pb) = &progress_bar {
+            pb.set_message("Detecting changes...");
+        }
+        indexer.detect_changes()?
+    } else {
+        // Use specified files
+        files.iter().map(|f| {
+            let hash = prime_core::ContentHash::from_bytes(&std::fs::read(f).unwrap_or_default());
+            prime_index::FileChange {
+                path: f.clone(),
+                change_type: prime_index::ChangeType::Modified,
+                old_hash: None,
+                new_hash: hash,
+            }
+        }).collect()
+    };
+
+    if changes.is_empty() {
+        if let Some(pb) = &progress_bar {
+            pb.finish_with_message("No changes detected");
+        }
+        println!("No changes detected.");
+        return Ok(());
+    }
+
+    println!("Detected {} changes:", changes.len());
+    for change in &changes {
+        println!("  {:?}: {}", change.change_type, change.path.display());
+    }
+
+    // Load existing graph
+    if let Some(pb) = &progress_bar {
+        pb.set_message("Loading existing index...");
+    }
+
+    let storage_config = StorageConfig {
+        path: storage.to_path_buf(),
+        compress: true,
+        compression_level: 3,
+        use_mmap: true,
+        ..Default::default()
+    };
+
+    let mut storage_mgr = StorageManager::new(storage_config);
+    let mut graph = storage_mgr.load()?;
+
+    // Build invalidation index
+    indexer.build_invalidation_index(&graph);
+
+    // Get files to update
+    let files_to_update: Vec<PathBuf> = changes.iter()
+        .filter(|c| c.change_type != prime_index::ChangeType::Removed)
+        .map(|c| c.path.clone())
+        .collect();
+
+    // Also update dependent files
+    let mut all_files_to_update = files_to_update.clone();
+    for file in &files_to_update {
+        let dependents = indexer.dependent_files(file, &graph);
+        for dep in dependents {
+            if !all_files_to_update.contains(&dep) {
+                all_files_to_update.push(dep);
+            }
+        }
+    }
+
+    println!("Updating {} files (including dependents)...", all_files_to_update.len());
+
+    // Create parser and analyzer
+    let config = ParserConfig {
+        max_file_size: 1024 * 1024,
+        ..Default::default()
+    };
+    let mut analyzer = prime_parser::ProjectAnalyzer::new(config)?;
+
+    // Perform incremental update
+    if let Some(pb) = &progress_bar {
+        pb.set_message("Updating graph...");
+    }
+
+    let update_result = analyzer.update_incremental(&mut graph, &all_files_to_update, root)?;
+
+    // Save updated graph
+    if let Some(pb) = &progress_bar {
+        pb.set_message("Saving updated index...");
+    }
+
+    storage_mgr.save(&graph)?;
+
+    if let Some(pb) = &progress_bar {
+        pb.finish_with_message("Done!");
+    }
+
+    let elapsed = start.elapsed();
+    println!("\nUpdate completed in {:.2}s", elapsed.as_secs_f64());
+    println!("  {}", update_result.summary());
+    println!("  Total entities: {}", graph.project.entity_count);
+    println!("  Total relations: {}", graph.project.relation_count);
+
+    if !update_result.errors.is_empty() {
+        println!("\nErrors:");
+        for error in &update_result.errors {
+            println!("  {}", error);
+        }
+    }
 
     Ok(())
 }
@@ -378,9 +530,32 @@ fn cmd_stats(storage: &Path) -> anyhow::Result<()> {
 }
 
 fn cmd_check(storage: &Path) -> anyhow::Result<()> {
+    use prime_index::IncrementalIndexer;
+
     println!("Checking for drift...");
-    // Would compare current source hashes with index
-    println!("No drift detected (not fully implemented)");
+
+    // Get the root path from storage
+    let root = storage.parent().unwrap_or(Path::new("."));
+
+    // Initialize incremental indexer
+    let mut indexer = IncrementalIndexer::new(root.to_path_buf());
+    indexer.init()?;
+
+    // Detect changes
+    let changes = indexer.detect_changes()?;
+
+    if changes.is_empty() {
+        println!("No drift detected.");
+        println!("  Tracked files: {}", indexer.file_count());
+    } else {
+        println!("Drift detected!");
+        println!("  Changed files: {}", changes.len());
+        for change in &changes {
+            println!("    {:?}: {}", change.change_type, change.path.display());
+        }
+        println!("\nRun 'prime update' to update the index.");
+    }
+
     Ok(())
 }
 

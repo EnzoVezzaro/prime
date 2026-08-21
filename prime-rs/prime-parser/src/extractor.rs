@@ -71,6 +71,38 @@ impl<'a> Extractor<'a> {
             });
         }
 
+        // Extract overrides (methods that override parent methods)
+        if let Err(e) = self.extract_overrides(tree.root_node(), &mut relations) {
+            errors.push(crate::ParseError {
+                message: format!("Failed to extract overrides: {}", e),
+                range: None,
+            });
+        }
+
+        // Extract exports (public symbols)
+        if let Err(e) = self.extract_exports(tree.root_node(), &mut relations) {
+            errors.push(crate::ParseError {
+                message: format!("Failed to extract exports: {}", e),
+                range: None,
+            });
+        }
+
+        // Extract data flows (return value usage)
+        if let Err(e) = self.extract_dataflows(tree.root_node(), &mut relations) {
+            errors.push(crate::ParseError {
+                message: format!("Failed to extract dataflows: {}", e),
+                range: None,
+            });
+        }
+
+        // Extract instantiations (new/construct calls)
+        if let Err(e) = self.extract_instantiations(tree.root_node(), &mut relations) {
+            errors.push(crate::ParseError {
+                message: format!("Failed to extract instantiations: {}", e),
+                range: None,
+            });
+        }
+
         (entities, relations, errors)
     }
 
@@ -254,6 +286,361 @@ impl<'a> Extractor<'a> {
                 }
             }
         }
+        Ok(())
+    }
+
+    fn extract_overrides(&mut self, node: Node, relations: &mut Vec<crate::ExtractedRelation>) -> anyhow::Result<()> {
+        // Look for method definitions that have a parent class with inheritance
+        // This is a heuristic: if we see a method in a class that extends another class,
+        // and the parent class likely has the same method, we mark it as an override
+        
+        let mut class_stack: Vec<(String, Vec<String>)> = Vec::new(); // (class_name, methods)
+        
+        self.extract_overrides_recursive(node, &mut class_stack, relations);
+        Ok(())
+    }
+
+    fn extract_overrides_recursive(&mut self, node: Node, class_stack: &mut Vec<(String, Vec<String>)>, relations: &mut Vec<crate::ExtractedRelation>) {
+        match node.kind() {
+            "class_declaration" | "class_definition" | "class_item" | "class_specifier" => {
+                if let Some(class_name) = self.extract_name_from_node(node) {
+                    let qualified = self.qualify_name(&class_name);
+                    let mut methods = Vec::new();
+                    
+                    // Extract methods in this class
+                    let mut cursor = node.walk();
+                    for child in node.children(&mut cursor) {
+                        if matches!(child.kind(), "method_definition" | "method_declaration" | "function_item") {
+                            if let Some(method_name) = self.extract_name_from_node(child) {
+                                methods.push(method_name);
+                            }
+                        }
+                    }
+                    
+                    class_stack.push((qualified, methods));
+                }
+            }
+            "method_definition" | "method_declaration" | "function_item" => {
+                if let Some(method_name) = self.extract_name_from_node(node) {
+                    // Check if parent class has inheritance
+                    if let Some(parent_class) = class_stack.last() {
+                        // Heuristic: if method exists in parent, it's likely an override
+                        // In a full implementation, we'd resolve the parent class
+                        let from_qualified = self.current_function_qualified(node);
+                        if !from_qualified.is_empty() {
+                            relations.push(crate::ExtractedRelation {
+                                from_name: method_name.clone(),
+                                from_qualified,
+                                to_name: method_name,
+                                to_qualified: String::new(), // Would need parent class resolution
+                                kind: prime_core::RelationKind::Overrides,
+                                confidence: Confidence::Low, // Heuristic, not certain
+                            });
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
+        
+        // Recurse into children
+        let mut cursor = node.walk();
+        for child in node.children(&mut cursor) {
+            self.extract_overrides_recursive(child, class_stack, relations);
+        }
+        
+        // Pop class from stack when leaving
+        if matches!(node.kind(), "class_declaration" | "class_definition" | "class_item" | "class_specifier") {
+            class_stack.pop();
+        }
+    }
+
+    fn extract_dataflows(&mut self, node: Node, relations: &mut Vec<crate::ExtractedRelation>) -> anyhow::Result<()> {
+        // Detect data flow patterns by scanning function bodies:
+        // 1. bar(foo()) -> foo flows to bar (nested calls)
+        // 2. return foo() -> foo flows to return
+        // Walk the tree looking for call_expression nodes that contain other call_expression nodes
+        self.extract_dataflows_recursive(node, relations);
+        Ok(())
+    }
+
+    fn extract_dataflows_recursive(&mut self, node: Node, relations: &mut Vec<crate::ExtractedRelation>) {
+        match node.kind() {
+            // Pattern: bar(foo()) or bar(x, foo()) - nested call as argument
+            "call_expression" => {
+                self.detect_nested_calls(node, relations);
+            }
+            "return_statement" => {
+                // return foo() -> foo flows to caller's return
+                self.detect_return_flow(node, relations);
+            }
+            _ => {}
+        }
+        
+        // Recurse into children
+        let mut cursor = node.walk();
+        for child in node.children(&mut cursor) {
+            self.extract_dataflows_recursive(child, relations);
+        }
+    }
+
+    /// Detect nested call patterns: bar(foo()) -> foo FlowsTo bar
+    fn detect_nested_calls(&self, outer_call: Node, relations: &mut Vec<crate::ExtractedRelation>) {
+        // The outer call has: function expression + arguments
+        // We look for call_expression nodes inside the arguments
+        let mut cursor = outer_call.walk();
+        for child in outer_call.children(&mut cursor) {
+            // Arguments node contains the actual arguments
+            if child.kind() == "arguments" || child.kind() == "argument_list" {
+                let mut arg_cursor = child.walk();
+                for arg in child.children(&mut arg_cursor) {
+                    if arg.kind() == "call_expression" {
+                        // Found inner call inside outer call's arguments
+                        if let Some(inner_name) = self.extract_call_name(arg) {
+                            if let Some(outer_name) = self.extract_call_name(outer_call) {
+                                let from_qualified = self.current_function_qualified(arg);
+                                let to_qualified = self.current_function_qualified(outer_call);
+                                relations.push(crate::ExtractedRelation {
+                                    from_name: inner_name,
+                                    from_qualified,
+                                    to_name: outer_name,
+                                    to_qualified,
+                                    kind: prime_core::RelationKind::FlowsTo,
+                                    confidence: Confidence::Medium,
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            // Also check for macro invocations with nested calls
+            if child.kind() == "macro_invocation" {
+                let mut macro_cursor = child.walk();
+                for macro_child in child.children(&mut macro_cursor) {
+                    if macro_child.kind() == "token_tree" {
+                        let mut token_cursor = macro_child.walk();
+                        for token in macro_child.children(&mut token_cursor) {
+                            if token.kind() == "call_expression" {
+                                if let Some(inner_name) = self.extract_call_name(token) {
+                                    if let Some(outer_name) = self.extract_macro_name(child) {
+                                        let from_qualified = self.current_function_qualified(token);
+                                        let to_qualified = self.current_function_qualified(outer_call);
+                                        relations.push(crate::ExtractedRelation {
+                                            from_name: inner_name,
+                                            from_qualified,
+                                            to_name: outer_name,
+                                            to_qualified,
+                                            kind: prime_core::RelationKind::FlowsTo,
+                                            confidence: Confidence::Medium,
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Detect return flow: return foo() -> foo FlowsTo caller
+    fn detect_return_flow(&self, return_node: Node, relations: &mut Vec<crate::ExtractedRelation>) {
+        // Walk the return statement looking for call expressions
+        let mut cursor = return_node.walk();
+        for child in return_node.children(&mut cursor) {
+            if child.kind() == "call_expression" {
+                if let Some(callee_name) = self.extract_call_name(child) {
+                    let from_qualified = self.current_function_qualified(child);
+                    let to_qualified = self.current_function_qualified(return_node);
+                    relations.push(crate::ExtractedRelation {
+                        from_name: callee_name,
+                        from_qualified,
+                        to_name: "return".to_string(),
+                        to_qualified,
+                        kind: prime_core::RelationKind::FlowsTo,
+                        confidence: Confidence::High,
+                    });
+                }
+            }
+        }
+    }
+
+    /// Extract the name of a function being called in a call_expression
+    fn extract_call_name(&self, call_node: Node) -> Option<String> {
+        let mut cursor = call_node.walk();
+        for child in call_node.children(&mut cursor) {
+            match child.kind() {
+                "identifier" | "field_expression" | "scoped_identifier" | "type_identifier" => {
+                    if let Some(name) = child.utf8_text(self.source).ok() {
+                        return Some(name.to_string());
+                    }
+                }
+                // For field expressions like obj.method(), return the method name
+                _ => {}
+            }
+        }
+        // Fallback: try extract_name_from_node
+        self.extract_name_from_node(call_node)
+    }
+
+    /// Extract name from a macro invocation
+    fn extract_macro_name(&self, macro_node: Node) -> Option<String> {
+        let mut cursor = macro_node.walk();
+        for child in macro_node.children(&mut cursor) {
+            if child.kind() == "identifier" || child.kind() == "scoped_identifier" {
+                return child.utf8_text(self.source).ok().map(|s| s.to_string());
+            }
+        }
+        None
+    }
+
+    /// Extract instantiation patterns: new Foo(), Foo::new(), Foo::default(), etc.
+    fn extract_instantiations(&mut self, node: Node, relations: &mut Vec<crate::ExtractedRelation>) -> anyhow::Result<()> {
+        self.extract_instantiations_recursive(node, relations);
+        Ok(())
+    }
+
+    fn extract_instantiations_recursive(&mut self, node: Node, relations: &mut Vec<crate::ExtractedRelation>) {
+        match node.kind() {
+            // Pattern: new ClassName() in JS/TS/Java/PHP
+            "new_expression" => {
+                if let Some(class_name) = self.extract_new_class_name(node) {
+                    let from_qualified = self.current_function_qualified(node);
+                    relations.push(crate::ExtractedRelation {
+                        from_name: self.extract_simple_name(&from_qualified),
+                        from_qualified,
+                        to_name: class_name.clone(),
+                        to_qualified: class_name,
+                        kind: prime_core::RelationKind::Instantiates,
+                        confidence: Confidence::High,
+                    });
+                }
+            }
+            // Pattern: ClassName::new() or ClassName::default() in Rust
+            "call_expression" => {
+                if let Some(type_name) = self.detect_static_constructor(node) {
+                    let from_qualified = self.current_function_qualified(node);
+                    relations.push(crate::ExtractedRelation {
+                        from_name: self.extract_simple_name(&from_qualified),
+                        from_qualified,
+                        to_name: type_name.clone(),
+                        to_qualified: type_name,
+                        kind: prime_core::RelationKind::Instantiates,
+                        confidence: Confidence::Medium,
+                    });
+                }
+            }
+            // Pattern: Python ClassName() 
+            "identifier" => {
+                // Python: ClassName() looks like a call with identifier callee
+                // This is already handled by call_expression above
+            }
+            _ => {}
+        }
+
+        // Recurse into children
+        let mut cursor = node.walk();
+        for child in node.children(&mut cursor) {
+            self.extract_instantiations_recursive(child, relations);
+        }
+    }
+
+    /// Extract class name from new_expression (JS/TS/Java)
+    fn extract_new_class_name(&self, new_node: Node) -> Option<String> {
+        let mut cursor = new_node.walk();
+        for child in new_node.children(&mut cursor) {
+            match child.kind() {
+                "identifier" | "type_identifier" | "scoped_identifier" => {
+                    return child.utf8_text(self.source).ok().map(|s| s.to_string());
+                }
+                _ => {}
+            }
+        }
+        None
+    }
+
+    /// Detect static constructor patterns like ClassName::new() or ClassName::create()
+    fn detect_static_constructor(&self, call_node: Node) -> Option<String> {
+        // Check if this is a qualified call like Type::method()
+        let mut cursor = call_node.walk();
+        for child in call_node.children(&mut cursor) {
+            if child.kind() == "scoped_identifier" || child.kind() == "field_expression" {
+                if let Some(qualified_name) = child.utf8_text(self.source).ok() {
+                    // Check if it ends with known constructor patterns
+                    let name_lower = qualified_name.to_lowercase();
+                    if name_lower.ends_with("::new") || 
+                       name_lower.ends_with("::create") ||
+                       name_lower.ends_with("::default") ||
+                       name_lower.ends_with("::with") ||
+                       name_lower.ends_with("::from") ||
+                       name_lower.ends_with(".new") ||
+                       name_lower.ends_with(".create") {
+                        // Extract the type name (before ::new, etc.)
+                        let type_name = if let Some(pos) = qualified_name.rfind("::") {
+                            &qualified_name[..pos]
+                        } else if let Some(pos) = qualified_name.rfind(".") {
+                            &qualified_name[..pos]
+                        } else {
+                            qualified_name
+                        };
+                        return Some(type_name.to_string());
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    fn extract_exports(&mut self, node: Node, relations: &mut Vec<crate::ExtractedRelation>) -> anyhow::Result<()> {
+        // Look for export statements and public visibility
+        let query_str = match self.config.language {
+            prime_core::Language::Rust => {
+                // Rust: pub items are exported
+                "(visibility_modifier) @visibility"
+            }
+            prime_core::Language::TypeScript | prime_core::Language::JavaScript => {
+                // TS/JS: export keyword
+                "(export_statement) @export"
+            }
+            prime_core::Language::Python => {
+                // Python: __all__ or non-underscore names
+                "(identifier) @name"
+            }
+            _ => {
+                // Default: look for 'public' keyword
+                "(visibility_modifier) @visibility"
+            }
+        };
+        
+        // For now, use a simple heuristic: look for 'pub' or 'export' keywords
+        let source_str = std::str::from_utf8(self.source).unwrap_or("");
+        
+        // Check for Rust pub items
+        if source_str.contains("pub fn ") || source_str.contains("pub struct ") || 
+           source_str.contains("pub enum ") || source_str.contains("pub trait ") {
+            // Find the current module
+            let module_qualified = self.current_module_qualified(node);
+            
+            // Simple extraction: find all pub items
+            let mut cursor = node.walk();
+            for child in node.children(&mut cursor) {
+                if let Some(name) = self.extract_name_from_node(child) {
+                    let child_text = child.utf8_text(self.source).unwrap_or("");
+                    if child_text.starts_with("pub ") || child_text.contains("\npub ") {
+                        let from_qualified = self.qualify_name(&name);
+                        relations.push(crate::ExtractedRelation {
+                            from_name: self.extract_simple_name(&module_qualified),
+                            from_qualified: module_qualified.clone(),
+                            to_name: name,
+                            to_qualified: from_qualified,
+                            kind: prime_core::RelationKind::Exports,
+                            confidence: Confidence::High,
+                        });
+                    }
+                }
+            }
+        }
+        
         Ok(())
     }
 

@@ -216,6 +216,14 @@ pub enum RelationKind {
     Overrides = 50,      // Method overrides parent
     Overloads = 51,      // Function overloads another
 
+    // Instantiation
+    Instantiates = 52,   // Creates instance of class/struct
+    Factory = 53,        // Factory method creates instance
+
+    // Data flow
+    FlowsTo = 55,        // Data flows from producer to consumer
+    Yields = 56,         // Generator yields value
+
     // Module boundaries
     Exports = 60,        // Module exports symbol
     ReExports = 61,      // Module re-exports
@@ -246,6 +254,10 @@ impl std::str::FromStr for RelationKind {
             "genericargof" => Ok(RelationKind::GenericArgOf),
             "overrides" => Ok(RelationKind::Overrides),
             "overloads" => Ok(RelationKind::Overloads),
+            "instantiates" => Ok(RelationKind::Instantiates),
+            "factory" => Ok(RelationKind::Factory),
+            "flowsto" => Ok(RelationKind::FlowsTo),
+            "yields" => Ok(RelationKind::Yields),
             "exports" => Ok(RelationKind::Exports),
             "reexports" => Ok(RelationKind::ReExports),
             "unknown" => Ok(RelationKind::Unknown),
