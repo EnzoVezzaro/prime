@@ -94,11 +94,45 @@ impl ProjectAnalyzer {
             graph.add_file(file_entity);
         }
 
-        // Add relations
+        // Build a name-to-qualified-name index for cross-file resolution
+        let mut name_to_qualified: HashMap<String, Vec<String>> = HashMap::new();
+        for entity in graph.entities.values() {
+            let simple = entity.name.clone();
+            name_to_qualified.entry(simple).or_default().push(entity.qualified_name.clone());
+        }
+
+        // Add relations with cross-file resolution
         for file_result in &parse_result.files {
             for relation in &file_result.relations {
                 let from_id = EntityId::from_str(&relation.from_qualified);
-                let to_id = EntityId::from_str(&relation.to_qualified);
+                
+                // Resolve the to_qualified name
+                let to_qn = if graph.entities.contains_key(&EntityId::from_str(&relation.to_qualified)) {
+                    // Direct match - entity exists
+                    relation.to_qualified.clone()
+                } else if let Some(candidates) = name_to_qualified.get(&relation.to_name) {
+                    // Try to find by simple name (cross-file resolution)
+                    // Prefer candidates that are NOT in the same file (cross-file calls)
+                    let same_file_candidates: Vec<_> = candidates.iter()
+                        .filter(|qn| qn.starts_with(&relation.from_qualified.rsplit("::").next().unwrap_or("")))
+                        .collect();
+                    let cross_file_candidates: Vec<_> = candidates.iter()
+                        .filter(|qn| !qn.starts_with(&relation.from_qualified.rsplit("::").next().unwrap_or("")))
+                        .collect();
+                    
+                    if !cross_file_candidates.is_empty() {
+                        cross_file_candidates[0].clone()
+                    } else if !same_file_candidates.is_empty() {
+                        same_file_candidates[0].clone()
+                    } else {
+                        candidates[0].clone()
+                    }
+                } else {
+                    // No match found, keep original
+                    relation.to_qualified.clone()
+                };
+                
+                let to_id = EntityId::from_str(&to_qn);
 
                 let relation = Relation {
                     from: from_id,

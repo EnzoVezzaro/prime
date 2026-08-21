@@ -4,7 +4,7 @@
   "benchmark": {
     "name": "Prime Benchmark",
     "version": "1.0.0",
-    "timestamp": "2026-08-21T23:33:24.562483+00:00",
+    "timestamp": "2026-08-21T23:21:18.100554+00:00",
     "git_commit": "82536bb1ee4a",
     "dirty": false
   },
@@ -13,7 +13,7 @@
     "git_commit": "82536bb1ee4a"
   },
   "benchmark_version": "1.0.0",
-  "timestamp": "2026-08-21T23:33:24.562496+00:00",
+  "timestamp": "2026-08-21T23:21:18.100566+00:00",
   "environment": {
     "os": "macos",
     "arch": "aarch64",
@@ -88,7 +88,7 @@
       "status": "complete",
       "error": null,
       "derivation": {
-        "time_ms": 642.834,
+        "time_ms": 573.337,
         "files": 369,
         "source_bytes": 2657084,
         "lines_of_code": 52570,
@@ -96,13 +96,13 @@
         "entities": 1439,
         "symbols": 1413,
         "relations": 46034,
-        "files_per_second": 574.0206647439308,
-        "loc_per_second": 81778.49958154048,
-        "symbols_per_second": 2198.0791308487105,
-        "relationships_per_second": 71611.02244125232,
-        "peak_memory_bytes": 88866816,
-        "parse_time_us": 639263.0,
-        "index_time_us": 3571.0,
+        "files_per_second": 643.6005351128568,
+        "loc_per_second": 91691.27406743329,
+        "symbols_per_second": 2464.5191222614276,
+        "relationships_per_second": 80291.34697394377,
+        "peak_memory_bytes": 85082112,
+        "parse_time_us": 570894.0,
+        "index_time_us": 2443.0,
         "serialization_time_us": 0.0
       },
       "artifact": {
@@ -115,79 +115,98 @@
       "retrieval": {
         "cold": {
           "samples": 5,
-          "min": 558.875,
-          "mean": 611.425,
-          "median": 588.875,
-          "p95": 728.75,
-          "p99": 728.75,
-          "max": 728.75
+          "min": 542.25,
+          "mean": 590.825,
+          "median": 589.833,
+          "p95": 670.75,
+          "p99": 670.75,
+          "max": 670.75
         },
         "warm": {
           "samples": 1000,
-          "min": 542.708,
-          "mean": 710.2847959999998,
-          "median": 590.084,
-          "p95": 744.083,
-          "p99": 2761.791,
-          "max": 26414.291
+          "min": 539.25,
+          "mean": 584.5342139999996,
+          "median": 580.416,
+          "p95": 634.75,
+          "p99": 677.25,
+          "max": 795.416
         },
         "search": {
           "samples": 1000,
-          "min": 542.708,
-          "mean": 710.2847959999998,
-          "median": 590.084,
-          "p95": 744.083,
-          "p99": 2761.791,
-          "max": 26414.291
+          "min": 539.25,
+          "mean": 584.5342139999996,
+          "median": 580.416,
+          "p95": 634.75,
+          "p99": 677.25,
+          "max": 795.416
         },
         "lookup": {
           "samples": 1000,
-          "min": 28.875,
-          "mean": 32.37882999999998,
-          "median": 29.791,
-          "p95": 38.583,
-          "p99": 67.833,
-          "max": 496.458
+          "min": 28.833,
+          "mean": 30.07627999999997,
+          "median": 29.292,
+          "p95": 34.625,
+          "p99": 41.042,
+          "max": 91.708
         },
         "context": {
           "samples": 1000,
-          "min": 2.083,
-          "mean": 7.795803999999999,
-          "median": 5.041,
-          "p95": 22.375,
-          "p99": 28.0,
-          "max": 336.875
+          "min": 2.041,
+          "mean": 3.598500000000002,
+          "median": 2.417,
+          "p95": 9.166,
+          "p99": 13.584,
+          "max": 26.583
         },
         "repeated": {
           "samples": 100,
-          "min": 607.666,
-          "mean": 620.74417,
-          "median": 610.041,
-          "p95": 656.208,
-          "p99": 661.0,
-          "max": 688.167
+          "min": 605.917,
+          "mean": 623.43875,
+          "median": 613.167,
+          "p95": 670.041,
+          "p99": 697.917,
+          "max": 698.417
         }
       },
       "knowledge": {
         "total_questions": 25,
-        "correct": 9,
-        "incorrect": 16,
+        "correct": 7,
+        "incorrect": 18,
         "source_free_correct": 7,
-        "source_required_correct": 2,
-        "accuracy": 0.36,
+        "source_required_correct": 0,
+        "accuracy": 0.28,
         "source_free_accuracy": 0.28,
-        "entity_precision": 0.013333333333333334,
+        "entity_precision": 0.017241379310344827,
         "entity_recall": 0.5,
-        "entity_f1": 0.025974025974025976,
-        "relationship_precision": 1.0,
-        "relationship_recall": 0.3333333333333333,
-        "relationship_f1": 0.5,
+        "entity_f1": 0.03333333333333333,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
         "mrr": 1.0,
         "recall_at_1": 0.04,
         "recall_at_3": 0.04,
         "recall_at_5": 0.04,
         "recall_at_10": 0.04,
         "by_category": {
+          "dependencies": {
+            "total": 3,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
           "impact": {
             "total": 3,
             "correct": 0,
@@ -226,32 +245,13 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "calls": {
-            "total": 3,
+          "exports": {
+            "total": 2,
             "correct": 0,
             "source_free_correct": 0,
             "source_required_correct": 0,
             "accuracy": 0.0,
             "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "architecture": {
-            "total": 2,
-            "correct": 2,
-            "source_free_correct": 2,
-            "source_required_correct": 0,
-            "accuracy": 1.0,
-            "source_free_accuracy": 1.0,
             "entity_precision": 0.0,
             "entity_recall": 0.0,
             "entity_f1": 0.0,
@@ -302,248 +302,6 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "exports": {
-            "total": 2,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "dependencies": {
-            "total": 3,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "flows_to": {
-            "total": 2,
-            "correct": 2,
-            "source_free_correct": 0,
-            "source_required_correct": 2,
-            "accuracy": 1.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          }
-        }
-      },
-      "source_savings": null
-    },
-    {
-      "repo_name": "httpx",
-      "status": "complete",
-      "error": null,
-      "derivation": {
-        "time_ms": 157.047,
-        "files": 98,
-        "source_bytes": 784955,
-        "lines_of_code": 23628,
-        "non_empty_lines": 18640,
-        "entities": 1075,
-        "symbols": 1075,
-        "relations": 38453,
-        "files_per_second": 624.0170140149128,
-        "loc_per_second": 150451.77558310571,
-        "symbols_per_second": 6845.084592510522,
-        "relationships_per_second": 244850.26775423918,
-        "peak_memory_bytes": 100319232,
-        "parse_time_us": 153685.0,
-        "index_time_us": 3362.0,
-        "serialization_time_us": 0.0
-      },
-      "artifact": {
-        "source_bytes": 784955,
-        "artifact_bytes": 1951800,
-        "artifact_to_source_ratio": 2.486511965654082,
-        "source_reduction_ratio": -1.4865119656540822,
-        "artifact_bytes_per_kloc": 248651.1965654082
-      },
-      "retrieval": {
-        "cold": {
-          "samples": 5,
-          "min": 257.208,
-          "mean": 336.6664,
-          "median": 344.625,
-          "p95": 390.833,
-          "p99": 390.833,
-          "max": 390.833
-        },
-        "warm": {
-          "samples": 1000,
-          "min": 147.042,
-          "mean": 329.78805100000017,
-          "median": 336.459,
-          "p95": 423.417,
-          "p99": 455.125,
-          "max": 812.75
-        },
-        "search": {
-          "samples": 1000,
-          "min": 147.042,
-          "mean": 329.78805100000017,
-          "median": 336.459,
-          "p95": 423.417,
-          "p99": 455.125,
-          "max": 812.75
-        },
-        "lookup": {
-          "samples": 1000,
-          "min": 24.791,
-          "mean": 26.25403699999999,
-          "median": 25.333,
-          "p95": 29.792,
-          "p99": 35.083,
-          "max": 104.541
-        },
-        "context": {
-          "samples": 1000,
-          "min": 10.75,
-          "mean": 31.784896,
-          "median": 20.333,
-          "p95": 81.75,
-          "p99": 237.208,
-          "max": 267.041
-        },
-        "repeated": {
-          "samples": 100,
-          "min": 374.583,
-          "mean": 386.0203699999999,
-          "median": 380.625,
-          "p95": 410.0,
-          "p99": 430.0,
-          "max": 480.375
-        }
-      },
-      "knowledge": {
-        "total_questions": 23,
-        "correct": 5,
-        "incorrect": 18,
-        "source_free_correct": 5,
-        "source_required_correct": 0,
-        "accuracy": 0.21739130434782608,
-        "source_free_accuracy": 0.21739130434782608,
-        "entity_precision": 0.0,
-        "entity_recall": 0.0,
-        "entity_f1": 0.0,
-        "relationship_precision": 1.0,
-        "relationship_recall": 0.23076923076923078,
-        "relationship_f1": 0.375,
-        "mrr": 0.0,
-        "recall_at_1": 0.0,
-        "recall_at_3": 0.0,
-        "recall_at_5": 0.0,
-        "recall_at_10": 0.0,
-        "by_category": {
-          "instantiates": {
-            "total": 2,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "impact": {
-            "total": 3,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "exports": {
-            "total": 2,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "architecture": {
-            "total": 2,
-            "correct": 2,
-            "source_free_correct": 2,
-            "source_required_correct": 0,
-            "accuracy": 1.0,
-            "source_free_accuracy": 1.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
           "flows_to": {
             "total": 2,
             "correct": 0,
@@ -582,6 +340,191 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
+          "architecture": {
+            "total": 2,
+            "correct": 2,
+            "source_free_correct": 2,
+            "source_required_correct": 0,
+            "accuracy": 1.0,
+            "source_free_accuracy": 1.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          }
+        }
+      },
+      "source_savings": null
+    },
+    {
+      "repo_name": "httpx",
+      "status": "complete",
+      "error": null,
+      "derivation": {
+        "time_ms": 142.988,
+        "files": 98,
+        "source_bytes": 784955,
+        "lines_of_code": 23628,
+        "non_empty_lines": 18640,
+        "entities": 1075,
+        "symbols": 1075,
+        "relations": 38453,
+        "files_per_second": 685.3721990656559,
+        "loc_per_second": 165244.63591350324,
+        "symbols_per_second": 7518.1134081181635,
+        "relationships_per_second": 268924.6650068537,
+        "peak_memory_bytes": 106430464,
+        "parse_time_us": 139482.0,
+        "index_time_us": 3506.0,
+        "serialization_time_us": 0.0
+      },
+      "artifact": {
+        "source_bytes": 784955,
+        "artifact_bytes": 1951800,
+        "artifact_to_source_ratio": 2.486511965654082,
+        "source_reduction_ratio": -1.4865119656540822,
+        "artifact_bytes_per_kloc": 248651.1965654082
+      },
+      "retrieval": {
+        "cold": {
+          "samples": 5,
+          "min": 259.0,
+          "mean": 334.6,
+          "median": 340.209,
+          "p95": 387.375,
+          "p99": 387.375,
+          "max": 387.375
+        },
+        "warm": {
+          "samples": 1000,
+          "min": 146.542,
+          "mean": 325.14629200000013,
+          "median": 328.792,
+          "p95": 420.458,
+          "p99": 438.916,
+          "max": 456.875
+        },
+        "search": {
+          "samples": 1000,
+          "min": 146.542,
+          "mean": 325.14629200000013,
+          "median": 328.792,
+          "p95": 420.458,
+          "p99": 438.916,
+          "max": 456.875
+        },
+        "lookup": {
+          "samples": 1000,
+          "min": 24.708,
+          "mean": 25.750915000000024,
+          "median": 25.0,
+          "p95": 29.5,
+          "p99": 35.208,
+          "max": 65.917
+        },
+        "context": {
+          "samples": 1000,
+          "min": 2.25,
+          "mean": 3.8131620000000015,
+          "median": 2.625,
+          "p95": 19.625,
+          "p99": 23.5,
+          "max": 44.292
+        },
+        "repeated": {
+          "samples": 100,
+          "min": 373.5,
+          "mean": 386.07837000000023,
+          "median": 377.041,
+          "p95": 420.625,
+          "p99": 444.041,
+          "max": 454.584
+        }
+      },
+      "knowledge": {
+        "total_questions": 23,
+        "correct": 5,
+        "incorrect": 18,
+        "source_free_correct": 5,
+        "source_required_correct": 0,
+        "accuracy": 0.21739130434782608,
+        "source_free_accuracy": 0.21739130434782608,
+        "entity_precision": 0.0,
+        "entity_recall": 0.0,
+        "entity_f1": 0.0,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
+        "mrr": 0.0,
+        "recall_at_1": 0.0,
+        "recall_at_3": 0.0,
+        "recall_at_5": 0.0,
+        "recall_at_10": 0.0,
+        "by_category": {
+          "architecture": {
+            "total": 2,
+            "correct": 2,
+            "source_free_correct": 2,
+            "source_required_correct": 0,
+            "accuracy": 1.0,
+            "source_free_accuracy": 1.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "imports": {
+            "total": 3,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "impact": {
+            "total": 3,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
           "symbols": {
             "total": 3,
             "correct": 3,
@@ -589,6 +532,44 @@
             "source_required_correct": 0,
             "accuracy": 1.0,
             "source_free_accuracy": 1.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "exports": {
+            "total": 2,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "flows_to": {
+            "total": 2,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
             "entity_precision": 0.0,
             "entity_recall": 0.0,
             "entity_f1": 0.0,
@@ -620,8 +601,27 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "imports": {
+          "calls": {
             "total": 3,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "instantiates": {
+            "total": 2,
             "correct": 0,
             "source_free_correct": 0,
             "source_required_correct": 0,
@@ -648,7 +648,7 @@
       "status": "complete",
       "error": null,
       "derivation": {
-        "time_ms": 372.966,
+        "time_ms": 345.954,
         "files": 182,
         "source_bytes": 772591,
         "lines_of_code": 28941,
@@ -656,13 +656,13 @@
         "entities": 109,
         "symbols": 109,
         "relations": 29931,
-        "files_per_second": 487.9801375996739,
-        "loc_per_second": 77596.88550698991,
-        "symbols_per_second": 292.25184065035415,
-        "relationships_per_second": 80251.28295876835,
-        "peak_memory_bytes": 138100736,
-        "parse_time_us": 371781.0,
-        "index_time_us": 1185.0,
+        "files_per_second": 526.0815021650277,
+        "loc_per_second": 83655.63051735202,
+        "symbols_per_second": 315.070789758176,
+        "relationships_per_second": 86517.28264451344,
+        "peak_memory_bytes": 137281536,
+        "parse_time_us": 344195.0,
+        "index_time_us": 1759.0,
         "serialization_time_us": 0.0
       },
       "artifact": {
@@ -675,99 +675,80 @@
       "retrieval": {
         "cold": {
           "samples": 5,
-          "min": 37.417,
-          "mean": 53.45,
-          "median": 55.791,
-          "p95": 60.542,
-          "p99": 60.542,
-          "max": 60.542
+          "min": 34.25,
+          "mean": 48.0332,
+          "median": 48.709,
+          "p95": 57.333,
+          "p99": 57.333,
+          "max": 57.333
         },
         "warm": {
           "samples": 1000,
-          "min": 30.709,
-          "mean": 46.712290000000024,
-          "median": 47.75,
-          "p95": 58.375,
-          "p99": 76.041,
-          "max": 129.083
+          "min": 30.458,
+          "mean": 45.771324999999955,
+          "median": 47.5,
+          "p95": 56.833,
+          "p99": 65.667,
+          "max": 97.208
         },
         "search": {
           "samples": 1000,
-          "min": 30.709,
-          "mean": 46.712290000000024,
-          "median": 47.75,
-          "p95": 58.375,
-          "p99": 76.041,
-          "max": 129.083
+          "min": 30.458,
+          "mean": 45.771324999999955,
+          "median": 47.5,
+          "p95": 56.833,
+          "p99": 65.667,
+          "max": 97.208
         },
         "lookup": {
           "samples": 1000,
-          "min": 19.708,
-          "mean": 20.83706800000003,
-          "median": 20.125,
-          "p95": 24.416,
-          "p99": 33.458,
-          "max": 45.291
+          "min": 19.583,
+          "mean": 20.41148200000007,
+          "median": 19.834,
+          "p95": 23.416,
+          "p99": 27.958,
+          "max": 76.208
         },
         "context": {
           "samples": 1000,
-          "min": 3.375,
-          "mean": 7.949577000000011,
-          "median": 5.5,
-          "p95": 18.25,
-          "p99": 22.458,
-          "max": 58.958
+          "min": 2.208,
+          "mean": 3.034582999999999,
+          "median": 2.625,
+          "p95": 4.5,
+          "p99": 6.042,
+          "max": 36.792
         },
         "repeated": {
           "samples": 100,
-          "min": 49.917,
-          "mean": 50.81715999999999,
-          "median": 50.125,
-          "p95": 53.209,
-          "p99": 66.042,
-          "max": 69.209
+          "min": 47.75,
+          "mean": 50.10451999999999,
+          "median": 47.958,
+          "p95": 58.833,
+          "p99": 76.167,
+          "max": 78.333
         }
       },
       "knowledge": {
         "total_questions": 24,
-        "correct": 8,
-        "incorrect": 16,
-        "source_free_correct": 8,
+        "correct": 7,
+        "incorrect": 17,
+        "source_free_correct": 7,
         "source_required_correct": 0,
-        "accuracy": 0.3333333333333333,
-        "source_free_accuracy": 0.3333333333333333,
-        "entity_precision": 0.029411764705882353,
-        "entity_recall": 0.6,
-        "entity_f1": 0.056074766355140186,
-        "relationship_precision": 1.0,
-        "relationship_recall": 0.23076923076923078,
-        "relationship_f1": 0.375,
+        "accuracy": 0.2916666666666667,
+        "source_free_accuracy": 0.2916666666666667,
+        "entity_precision": 0.015625,
+        "entity_recall": 0.25,
+        "entity_f1": 0.029411764705882353,
+        "relationship_precision": 0.0,
+        "relationship_recall": 0.0,
+        "relationship_f1": 0.0,
         "mrr": 1.0,
-        "recall_at_1": 0.08333333333333333,
-        "recall_at_3": 0.08333333333333333,
-        "recall_at_5": 0.08333333333333333,
-        "recall_at_10": 0.08333333333333333,
+        "recall_at_1": 0.041666666666666664,
+        "recall_at_3": 0.041666666666666664,
+        "recall_at_5": 0.041666666666666664,
+        "recall_at_10": 0.041666666666666664,
         "by_category": {
-          "instantiates": {
-            "total": 2,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "flows_to": {
+          "exports": {
             "total": 2,
             "correct": 0,
             "source_free_correct": 0,
@@ -805,8 +786,27 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "exports": {
-            "total": 2,
+          "symbols": {
+            "total": 5,
+            "correct": 5,
+            "source_free_correct": 5,
+            "source_required_correct": 0,
+            "accuracy": 1.0,
+            "source_free_accuracy": 1.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "dependencies": {
+            "total": 3,
             "correct": 0,
             "source_free_correct": 0,
             "source_required_correct": 0,
@@ -843,8 +843,46 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "dependencies": {
+          "calls": {
             "total": 3,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "flows_to": {
+            "total": 2,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "instantiates": {
+            "total": 2,
             "correct": 0,
             "source_free_correct": 0,
             "source_required_correct": 0,
@@ -880,44 +918,6 @@
             "recall_at_3": 0.0,
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
-          },
-          "symbols": {
-            "total": 5,
-            "correct": 5,
-            "source_free_correct": 5,
-            "source_required_correct": 0,
-            "accuracy": 1.0,
-            "source_free_accuracy": 1.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "calls": {
-            "total": 3,
-            "correct": 1,
-            "source_free_correct": 1,
-            "source_required_correct": 0,
-            "accuracy": 0.3333333333333333,
-            "source_free_accuracy": 0.3333333333333333,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
           }
         }
       },
@@ -928,7 +928,7 @@
       "status": "complete",
       "error": null,
       "derivation": {
-        "time_ms": 148.678,
+        "time_ms": 141.515,
         "files": 111,
         "source_bytes": 732481,
         "lines_of_code": 23762,
@@ -936,13 +936,13 @@
         "entities": 708,
         "symbols": 708,
         "relations": 33958,
-        "files_per_second": 746.5798571409355,
-        "loc_per_second": 159821.8969854316,
-        "symbols_per_second": 4761.968818520561,
-        "relationships_per_second": 228399.6287278548,
-        "peak_memory_bytes": 152027136,
-        "parse_time_us": 146076.0,
-        "index_time_us": 2602.0,
+        "files_per_second": 784.3691481468395,
+        "loc_per_second": 167911.5288132,
+        "symbols_per_second": 5003.003215206869,
+        "relationships_per_second": 239960.42822315654,
+        "peak_memory_bytes": 145932288,
+        "parse_time_us": 136350.0,
+        "index_time_us": 5165.0,
         "serialization_time_us": 0.0
       },
       "artifact": {
@@ -955,57 +955,57 @@
       "retrieval": {
         "cold": {
           "samples": 5,
-          "min": 242.667,
-          "mean": 274.1498,
-          "median": 279.333,
-          "p95": 302.333,
-          "p99": 302.333,
-          "max": 302.333
+          "min": 240.834,
+          "mean": 264.7914,
+          "median": 272.541,
+          "p95": 276.166,
+          "p99": 276.166,
+          "max": 276.166
         },
         "warm": {
           "samples": 1000,
-          "min": 182.167,
-          "mean": 268.86513899999983,
-          "median": 264.375,
-          "p95": 362.25,
-          "p99": 498.209,
-          "max": 1358.583
+          "min": 183.166,
+          "mean": 253.85476899999995,
+          "median": 253.709,
+          "p95": 305.417,
+          "p99": 329.917,
+          "max": 428.333
         },
         "search": {
           "samples": 1000,
-          "min": 182.167,
-          "mean": 268.86513899999983,
-          "median": 264.375,
-          "p95": 362.25,
-          "p99": 498.209,
-          "max": 1358.583
+          "min": 183.166,
+          "mean": 253.85476899999995,
+          "median": 253.709,
+          "p95": 305.417,
+          "p99": 329.917,
+          "max": 428.333
         },
         "lookup": {
           "samples": 1000,
-          "min": 22.25,
-          "mean": 24.827856999999966,
-          "median": 23.292,
-          "p95": 30.291,
-          "p99": 48.834,
-          "max": 100.416
+          "min": 22.166,
+          "mean": 23.355820000000012,
+          "median": 22.708,
+          "p95": 28.417,
+          "p99": 31.834,
+          "max": 43.542
         },
         "context": {
           "samples": 1000,
-          "min": 6.125,
-          "mean": 16.29900000000001,
-          "median": 10.083,
-          "p95": 43.333,
-          "p99": 54.667,
-          "max": 487.667
+          "min": 2.375,
+          "mean": 5.508661999999993,
+          "median": 3.875,
+          "p95": 15.041,
+          "p99": 23.375,
+          "max": 48.084
         },
         "repeated": {
           "samples": 100,
-          "min": 264.875,
-          "mean": 282.56579999999985,
-          "median": 267.667,
-          "p95": 302.584,
-          "p99": 403.084,
-          "max": 833.958
+          "min": 263.25,
+          "mean": 269.61287,
+          "median": 263.75,
+          "p95": 298.333,
+          "p99": 316.75,
+          "max": 319.583
         }
       },
       "knowledge": {
@@ -1047,8 +1047,8 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "flows_to": {
-            "total": 2,
+          "dependencies": {
+            "total": 3,
             "correct": 0,
             "source_free_correct": 0,
             "source_required_correct": 0,
@@ -1085,25 +1085,6 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "calls": {
-            "total": 3,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
           "exports": {
             "total": 2,
             "correct": 0,
@@ -1123,7 +1104,7 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "imports": {
+          "impact": {
             "total": 3,
             "correct": 0,
             "source_free_correct": 0,
@@ -1142,8 +1123,8 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "dependencies": {
-            "total": 3,
+          "flows_to": {
+            "total": 2,
             "correct": 0,
             "source_free_correct": 0,
             "source_required_correct": 0,
@@ -1180,7 +1161,26 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "impact": {
+          "calls": {
+            "total": 3,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "imports": {
             "total": 3,
             "correct": 0,
             "source_free_correct": 0,
@@ -1208,7 +1208,7 @@
       "status": "complete",
       "error": null,
       "derivation": {
-        "time_ms": 430.488,
+        "time_ms": 430.651,
         "files": 155,
         "source_bytes": 1118463,
         "lines_of_code": 31931,
@@ -1216,13 +1216,13 @@
         "entities": 1094,
         "symbols": 6,
         "relations": 50110,
-        "files_per_second": 360.0564940253852,
-        "loc_per_second": 74173.96071435208,
-        "symbols_per_second": 13.937670736466522,
-        "relationships_per_second": 116402.7801007229,
-        "peak_memory_bytes": 226803712,
-        "parse_time_us": 427804.0,
-        "index_time_us": 2684.0,
+        "files_per_second": 359.92021381582765,
+        "loc_per_second": 74145.88611195609,
+        "symbols_per_second": 13.93239537351591,
+        "relationships_per_second": 116358.72202781371,
+        "peak_memory_bytes": 101662720,
+        "parse_time_us": 426624.0,
+        "index_time_us": 4027.0,
         "serialization_time_us": 0.0
       },
       "artifact": {
@@ -1235,57 +1235,57 @@
       "retrieval": {
         "cold": {
           "samples": 5,
-          "min": 485.459,
-          "mean": 514.0166,
-          "median": 512.708,
-          "p95": 544.791,
-          "p99": 544.791,
-          "max": 544.791
+          "min": 497.0,
+          "mean": 511.675,
+          "median": 512.5,
+          "p95": 526.25,
+          "p99": 526.25,
+          "max": 526.25
         },
         "warm": {
           "samples": 1000,
-          "min": 214.709,
-          "mean": 508.16773199999994,
-          "median": 516.084,
-          "p95": 575.042,
-          "p99": 602.5,
-          "max": 737.625
+          "min": 214.416,
+          "mean": 500.37687499999987,
+          "median": 512.209,
+          "p95": 561.291,
+          "p99": 597.584,
+          "max": 644.917
         },
         "search": {
           "samples": 1000,
-          "min": 214.709,
-          "mean": 508.16773199999994,
-          "median": 516.084,
-          "p95": 575.042,
-          "p99": 602.5,
-          "max": 737.625
+          "min": 214.416,
+          "mean": 500.37687499999987,
+          "median": 512.209,
+          "p95": 561.291,
+          "p99": 597.584,
+          "max": 644.917
         },
         "lookup": {
           "samples": 1000,
           "min": 31.291,
-          "mean": 33.34623000000004,
-          "median": 32.0,
-          "p95": 38.834,
-          "p99": 43.875,
-          "max": 87.542
+          "mean": 32.31583499999976,
+          "median": 31.417,
+          "p95": 37.917,
+          "p99": 42.625,
+          "max": 70.958
         },
         "context": {
           "samples": 1000,
           "min": 2.041,
-          "mean": 8.771026,
-          "median": 2.292,
-          "p95": 64.375,
-          "p99": 74.875,
-          "max": 89.583
+          "mean": 2.3349760000000175,
+          "median": 2.167,
+          "p95": 2.833,
+          "p99": 10.416,
+          "max": 10.875
         },
         "repeated": {
           "samples": 100,
-          "min": 473.958,
-          "mean": 489.95498,
-          "median": 486.5,
-          "p95": 517.541,
-          "p99": 581.667,
-          "max": 612.125
+          "min": 469.417,
+          "mean": 478.36377999999996,
+          "median": 472.792,
+          "p95": 505.041,
+          "p99": 524.042,
+          "max": 545.667
         }
       },
       "knowledge": {
@@ -1308,6 +1308,44 @@
         "recall_at_5": 0.0,
         "recall_at_10": 0.0,
         "by_category": {
+          "flows_to": {
+            "total": 2,
+            "correct": 0,
+            "source_free_correct": 0,
+            "source_required_correct": 0,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
+          "symbols": {
+            "total": 3,
+            "correct": 1,
+            "source_free_correct": 1,
+            "source_required_correct": 0,
+            "accuracy": 0.3333333333333333,
+            "source_free_accuracy": 0.3333333333333333,
+            "entity_precision": 0.0,
+            "entity_recall": 0.0,
+            "entity_f1": 0.0,
+            "relationship_precision": 0.0,
+            "relationship_recall": 0.0,
+            "relationship_f1": 0.0,
+            "mrr": 0.0,
+            "recall_at_1": 0.0,
+            "recall_at_3": 0.0,
+            "recall_at_5": 0.0,
+            "recall_at_10": 0.0
+          },
           "dependencies": {
             "total": 3,
             "correct": 0,
@@ -1327,27 +1365,8 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "impact": {
+          "calls": {
             "total": 3,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
-          "flows_to": {
-            "total": 2,
             "correct": 0,
             "source_free_correct": 0,
             "source_required_correct": 0,
@@ -1422,25 +1441,6 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "calls": {
-            "total": 3,
-            "correct": 0,
-            "source_free_correct": 0,
-            "source_required_correct": 0,
-            "accuracy": 0.0,
-            "source_free_accuracy": 0.0,
-            "entity_precision": 0.0,
-            "entity_recall": 0.0,
-            "entity_f1": 0.0,
-            "relationship_precision": 0.0,
-            "relationship_recall": 0.0,
-            "relationship_f1": 0.0,
-            "mrr": 0.0,
-            "recall_at_1": 0.0,
-            "recall_at_3": 0.0,
-            "recall_at_5": 0.0,
-            "recall_at_10": 0.0
-          },
           "imports": {
             "total": 3,
             "correct": 0,
@@ -1460,13 +1460,13 @@
             "recall_at_5": 0.0,
             "recall_at_10": 0.0
           },
-          "symbols": {
+          "impact": {
             "total": 3,
-            "correct": 1,
-            "source_free_correct": 1,
+            "correct": 0,
+            "source_free_correct": 0,
             "source_required_correct": 0,
-            "accuracy": 0.3333333333333333,
-            "source_free_accuracy": 0.3333333333333333,
+            "accuracy": 0.0,
+            "source_free_accuracy": 0.0,
             "entity_precision": 0.0,
             "entity_recall": 0.0,
             "entity_f1": 0.0,
@@ -1494,53 +1494,53 @@
     "prime::derivation": {
       "latency": {
         "unit": "ms",
-        "value": 350.4026
+        "value": 326.889
       }
     },
     "prime::knowledge::accuracy": {
       "ratio": {
-        "value": 0.2542372881355932
+        "value": 0.2288135593220339
       }
     },
     "prime::knowledge::source_free_accuracy": {
       "ratio": {
-        "value": 0.23728813559322035
+        "value": 0.2288135593220339
       }
     },
     "prime::retrieval::cold": {
       "latency": {
         "unit": "us",
-        "value": 356.2664
+        "value": 352.7584
       }
     },
     "prime::retrieval::context": {
       "latency": {
         "unit": "us",
-        "value": 8.6498
+        "value": 2.7418
       }
     },
     "prime::retrieval::lookup": {
       "latency": {
         "unit": "us",
-        "value": 26.1082
+        "value": 25.6502
       }
     },
     "prime::retrieval::repeated": {
       "latency": {
         "unit": "us",
-        "value": 358.9916
+        "value": 354.9416
       }
     },
     "prime::retrieval::search": {
       "latency": {
         "unit": "us",
-        "value": 350.9504
+        "value": 344.52520000000004
       }
     },
     "prime::retrieval::warm": {
       "latency": {
         "unit": "us",
-        "value": 350.9504
+        "value": 344.52520000000004
       }
     }
   },

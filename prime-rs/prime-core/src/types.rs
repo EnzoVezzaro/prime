@@ -512,13 +512,31 @@ impl KnowledgeGraph {
         self.incoming(entity, RelationKind::DependsOn)
     }
 
-    /// Get callers of a function
+    /// Get callers of a function (Calls relationships)
     pub fn callers(&self, entity: EntityId) -> Vec<EntityId> {
         self.incoming(entity, RelationKind::Calls)
     }
 
-    /// Get callees of a function
+    /// Get callees of a function (Calls relationships)
     pub fn callees(&self, entity: EntityId) -> Vec<EntityId> {
         self.outgoing(entity, RelationKind::Calls)
+    }
+
+    /// Get ALL incoming relationships (any kind) for an entity
+    pub fn all_incoming(&self, entity: EntityId) -> Vec<(RelationKind, EntityId)> {
+        self.relation_index
+            .as_ref()
+            .and_then(|idx| idx.incoming.get(&entity))
+            .map(|vec| vec.iter().map(|(k, from)| (*k, *from)).collect())
+            .unwrap_or_default()
+    }
+
+    /// Get ALL outgoing relationships (any kind) for an entity
+    pub fn all_outgoing(&self, entity: EntityId) -> Vec<(RelationKind, EntityId)> {
+        self.relation_index
+            .as_ref()
+            .and_then(|idx| idx.outgoing.get(&entity))
+            .map(|vec| vec.iter().map(|(k, to)| (*k, *to)).collect())
+            .unwrap_or_default()
     }
 }

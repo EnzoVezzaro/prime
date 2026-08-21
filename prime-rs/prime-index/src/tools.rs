@@ -232,21 +232,40 @@ impl ToolExecutor {
 
         let target = entity_to_detail(&entity_id, entity);
 
-        let deps = self.engine.graph().dependencies(entity_id);
-        let dependents = self.engine.graph().dependents(entity_id);
-        let callers = self.engine.graph().callers(entity_id);
-        let callees = self.engine.graph().callees(entity_id);
+        // Use ALL relationships, not just Calls/DependsOn
+        let all_in = self.engine.graph().all_incoming(entity_id);
+        let all_out = self.engine.graph().all_outgoing(entity_id);
 
-        let to_details = |ids: Vec<EntityId>| -> Vec<EntityDetail> {
-            ids.into_iter()
-                .filter_map(|id| self.engine.graph().entities.get(&id).map(|e| entity_to_detail(&id, e)))
-                .collect()
+        let to_detail = |id: EntityId| -> Option<EntityDetail> {
+            self.engine.graph().entities.get(&id).map(|e| entity_to_detail(&id, e))
         };
 
-        let dependencies = to_details(deps);
-        let dependents = to_details(dependents);
-        let callers = to_details(callers);
-        let callees = to_details(callees);
+        // Classify relationships by kind
+        let mut callers_vec = Vec::new();
+        let mut callees_vec = Vec::new();
+        let mut deps_vec = Vec::new();
+        let mut dependents_vec = Vec::new();
+        for (kind, from) in &all_in {
+            match kind {
+                RelationKind::Calls => { if let Some(d) = to_detail(*from) { callers_vec.push(d); } }
+                RelationKind::DependsOn => { if let Some(d) = to_detail(*from) { dependents_vec.push(d); } }
+                RelationKind::Imports => { if let Some(d) = to_detail(*from) { dependents_vec.push(d); } }
+                _ => { if let Some(d) = to_detail(*from) { dependents_vec.push(d); } }
+            }
+        }
+        for (kind, to) in &all_out {
+            match kind {
+                RelationKind::Calls => { if let Some(d) = to_detail(*to) { callees_vec.push(d); } }
+                RelationKind::DependsOn => { if let Some(d) = to_detail(*to) { deps_vec.push(d); } }
+                RelationKind::Imports => { if let Some(d) = to_detail(*to) { deps_vec.push(d); } }
+                _ => { if let Some(d) = to_detail(*to) { callees_vec.push(d); } }
+            }
+        }
+
+        let dependencies = deps_vec;
+        let dependents = dependents_vec;
+        let callers = callers_vec;
+        let callees = callees_vec;
 
         let has_signature = entity.signature.is_some();
         let has_docs = entity.documentation.is_some();
