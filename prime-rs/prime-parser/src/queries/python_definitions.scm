@@ -1,7 +1,3 @@
 ; Python definitions query
-
-(function_definition
-  name: (identifier) @name) @definition
-
-(class_definition
-  name: (identifier) @name) @definition
+(function_definition name: (identifier) @name) @definition
+(class_definition name: (identifier) @name) @definition
