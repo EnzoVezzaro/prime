@@ -36,7 +36,7 @@ If you're looking for something polished and predictable... this might be a litt
 
 ---
 
-> **What is the minimum information an agent needs to understand a codebase without reading its code?**
+> **What is the minimum information an agent needs to understand a codebase and acomplish a task without reading unnecesary/unrelated code?**
 
 That is the question behind Prime.
 
@@ -44,7 +44,7 @@ Prime is a research project exploring how an entire software repository can be t
 
 Prime does **not** aim to compress source code.
 
-Prime aims to make the source code unnecessary for as many agent questions as possible.
+Prime aims to make the source code more understandable and navigatable for as many agent questions as possible.
 
 ```text
                          CODEBASE
@@ -972,21 +972,18 @@ The repository itself is deliberately organized into three layers.
                   RESEARCH
                      │
                      ▼
-              RESEARCH FINDINGS
+              RESEARCH FINDINGS (specs)
                      │
                      ▼
                    DOCS
                      │
                      ▼
-             FUTURE PRIME PRODUCT
-                     │
-                     ▼
-                    ACC
+                   PRIME
 ```
 
-### `research/`
+### `specs/`
 
-Contains the external knowledge and experiments.
+Contains the external knowledge and research.
 
 It answers:
 
@@ -1012,25 +1009,12 @@ It answers:
 
 # Repository structure
 
-The repository intentionally begins with only two files:
-
-```text
-Prime/
-├── README.md
-└── init-prompt.md
-```
-
-`init-prompt.md` is the bootstrap specification for the research agent.
-
-After initialization, the repository is expected to evolve into:
-
 ```text
 Prime/
 │
 ├── README.md
-├── init-prompt.md
 │
-├── research/
+├── specs/
 │   ├── agents/
 │   ├── codebase-analysis/
 │   ├── prior-art/
