@@ -7,7 +7,6 @@
 ### The smallest useful representation of a codebase for agents.
 
 [![Status: Research](https://img.shields.io/badge/status-research-red?style=for-the-badge)](#status)
-[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 **Research into a universal, language-agnostic representation that lets next-generation agents understand and operate on codebases without retrieving the underlying source.**
 
