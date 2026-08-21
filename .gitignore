@@ -4,3 +4,8 @@ target/
 benchmarks/repos/
 prime-rs/benchmarks/repos/
 prime-rs/target/
+
+docs/.vitepress
+docs/node_modules
+
+package-lock.json

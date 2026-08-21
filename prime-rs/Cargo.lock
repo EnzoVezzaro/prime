@@ -1032,6 +1032,7 @@ dependencies = [
  "anyhow",
  "bincode",
  "blake3",
+ "byteorder",
  "flatbuffers",
  "indexmap",
  "libc",

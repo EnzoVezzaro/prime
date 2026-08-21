@@ -331,22 +331,56 @@ impl<'a> Extractor<'a> {
 
     fn parse_symbol_kind(&self, kind_str: &str) -> SymbolKind {
         match kind_str {
-            "function" | "function_item" | "function_declaration" => SymbolKind::Function,
-            "method" | "method_definition" | "method_declaration" => SymbolKind::Method,
-            "class" | "class_declaration" | "class_item" | "class_specifier" => SymbolKind::Class,
-            "struct" | "struct_item" | "struct_specifier" => SymbolKind::Struct,
+            // Functions
+            "function" | "function_item" | "function_declaration" | "function_definition" | "async_function_definition" => SymbolKind::Function,
+            // Methods
+            "method" | "method_definition" | "method_declaration" | "method_declaration" => SymbolKind::Method,
+            // Classes/Structs/Enums
+            "class" | "class_declaration" | "class_item" | "class_specifier" | "class_definition" => SymbolKind::Class,
+            "struct" | "struct_item" | "struct_specifier" | "struct_declaration" => SymbolKind::Struct,
             "enum" | "enum_item" | "enum_declaration" | "enum_specifier" => SymbolKind::Enum,
+            // Traits/Interfaces
             "trait" | "trait_item" | "trait_declaration" | "interface_declaration" => SymbolKind::Trait,
             "interface" => SymbolKind::Interface,
             "impl" | "impl_item" => SymbolKind::Trait,
+            // Types
             "type_alias" | "type_item" | "type_declaration" => SymbolKind::TypeAlias,
+            // Macros
             "macro" | "macro_definition" | "macro_rules" => SymbolKind::Macro,
+            // Modules
             "module" | "mod_item" | "namespace_definition" => SymbolKind::Module,
+            // Constants/Variables
             "const" | "const_item" | "const_declaration" => SymbolKind::Constant,
             "static" | "static_item" => SymbolKind::StaticVariable,
             "field" | "field_declaration" => SymbolKind::Field,
             "parameter" => SymbolKind::Parameter,
             "variable" | "var_declaration" => SymbolKind::Variable,
+            // Python-specific
+            "function_definition" => SymbolKind::Function,
+            "async_function_definition" => SymbolKind::Function,
+            "class_definition" => SymbolKind::Class,
+            "async_function_definition" => SymbolKind::Function,
+            // JavaScript/TypeScript
+            "function_declaration" => SymbolKind::Function,
+            "function_expression" => SymbolKind::Function,
+            "arrow_function" => SymbolKind::Function,
+            "method_definition" => SymbolKind::Method,
+            "class_declaration" => SymbolKind::Class,
+            "interface_declaration" => SymbolKind::Interface,
+            "type_alias_declaration" => SymbolKind::TypeAlias,
+            "enum_declaration" => SymbolKind::Enum,
+            // Go
+            "function_declaration" => SymbolKind::Function,
+            "method_declaration" => SymbolKind::Method,
+            "struct_declaration" => SymbolKind::Struct,
+            "interface_declaration" => SymbolKind::Interface,
+            "type_declaration" => SymbolKind::TypeAlias,
+            // Python-specific
+            "async_function_definition" => SymbolKind::Function,
+            "class_definition" => SymbolKind::Class,
+            "type_alias_declaration" => SymbolKind::TypeAlias,
+            // Variables
+            "variable_declaration" => SymbolKind::Variable,
             _ => SymbolKind::Unknown,
         }
     }

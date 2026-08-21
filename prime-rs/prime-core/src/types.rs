@@ -143,6 +143,45 @@ impl std::fmt::Display for SymbolKind {
     }
 }
 
+impl std::str::FromStr for SymbolKind {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "module" => Ok(SymbolKind::Module),
+            "namespace" => Ok(SymbolKind::Namespace),
+            "package" => Ok(SymbolKind::Package),
+            "class" => Ok(SymbolKind::Class),
+            "struct" => Ok(SymbolKind::Struct),
+            "enum" => Ok(SymbolKind::Enum),
+            "trait" => Ok(SymbolKind::Trait),
+            "interface" => Ok(SymbolKind::Interface),
+            "typealias" => Ok(SymbolKind::TypeAlias),
+            "protocol" => Ok(SymbolKind::Protocol),
+            "function" => Ok(SymbolKind::Function),
+            "method" => Ok(SymbolKind::Method),
+            "constructor" => Ok(SymbolKind::Constructor),
+            "destructor" => Ok(SymbolKind::Destructor),
+            "asyncfunction" => Ok(SymbolKind::AsyncFunction),
+            "asyncmethod" => Ok(SymbolKind::AsyncMethod),
+            "variable" => Ok(SymbolKind::Variable),
+            "field" => Ok(SymbolKind::Field),
+            "constant" => Ok(SymbolKind::Constant),
+            "staticvariable" => Ok(SymbolKind::StaticVariable),
+            "parameter" => Ok(SymbolKind::Parameter),
+            "macro" => Ok(SymbolKind::Macro),
+            "delegate" => Ok(SymbolKind::Delegate),
+            "event" => Ok(SymbolKind::Event),
+            "property" => Ok(SymbolKind::Property),
+            "genericparameter" => Ok(SymbolKind::GenericParameter),
+            "moduleimport" => Ok(SymbolKind::ModuleImport),
+            "moduleexport" => Ok(SymbolKind::ModuleExport),
+            "unknown" => Ok(SymbolKind::Unknown),
+            _ => Err(format!("Unknown SymbolKind: {}", s)),
+        }
+    }
+}
+
 /// Relationship kinds between entities
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[repr(u8)]
@@ -184,6 +223,37 @@ pub enum RelationKind {
     Unknown = 255,
 }
 
+impl std::str::FromStr for RelationKind {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "contains" => Ok(RelationKind::Contains),
+            "partof" => Ok(RelationKind::PartOf),
+            "extends" => Ok(RelationKind::Extends),
+            "implements" => Ok(RelationKind::Implements),
+            "inherits" => Ok(RelationKind::Inherits),
+            "dependson" => Ok(RelationKind::DependsOn),
+            "imports" => Ok(RelationKind::Imports),
+            "requires" => Ok(RelationKind::Requires),
+            "calls" => Ok(RelationKind::Calls),
+            "references" => Ok(RelationKind::References),
+            "reads" => Ok(RelationKind::Reads),
+            "writes" => Ok(RelationKind::Writes),
+            "returns" => Ok(RelationKind::Returns),
+            "parameterof" => Ok(RelationKind::ParameterOf),
+            "typeof" => Ok(RelationKind::TypeOf),
+            "genericargof" => Ok(RelationKind::GenericArgOf),
+            "overrides" => Ok(RelationKind::Overrides),
+            "overloads" => Ok(RelationKind::Overloads),
+            "exports" => Ok(RelationKind::Exports),
+            "reexports" => Ok(RelationKind::ReExports),
+            "unknown" => Ok(RelationKind::Unknown),
+            _ => Err(format!("Unknown RelationKind: {}", s)),
+        }
+    }
+}
+
 /// An entity in the knowledge graph
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Entity {
@@ -220,6 +290,7 @@ pub enum Provenance {
     Discovered = 2,    // Found by analyzer (imports, calls)
     Inferred = 3,      // Deduced from patterns
     Memory = 4,        // From .acc-memory.md
+    Stored = 5,        // From storage (loaded from disk)
 }
 
 /// A source file

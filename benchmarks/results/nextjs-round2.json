@@ -1,0 +1,10 @@
+{
+  "framework": "nextjs",
+  "round": 2,
+  "timestamp": "2026-08-20T17:05:00Z",
+  "clean_seconds": 1.82,
+  "install_seconds": 8.56,
+  "total_seconds": 10.38,
+  "packages": 360,
+  "cache_state": "warm"
+}

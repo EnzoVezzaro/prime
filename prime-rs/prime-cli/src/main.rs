@@ -974,8 +974,10 @@ fn repo_config(name: &str, path: &str, language: &str, size_category: &str, comm
 }
 
 fn load_corpus(corpus: &str) -> anyhow::Result<Vec<RepoConfig>> {
-    // Load from repositories.json
-    let corpus_config = fs::read_to_string("benchmarks/corpus/repositories.json")?;
+    // Load from repositories.json - use absolute path from workspace root
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    let corpus_path = std::path::Path::new(manifest_dir).join("../../benchmarks/corpus/repositories.json");
+    let corpus_config = fs::read_to_string(&corpus_path)?;
     let data: serde_json::Value = serde_json::from_str(&corpus_config)?;
 
     let repo_names = if corpus == "pr" {
@@ -1014,7 +1016,7 @@ fn load_corpus(corpus: &str) -> anyhow::Result<Vec<RepoConfig>> {
         {
             repos.push(RepoConfig {
                 name: name.clone(),
-                path: format!("benchmarks/repos/{}", name),
+                path: format!("../benchmarks/repos/{}", name),
                 language: repo["language"].as_str().unwrap_or("unknown").to_string(),
                 size_category: repo["size_category"].as_str().unwrap_or("unknown").to_string(),
                 commit: repo["commit"].as_str().unwrap_or("").to_string(),
@@ -1030,8 +1032,10 @@ fn load_corpus(corpus: &str) -> anyhow::Result<Vec<RepoConfig>> {
 
 fn benchmark_repo(repo: &RepoConfig, bench_storage: &PathBuf, _root: &Path) -> anyhow::Result<RepoBenchmark> {
     let repo_path = std::path::Path::new(&repo.path);
+    eprintln!("DEBUG: Checking repo path: {}", repo_path.display());
+    eprintln!("DEBUG: CWD: {}", std::env::current_dir().unwrap().display());
     if !repo_path.exists() {
-        println!("  Repo not found at {}, skipping", repo.path);
+        eprintln!("  Repo not found at {}, skipping", repo.path);
         return Ok(RepoBenchmark {
             repo_name: repo.name.clone(),
             status: "skipped".to_string(),
@@ -1039,9 +1043,10 @@ fn benchmark_repo(repo: &RepoConfig, bench_storage: &PathBuf, _root: &Path) -> a
             ..Default::default()
         });
     }
-
+    eprintln!("DEBUG: Repo exists, creating storage at: {}", bench_storage.join(&repo.name).display());
     let storage_path = bench_storage.join(&repo.name);
     fs::create_dir_all(&storage_path)?;
+    eprintln!("DEBUG: Storage dir created");
 
     // 1. Discover and measure corpus metrics (single source of truth)
     let corpus_info = discover_corpus_info(repo_path)?;
@@ -1384,6 +1389,30 @@ fn percentile(sorted: &[f64], p: f64) -> f64 {
     sorted[idx.min(sorted.len() - 1)]
 }
 
+// Helper function to map question category/evaluation to appropriate ToolIntent
+fn question_to_tool_intent(q: &KnowledgeQuestion) -> ToolIntent {
+    match q.category.as_str() {
+        "architecture" => {
+            // Architecture questions about module hierarchy, public APIs -> Architecture tool
+            if q.evaluation == "relationship_recall" || q.evaluation == "relationship_precision" {
+                ToolIntent::Architecture
+            } else {
+                ToolIntent::Search
+            }
+        }
+        "symbols" => ToolIntent::Search,
+        "relationships" => ToolIntent::Relationships,
+        "dependencies" => ToolIntent::Dependencies,
+        "impact" => ToolIntent::Impact,
+        "dataflow" => ToolIntent::Context,  // Context gives callers/callees/dependencies
+        "entrypoints" => ToolIntent::Search,
+        "configuration" => ToolIntent::Architecture,
+        "testing" => ToolIntent::Search,
+        "polyglot" => ToolIntent::Architecture,
+        _ => ToolIntent::Search,
+    }
+}
+
 fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> {
     let storage_config = StorageConfig {
         path: storage_path.to_path_buf(),
@@ -1420,8 +1449,10 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
 
     for q in &questions {
         total += 1;
+        // Use appropriate tool for question type
+        let tool_intent = question_to_tool_intent(q);
         let req = ToolRequest {
-            intent: ToolIntent::Search,
+            intent: tool_intent,
             target: Some(q.search_query.clone()),
             limit: 10,
             ..Default::default()
@@ -1445,7 +1476,7 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
 
         // Evaluate based on question type
         let (is_correct, entity_tp_q, entity_fp_q, entity_fn_q, rel_tp_q, rel_fp_q, rel_fn_q, rank) = 
-            evaluate_question(&q, &result_array, &returned_entities, &returned_kinds);
+            evaluate_question(&q, &result_array, &returned_entities, &returned_kinds, tool_intent);
 
         entity_tp += entity_tp_q;
         entity_fp += entity_fp_q;
@@ -1464,11 +1495,12 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
 
         let is_correct = entity_tp_q > 0 || (q.expected_entities.is_empty() && q.expected_relationships.is_empty() && !returned_entities.is_empty());
         
-        let source_required = q.source_allowed || returned_entities.is_empty();
-
+        // Use envelope's actual source_required field
+        let envelope_source_required = result.get("source_required").and_then(|v| v.as_bool()).unwrap_or(false);
+        
         if is_correct {
             correct += 1;
-            if !source_required {
+            if !envelope_source_required {
                 source_free_correct += 1;
             } else {
                 source_required_correct += 1;
@@ -1478,8 +1510,8 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
         let cat = by_category.entry(q.category.clone()).or_default();
         cat.total += 1;
         if is_correct { cat.correct += 1; }
-        if !source_required && is_correct { cat.source_free_correct += 1; }
-        if source_required && is_correct { cat.source_required_correct += 1; }
+        if !envelope_source_required && is_correct { cat.source_free_correct += 1; }
+        if envelope_source_required && is_correct { cat.source_required_correct += 1; }
     }
 
     let accuracy = if total > 0 { correct as f64 / total as f64 } else { 0.0 };
@@ -1548,7 +1580,7 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
 }
 
 // Evaluate a single question and return (is_correct, entity_tp, entity_fp, entity_fn, rel_tp, rel_fp, rel_fn, rank)
-fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], returned: &[String], kinds: &[String]) -> (bool, usize, usize, usize, usize, usize, usize, Option<usize>) {
+fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], returned: &[String], kinds: &[String], tool_intent: ToolIntent) -> (bool, usize, usize, usize, usize, usize, usize, Option<usize>) {
     let mut entity_tp = 0;
     let mut entity_fp = 0;
     let mut entity_fn = 0;
@@ -1557,12 +1589,12 @@ fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], retur
     let mut rel_fn = 0;
     let mut rank = None;
 
-    // Check entity retrieval
+    // Check entity retrieval - use exact matching on qualified names
     let expected_entities: Vec<String> = q.expected_entities.iter().map(|s| s.to_lowercase()).collect();
     let returned_lower: Vec<String> = returned.iter().map(|s| s.to_lowercase()).collect();
 
     for (i, ret) in returned_lower.iter().enumerate() {
-        if expected_entities.iter().any(|e| ret.contains(e) || e.contains(ret)) {
+        if expected_entities.iter().any(|e| ret == e || e == ret) {
             entity_tp += 1;
             if rank.is_none() { rank = Some(i + 1); }
         } else {
@@ -1571,24 +1603,28 @@ fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], retur
     }
     entity_fn = expected_entities.len().saturating_sub(entity_tp);
 
-    // Check relationship retrieval
+    // Check relationship retrieval - extract from structured response based on tool
     let expected_rels: Vec<Vec<String>> = q.expected_relationships.iter()
         .map(|rels| rels.iter().map(|s| s.to_lowercase()).collect())
         .collect();
-    
-    // For simplicity, check if any expected relationship keywords appear in results
-    let result_text = serde_json::to_string(results).unwrap_or_default().to_lowercase();
-    for rel in &expected_rels {
-        let mut found = false;
-        for rel_kw in rel {
-            if result_text.contains(rel_kw.as_str()) {
-                found = true;
-                break;
+
+    if !expected_rels.is_empty() {
+        // Extract relationships from structured response based on tool
+        let extracted_rels = extract_relationships_from_response(results, tool_intent);
+        
+        for expected_rel in &expected_rels {
+            let mut found = false;
+            for expected_kw in expected_rel {
+                if extracted_rels.iter().any(|r| r.to_lowercase().contains(expected_kw.as_str())) {
+                    found = true;
+                    break;
+                }
             }
+            if found { rel_tp += 1; } else { rel_fn += 1; }
         }
-        if found { rel_tp += 1; } else { rel_fn += 1; }
+        // Note: rel_fp is hard to measure without ground truth negatives
+        rel_fp = 0;
     }
-    rel_fp = 0; // Hard to measure false positives for relationships
 
     // Filter by expected kind if specified
     if let Some(expected_kind) = &q.expected_kind {
@@ -1611,11 +1647,113 @@ fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], retur
     (is_correct, entity_tp, entity_fp, entity_fn, rel_tp, rel_fp, rel_fn, rank)
 }
 
+// Extract relationships from tool response based on tool intent
+fn extract_relationships_from_response(results: &[serde_json::Value], tool_intent: ToolIntent) -> Vec<String> {
+    let mut rels = Vec::new();
+    
+    for result in results {
+        match tool_intent {
+            ToolIntent::Context => {
+                // Context returns: entity, calls, called_by, dependencies
+                if let Some(calls) = result.get("calls").and_then(|v| v.as_array()) {
+                    for call in calls {
+                        if let Some(s) = call.as_str() { rels.push(format!("calls:{}", s)); }
+                    }
+                }
+                if let Some(called_by) = result.get("called_by").and_then(|v| v.as_array()) {
+                    for cb in called_by {
+                        if let Some(s) = cb.as_str() { rels.push(format!("called_by:{}", s)); }
+                    }
+                }
+                if let Some(deps) = result.get("dependencies").and_then(|v| v.as_object()) {
+                    if let Some(declared) = deps.get("declared").and_then(|v| v.as_array()) {
+                        for d in declared { if let Some(s) = d.as_str() { rels.push(format!("depends_on:{}", s)); } }
+                    }
+                    if let Some(discovered) = deps.get("discovered").and_then(|v| v.as_array()) {
+                        for d in discovered { if let Some(s) = d.as_str() { rels.push(format!("depends_on:{}", s)); } }
+                    }
+                }
+            }
+            ToolIntent::Relationships => {
+                // Relationships returns: entity, relations array
+                if let Some(relations) = result.get("relations").and_then(|v| v.as_array()) {
+                    for rel in relations {
+                        if let Some(kind) = rel.get("kind").and_then(|v| v.as_str()) {
+                            if let Some(target) = rel.get("target").and_then(|v| v.as_str()) {
+                                rels.push(format!("{}:{}", kind.to_lowercase(), target));
+                            }
+                        }
+                    }
+                }
+            }
+            ToolIntent::Dependencies => {
+                // Dependencies returns: entity, dependencies array, dependents array
+                if let Some(deps) = result.get("dependencies").and_then(|v| v.as_array()) {
+                    for dep in deps {
+                        if let Some(target) = dep.get("target").and_then(|v| v.as_str()) {
+                            if let Some(kind) = dep.get("kind").and_then(|v| v.as_str()) {
+                                rels.push(format!("{}:{}", kind.to_lowercase(), target));
+                            } else {
+                                rels.push(format!("depends_on:{}", target));
+                            }
+                        }
+                    }
+                }
+                if let Some(dependents) = result.get("dependents").and_then(|v| v.as_array()) {
+                    for dep in dependents {
+                        if let Some(s) = dep.as_str() { rels.push(format!("depended_by:{}", s)); }
+                    }
+                }
+            }
+            ToolIntent::Impact => {
+                // Impact returns: entity, direct_impact, transitive_impact, tests_affected
+                if let Some(direct) = result.get("direct_impact").and_then(|v| v.as_array()) {
+                    for d in direct { if let Some(s) = d.as_str() { rels.push(format!("directly_affects:{}", s)); } }
+                }
+                if let Some(transitive) = result.get("transitive_impact").and_then(|v| v.as_array()) {
+                    for t in transitive { if let Some(s) = t.as_str() { rels.push(format!("transitively_affects:{}", s)); } }
+                }
+                if let Some(tests) = result.get("tests_affected").and_then(|v| v.as_array()) {
+                    for t in tests { if let Some(s) = t.as_str() { rels.push(format!("tests:{}", s)); } }
+                }
+            }
+            ToolIntent::Architecture => {
+                // Architecture returns: modules, boundaries, layers
+                if let Some(modules) = result.get("modules").and_then(|v| v.as_array()) {
+                    for m in modules {
+                        if let Some(name) = m.get("name").and_then(|v| v.as_str()) {
+                            if let Some(deps) = m.get("deps").and_then(|v| v.as_array()) {
+                                for d in deps { if let Some(s) = d.as_str() { rels.push(format!("module:{}:depends_on:{}", name, s)); } }
+                            }
+                        }
+                    }
+                }
+                if let Some(boundaries) = result.get("boundaries").and_then(|v| v.as_array()) {
+                    for b in boundaries {
+                        if let Some(from) = b.get("from").and_then(|v| v.as_str()) {
+                            if let Some(to) = b.get("to").and_then(|v| v.as_str()) {
+                                rels.push(format!("boundary_violation:{}:{}", from, to));
+                            }
+                        }
+                    }
+                }
+            }
+            _ => {
+                // For Search, Lookup - no relationship data in response
+            }
+        }
+    }
+    
+    rels
+}
+
 fn load_questions() -> anyhow::Result<Vec<KnowledgeQuestion>> {
-    // Try to load from file first
-    let questions_path = "benchmarks/corpus/questions/knowledge.json";
-    if let Ok(content) = fs::read_to_string(questions_path) {
-        if let Ok(parsed) = serde_json::from_value::<serde_json::Value>(serde_json::from_str(&content)?) {
+    // Try to load from file first - use absolute path from workspace root
+    let questions_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../benchmarks/corpus/questions/knowledge.json");
+    
+    if let Ok(content) = fs::read_to_string(&questions_path) {
+        if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&content) {
             if let Some(arr) = parsed.get("questions").and_then(|v| v.as_array()) {
                 let mut questions = Vec::new();
                 for q in arr {
@@ -1629,6 +1767,7 @@ fn load_questions() -> anyhow::Result<Vec<KnowledgeQuestion>> {
                             .and_then(|v| v.as_array())
                             .map(|arr| arr.iter().filter_map(|v| v.as_str()).map(|s| s.to_string()).collect())
                             .unwrap_or_default();
+                        // Fix: Parse expected_relationships as Vec<Vec<String>> - inner elements are strings, not arrays
                         let expected_relationships = q.get("expected_relationships")
                             .and_then(|v| v.as_array())
                             .map(|arr| arr.iter().filter_map(|v| v.as_array()).map(|a| a.iter().filter_map(|v| v.as_str()).map(|s| s.to_string()).collect()).collect())
@@ -2032,6 +2171,69 @@ impl BenchmarkResult {
         let correct: usize = complete.iter().map(|b| b.knowledge.correct).sum();
         let source_free_correct: usize = complete.iter().map(|b| b.knowledge.source_free_correct).sum();
         let source_required_correct: usize = complete.iter().map(|b| b.knowledge.source_required_correct).sum();
+        
+        // Properly aggregate retrieval metrics
+        let entity_precision = if complete.iter().map(|b| b.knowledge.entity_precision as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.entity_precision as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let entity_recall = if complete.iter().map(|b| b.knowledge.entity_recall as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.entity_recall as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let entity_f1 = if complete.iter().map(|b| b.knowledge.entity_f1 as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.entity_f1 as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let relationship_precision = if complete.iter().map(|b| b.knowledge.relationship_precision as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.relationship_precision as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let relationship_recall = if complete.iter().map(|b| b.knowledge.relationship_recall as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.relationship_recall as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let relationship_f1 = if complete.iter().map(|b| b.knowledge.relationship_f1 as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.relationship_f1 as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let mrr = if complete.iter().map(|b| b.knowledge.mrr as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.mrr as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let recall_at_1 = if complete.iter().map(|b| b.knowledge.recall_at_1 as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.recall_at_1 as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let recall_at_3 = if complete.iter().map(|b| b.knowledge.recall_at_3 as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.recall_at_3 as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let recall_at_5 = if complete.iter().map(|b| b.knowledge.recall_at_5 as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.recall_at_5 as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        let recall_at_10 = if complete.iter().map(|b| b.knowledge.recall_at_10 as f64).sum::<f64>() > 0.0 {
+            complete.iter().map(|b| b.knowledge.recall_at_10 as f64).sum::<f64>() / complete.len() as f64
+        } else { 0.0 };
+        
+        // Aggregate by_category
+        let mut by_category = HashMap::new();
+        for b in &complete {
+            for (cat, stats) in &b.knowledge.by_category {
+                let entry = by_category.entry(cat.clone()).or_insert(CategoryStats::default());
+                entry.total += stats.total;
+                entry.correct += stats.correct;
+                entry.source_free_correct += stats.source_free_correct;
+                entry.source_required_correct += stats.source_required_correct;
+                entry.accuracy = if entry.total > 0 { entry.correct as f64 / entry.total as f64 } else { 0.0 };
+                entry.source_free_accuracy = if entry.total > 0 { entry.source_free_correct as f64 / entry.total as f64 } else { 0.0 };
+                // Aggregate retrieval metrics per category (weighted average)
+                let weight = stats.total as f64;
+                entry.entity_precision = (entry.entity_precision * (entry.total - stats.total) as f64 + stats.entity_precision * weight) / entry.total as f64;
+                entry.entity_recall = (entry.entity_recall * (entry.total - stats.total) as f64 + stats.entity_recall * weight) / entry.total as f64;
+                entry.entity_f1 = (entry.entity_f1 * (entry.total - stats.total) as f64 + stats.entity_f1 * weight) / entry.total as f64;
+                entry.relationship_precision = (entry.relationship_precision * (entry.total - stats.total) as f64 + stats.relationship_precision * weight) / entry.total as f64;
+                entry.relationship_recall = (entry.relationship_recall * (entry.total - stats.total) as f64 + stats.relationship_recall * weight) / entry.total as f64;
+                entry.relationship_f1 = (entry.relationship_f1 * (entry.total - stats.total) as f64 + stats.relationship_f1 * weight) / entry.total as f64;
+                entry.mrr = (entry.mrr * (entry.total - stats.total) as f64 + stats.mrr * weight) / entry.total as f64;
+                entry.recall_at_1 = (entry.recall_at_1 * (entry.total - stats.total) as f64 + stats.recall_at_1 * weight) / entry.total as f64;
+                entry.recall_at_3 = (entry.recall_at_3 * (entry.total - stats.total) as f64 + stats.recall_at_3 * weight) / entry.total as f64;
+                entry.recall_at_5 = (entry.recall_at_5 * (entry.total - stats.total) as f64 + stats.recall_at_5 * weight) / entry.total as f64;
+                entry.recall_at_10 = (entry.recall_at_10 * (entry.total - stats.total) as f64 + stats.recall_at_10 * weight) / entry.total as f64;
+            }
+        }
+        
         Some(KnowledgeMetrics {
             total_questions: total,
             correct,
@@ -2040,18 +2242,18 @@ impl BenchmarkResult {
             source_required_correct,
             accuracy: if total > 0 { correct as f64 / total as f64 } else { 0.0 },
             source_free_accuracy: if total > 0 { source_free_correct as f64 / total as f64 } else { 0.0 },
-            entity_precision: 0.0,
-            entity_recall: 0.0,
-            entity_f1: 0.0,
-            relationship_precision: 0.0,
-            relationship_recall: 0.0,
-            relationship_f1: 0.0,
-            mrr: 0.0,
-            recall_at_1: 0.0,
-            recall_at_3: 0.0,
-            recall_at_5: 0.0,
-            recall_at_10: 0.0,
-            by_category: HashMap::new(),
+            entity_precision,
+            entity_recall,
+            entity_f1,
+            relationship_precision,
+            relationship_recall,
+            relationship_f1,
+            mrr,
+            recall_at_1,
+            recall_at_3,
+            recall_at_5,
+            recall_at_10,
+            by_category,
         })
     }
 

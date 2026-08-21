@@ -48,6 +48,21 @@ impl fmt::Display for Confidence {
     }
 }
 
+impl std::str::FromStr for Confidence {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "exact" => Ok(Confidence::Exact),
+            "high" => Ok(Confidence::High),
+            "medium" => Ok(Confidence::Medium),
+            "low" => Ok(Confidence::Low),
+            "unknown" => Ok(Confidence::Unknown),
+            _ => Err(format!("Unknown Confidence: {}", s)),
+        }
+    }
+}
+
 /// Provenance information for a derived fact
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FactProvenance {

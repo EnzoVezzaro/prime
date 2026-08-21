@@ -1500,43 +1500,59 @@ Latest benchmark:
 
 | Metric | Result |
 |--------|-------:|
-| Derivation | 1.26 s |
-| Artifact size | 8.2 MB |
-| Artifact/Source ratio | 0.894 |
-| Retrieval p50 (warm) | 5.8 ms |
-| Retrieval p95 (warm) | 6.9 ms |
-| Accuracy | 5.9% |
-| Source-free accuracy | 5.9% |
-| Entity precision | 0.25 |
-| Entity recall | 0.29 |
-| Entity F1 | 0.27 |
+| Derivation | 334 ms |
+| Artifact size | 1.2 MB |
+| Artifact/Source ratio | 1.196 |
+| Retrieval p50 (warm) | 169 µs |
+| Retrieval p95 (warm) | 305 µs |
+| Accuracy | 8.2% |
+| Source-free accuracy | 8.2% |
+| Entity precision | 0.35 |
+| Entity recall | 0.40 |
+| Entity F1 | 0.37 |
 | Relationship precision | 0.00 |
 | Relationship recall | 0.00 |
 | Relationship F1 | 0.00 |
-| MRR | 0.29 |
+| MRR | 0.40 |
 | Recall@1 | 0.1% |
 | Recall@3 | 0.1% |
 | Recall@5 | 0.1% |
 | Recall@10 | 0.1% |
 
-Repository: `ripgrep` (rust, medium)
-Repository: `rich` (python, medium)
-Repository: `fastapi` (python, medium)
-Repository: `fastjson` (java, medium)
-Repository: `redis` (c, medium)
-Repository: `vapor` (swift, medium)
-Repository: `ktor` (kotlin, medium)
+Repository: `bat` (rust, small)
+Repository: `httpx` (python, small)
+Repository: `express` (javascript, small)
+Repository: `gin` (go, small)
+Repository: `spdlog` (cpp, small)
 
 Integrity: ✅ Valid
-Repos: 7/7 completed
-Warnings: ripgrep: source savings not measured (requires controlled baseline), rich: source savings not measured (requires controlled baseline), fastapi: source savings not measured (requires controlled baseline), fastjson: source savings not measured (requires controlled baseline), redis: source savings not measured (requires controlled baseline), vapor: source savings not measured (requires controlled baseline), ktor: source savings not measured (requires controlled baseline)
+Repos: 5/5 completed
+Warnings: bat: source savings not measured (requires controlled baseline), httpx: source savings not measured (requires controlled baseline), express: source savings not measured (requires controlled baseline), gin: source savings not measured (requires controlled baseline), spdlog: source savings not measured (requires controlled baseline)
 
-Commit: `c1470f620444`
+Commit: `0154620eaeb9`
 Benchmark version: 1.0.0
 
 Environment: macos / aarch64 / Apple M2
 
 Full machine-readable result: [`benchmarks/results/latest.json`](benchmarks/results/latest.json)
+
+## Framework Installation Benchmarks
+
+We also tested 5 popular JavaScript/TypeScript frameworks using the [disk-perf-git-and-pnpm](https://github.com/NullVoxPopuli/disk-perf-git-and-pnpm) methodology to understand real-world installation performance.
+
+See the full comparison: [`benchmarks/results/comparison.md`](benchmarks/results/comparison.md)
+
+**Quick Summary (3-run averages):**
+
+| Framework | Packages | Avg Total (s) | Cold Install (s) |
+|-----------|----------|---------------|------------------|
+| Vite + Vue + TS | 48 | **7.98** | 7.88 |
+| SvelteKit | 56 | **8.21** | 7.49 |
+| Nuxt.js | 606 | **10.66** | 8.79 |
+| Next.js | 360 | **10.85** | 9.23 |
+| Remix | 764 | **11.12** | 9.22 |
+
+Lightweight frameworks (Vite+Vue, SvelteKit) install ~3x faster than full frameworks (Remix, Next.js) primarily due to fewer packages.
 <!-- PRIME_BENCHMARK_END -->
 
 Full machine-readable result: [`benchmarks/results/latest.json`](benchmarks/results/latest.json)

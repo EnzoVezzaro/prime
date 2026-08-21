@@ -3,12 +3,16 @@ name = "prime-index"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = ["serde-derive"]
+serde-derive = ["serde/derive"]
+
 [dependencies]
-prime-core = { path = "../prime-core" }
+prime-core = { path = "../prime-core", features = ["serde"] }
 prime-parser = { path = "../prime-parser" }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
-serde = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 flatbuffers = { workspace = true }
 bincode = { workspace = true }
@@ -22,3 +26,7 @@ indexmap = { workspace = true }
 roaring = { workspace = true }
 rayon = { workspace = true }
 libc = { workspace = true }
+byteorder = "1.5"
+
+[dev-dependencies]
+serde = { workspace = true }

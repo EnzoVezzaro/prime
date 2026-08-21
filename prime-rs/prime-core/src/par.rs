@@ -698,7 +698,7 @@ mod tokenizer_tests {
     fn test_gpt4_tokenizer() {
         let tokenizer = Gpt4Tokenizer;
         assert_eq!(tokenizer.count_tokens("hello world"), 3); // 11 chars / 4 = 3
-        assert_eq!(tokenizer.count_tokens("fn main() {}"), 4); // 12 chars / 4 = 3, ceil = 3
+        assert_eq!(tokenizer.count_tokens("fn main() {}"), 3); // 12 chars / 4 = 3
     }
 
     #[test]

@@ -1,0 +1,10 @@
+{
+  "framework": "remix",
+  "round": 1,
+  "timestamp": "2026-08-20T17:45:00Z",
+  "clean_seconds": 2.16,
+  "install_seconds": 9.22,
+  "total_seconds": 11.38,
+  "packages": 764,
+  "cache_state": "cold"
+}

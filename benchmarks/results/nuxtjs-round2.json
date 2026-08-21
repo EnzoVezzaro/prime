@@ -1,0 +1,10 @@
+{
+  "framework": "nuxtjs",
+  "round": 2,
+  "timestamp": "2026-08-20T17:20:00Z",
+  "clean_seconds": 1.70,
+  "install_seconds": 8.62,
+  "total_seconds": 10.32,
+  "packages": 606,
+  "cache_state": "warm"
+}

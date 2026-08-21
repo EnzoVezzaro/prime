@@ -1,0 +1,10 @@
+{
+  "framework": "sveltekit",
+  "round": 3,
+  "timestamp": "2026-08-20T17:40:00Z",
+  "clean_seconds": 0.16,
+  "install_seconds": 9.12,
+  "total_seconds": 9.28,
+  "packages": 56,
+  "cache_state": "warm"
+}

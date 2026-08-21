@@ -5,7 +5,8 @@ edition = "2021"
 
 [[bench]]
 name = "benchmarks"
-path = "src/main.rs"
+path = "benches/benchmarks.rs"
+harness = false
 
 [dependencies]
 prime-core = { path = "../prime-core" }

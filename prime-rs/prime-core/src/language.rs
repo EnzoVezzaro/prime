@@ -361,3 +361,44 @@ impl LanguageRegistry {
         self.languages.get(&lang)
     }
 }
+
+impl std::str::FromStr for Language {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "unknown" => Ok(Language::Unknown),
+            "rust" => Ok(Language::Rust),
+            "typescript" => Ok(Language::TypeScript),
+            "javascript" => Ok(Language::JavaScript),
+            "python" => Ok(Language::Python),
+            "go" => Ok(Language::Go),
+            "java" => Ok(Language::Java),
+            "c" => Ok(Language::C),
+            "cpp" => Ok(Language::Cpp),
+            "csharp" => Ok(Language::CSharp),
+            "python3" => Ok(Language::Python3),
+            "ruby" => Ok(Language::Ruby),
+            "php" => Ok(Language::PHP),
+            "swift" => Ok(Language::Swift),
+            "kotlin" => Ok(Language::Kotlin),
+            "scala" => Ok(Language::Scala),
+            "haskell" => Ok(Language::Haskell),
+            "zig" => Ok(Language::Zig),
+            "ziggy" => Ok(Language::Ziggy),
+            "lua" => Ok(Language::Lua),
+            "shell" => Ok(Language::Shell),
+            "sql" => Ok(Language::SQL),
+            "markdown" => Ok(Language::Markdown),
+            "json" => Ok(Language::JSON),
+            "yaml" => Ok(Language::YAML),
+            "toml" => Ok(Language::TOML),
+            "protobuf" => Ok(Language::Protobuf),
+            "graphql" => Ok(Language::GraphQL),
+            "dockerfile" => Ok(Language::Dockerfile),
+            "terraform" => Ok(Language::Terraform),
+            "other" => Ok(Language::Other),
+            _ => Err(format!("Unknown language: {}", s)),
+        }
+    }
+}

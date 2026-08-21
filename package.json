@@ -46,8 +46,6 @@
     "prime:export:json": "cargo run --bin prime -- export --format json",
     "prime:export:msgpack": "cargo run --bin prime -- export --format msgpack",
     "prime:export:dot": "cargo run --bin prime -- export --format dot",
-    "prime:stats": "cargo run --bin prime -- stats",
-    "prime:check": "cargo run --bin prime -- check",
     "prime:init": "cargo run --bin prime -- init",
     "prime:init:force": "cargo run --bin prime -- init --force",
     "dist:all": "npm run build && npm run dist",

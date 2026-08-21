@@ -1,0 +1,10 @@
+{
+  "framework": "vite-vue-ts",
+  "round": 2,
+  "timestamp": "2026-08-20T18:05:00Z",
+  "clean_seconds": 0.13,
+  "install_seconds": 8.00,
+  "total_seconds": 8.13,
+  "packages": 48,
+  "cache_state": "warm"
+}

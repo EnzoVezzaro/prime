@@ -4,9 +4,10 @@ use prime_core::{KnowledgeGraph, EntityId, Entity, Relation, File, Module, Proje
 use anyhow::Result;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
+use std::io::Write;
 use indexmap::IndexMap;
 use roaring::RoaringBitmap;
+use serde::{Serialize, Deserialize};
 
 /// Storage configuration
 #[derive(Debug, Clone)]
@@ -66,10 +67,15 @@ impl StorageBackend for BinaryStorage {
         if self.config.compress {
             let mut encoder = zstd::Encoder::new(writer, self.config.compression_level)?;
             encoder.include_checksum(true)?;
-            bincode::serialize_into(&mut encoder, graph)?;
+            // Use compact serialization for smaller artifacts
+            let compact_data = crate::compact_serialization::serialize_compact(graph, self.config.compression_level)?;
+            encoder.write_all(&compact_data)?;
             encoder.finish()?;
         } else {
-            bincode::serialize_into(writer, graph)?;
+            let data = crate::compact_serialization::serialize_compact(graph, 0)?;
+            let file = File::create(&self.path)?;
+            let mut writer = BufWriter::new(file);
+            writer.write_all(&data)?;
         }
 
         Ok(())
@@ -83,12 +89,15 @@ impl StorageBackend for BinaryStorage {
         let reader = BufReader::new(file);
 
         if self.config.compress {
-            let decoder = zstd::Decoder::new(reader)?;
-            let graph: KnowledgeGraph = bincode::deserialize_from(decoder)?;
-            Ok(graph)
+            let mut decoder = zstd::Decoder::new(reader)?;
+            let mut data = Vec::new();
+            std::io::copy(&mut decoder, &mut data)?;
+            crate::compact_serialization::deserialize_compact(&data)
         } else {
-            let graph: KnowledgeGraph = bincode::deserialize_from(reader)?;
-            Ok(graph)
+            let mut data = Vec::new();
+            let mut reader_mut = reader;
+            std::io::copy(&mut reader_mut, &mut data)?;
+            crate::compact_serialization::deserialize_compact(&data)
         }
     }
 
@@ -349,8 +358,8 @@ impl IncrementalStorage {
             base.add_relation(relation);
         }
 
-        for (from, to, kind) in delta.removed_relations {
-            base.relations.retain(|r| !(r.from == from && r.to == to && r.kind == kind));
+        for rel in &delta.removed_relations {
+            base.relations.retain(|r| !(r.from == rel.from && r.to == rel.to && r.kind == rel.kind));
         }
 
         base.build_indexes();
@@ -364,7 +373,15 @@ pub struct StorageDelta {
     pub added_entities: Vec<Entity>,
     pub removed_entities: Vec<EntityId>,
     pub added_relations: Vec<Relation>,
-    pub removed_relations: Vec<(EntityId, EntityId, RelationKind)>,
+    pub removed_relations: Vec<RemovedRelation>,
+}
+
+/// A relation removal with explicit fields to avoid tuple serialization issues
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RemovedRelation {
+    pub from: EntityId,
+    pub to: EntityId,
+    pub kind: RelationKind,
 }
 
 impl StorageDelta {
@@ -390,7 +407,7 @@ impl StorageDelta {
     }
 
     pub fn remove_relation(&mut self, from: EntityId, to: EntityId, kind: RelationKind) {
-        self.removed_relations.push((from, to, kind));
+        self.removed_relations.push(RemovedRelation { from, to, kind });
     }
 
     pub fn is_empty(&self) -> bool {
