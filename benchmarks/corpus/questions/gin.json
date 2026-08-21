@@ -1,0 +1,239 @@
+{
+  "version": "1.0.0",
+  "repo": "gin",
+  "description": "Benchmark questions for gin (Go)",
+  "questions": [
+    {
+      "id": "gin-sym-001",
+      "category": "symbols",
+      "question": "What functions exist in the project?",
+      "search_query": "func",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "function"
+    },
+    {
+      "id": "gin-sym-002",
+      "category": "symbols",
+      "question": "What structs are defined?",
+      "search_query": "struct",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "struct"
+    },
+    {
+      "id": "gin-sym-003",
+      "category": "symbols",
+      "question": "What interfaces are defined?",
+      "search_query": "interface",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "gin-call-001",
+      "category": "calls",
+      "question": "What functions call other functions?",
+      "search_query": "func",
+      "expected_entities": [],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-call-002",
+      "category": "calls",
+      "question": "What is the call graph?",
+      "search_query": "func",
+      "expected_entities": [],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-call-003",
+      "category": "calls",
+      "question": "What functions are called frequently?",
+      "search_query": "func",
+      "expected_entities": [],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-imp-001",
+      "category": "imports",
+      "question": "What modules import other modules?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-imp-002",
+      "category": "imports",
+      "question": "What external dependencies are used?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-imp-003",
+      "category": "imports",
+      "question": "What is the import graph structure?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-exp-001",
+      "category": "exports",
+      "question": "What public APIs are exposed?",
+      "search_query": "func",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "gin-exp-002",
+      "category": "exports",
+      "question": "What symbols are exported from modules?",
+      "search_query": "func",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "gin-flow-001",
+      "category": "flows_to",
+      "question": "Where does data flow through the program?",
+      "search_query": "return",
+      "expected_entities": [],
+      "expected_relationships": [["flows_to"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-flow-002",
+      "category": "flows_to",
+      "question": "What functions return values used by others?",
+      "search_query": "return",
+      "expected_entities": [],
+      "expected_relationships": [["flows_to"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-inst-001",
+      "category": "instantiates",
+      "question": "Where are objects or instances created?",
+      "search_query": "new",
+      "expected_entities": [],
+      "expected_relationships": [["instantiates"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-inst-002",
+      "category": "instantiates",
+      "question": "What constructors or factory methods exist?",
+      "search_query": "new",
+      "expected_entities": [],
+      "expected_relationships": [["instantiates"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-dep-001",
+      "category": "dependencies",
+      "question": "What are the direct dependencies?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-dep-002",
+      "category": "dependencies",
+      "question": "What modules depend on each other?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-dep-003",
+      "category": "dependencies",
+      "question": "What is the dependency graph?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "gin-arch-001",
+      "category": "architecture",
+      "question": "What is the project structure?",
+      "search_query": "struct",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "gin-arch-002",
+      "category": "architecture",
+      "question": "What are the main components?",
+      "search_query": "struct",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "gin-impact-001",
+      "category": "impact",
+      "question": "What would be affected if a core type changes?",
+      "search_query": "struct",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "gin-impact-002",
+      "category": "impact",
+      "question": "What functions would break if a module changes?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "gin-impact-003",
+      "category": "impact",
+      "question": "What is the impact of changing a public API?",
+      "search_query": "func",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    }
+  ]
+}

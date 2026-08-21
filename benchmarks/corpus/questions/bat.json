@@ -1,0 +1,261 @@
+{
+  "version": "1.0.0",
+  "repo": "bat",
+  "description": "Benchmark questions for bat (Rust) with verified ground truth",
+  "questions": [
+    {
+      "id": "bat-sym-001",
+      "category": "symbols",
+      "question": "Where is the main entry point?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_match"
+    },
+    {
+      "id": "bat-sym-002",
+      "category": "symbols",
+      "question": "What functions exist in the project?",
+      "search_query": "fn",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "function"
+    },
+    {
+      "id": "bat-sym-003",
+      "category": "symbols",
+      "question": "What structs are defined?",
+      "search_query": "struct",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "struct"
+    },
+    {
+      "id": "bat-sym-004",
+      "category": "symbols",
+      "question": "What traits are defined?",
+      "search_query": "trait",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "trait"
+    },
+    {
+      "id": "bat-sym-005",
+      "category": "symbols",
+      "question": "What enums are defined?",
+      "search_query": "enum",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "enum"
+    },
+    {
+      "id": "bat-call-001",
+      "category": "calls",
+      "question": "What functions call other functions?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-call-002",
+      "category": "calls",
+      "question": "What is the call graph of main?",
+      "search_query": "main",
+      "expected_entities": ["main"],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-call-003",
+      "category": "calls",
+      "question": "What functions are called frequently?",
+      "search_query": "fn",
+      "expected_entities": [],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-imp-001",
+      "category": "imports",
+      "question": "What modules import other modules?",
+      "search_query": "use",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-imp-002",
+      "category": "imports",
+      "question": "What external dependencies are used?",
+      "search_query": "use",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-imp-003",
+      "category": "imports",
+      "question": "What is the import graph structure?",
+      "search_query": "use",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-exp-001",
+      "category": "exports",
+      "question": "What public APIs are exposed?",
+      "search_query": "pub",
+      "expected_entities": [],
+      "expected_relationships": [["exports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-exp-002",
+      "category": "exports",
+      "question": "What symbols are exported from modules?",
+      "search_query": "pub",
+      "expected_entities": [],
+      "expected_relationships": [["exports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-flow-001",
+      "category": "flows_to",
+      "question": "Where does data flow through the program?",
+      "search_query": "return",
+      "expected_entities": [],
+      "expected_relationships": [["flows_to"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-flow-002",
+      "category": "flows_to",
+      "question": "What functions return values used by others?",
+      "search_query": "return",
+      "expected_entities": [],
+      "expected_relationships": [["flows_to"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-inst-001",
+      "category": "instantiates",
+      "question": "Where are objects or instances created?",
+      "search_query": "new",
+      "expected_entities": [],
+      "expected_relationships": [["instantiates"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-inst-002",
+      "category": "instantiates",
+      "question": "What constructors or factory methods exist?",
+      "search_query": "new",
+      "expected_entities": [],
+      "expected_relationships": [["instantiates"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-dep-001",
+      "category": "dependencies",
+      "question": "What are the direct dependencies?",
+      "search_query": "use",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-dep-002",
+      "category": "dependencies",
+      "question": "What modules depend on each other?",
+      "search_query": "use",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-dep-003",
+      "category": "dependencies",
+      "question": "What is the dependency graph?",
+      "search_query": "use",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "bat-arch-001",
+      "category": "architecture",
+      "question": "What is the project structure?",
+      "search_query": "mod",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "bat-arch-002",
+      "category": "architecture",
+      "question": "What are the main components?",
+      "search_query": "struct",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "bat-impact-001",
+      "category": "impact",
+      "question": "What would be affected if a core type changes?",
+      "search_query": "struct",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "bat-impact-002",
+      "category": "impact",
+      "question": "What functions would break if a module changes?",
+      "search_query": "mod",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "bat-impact-003",
+      "category": "impact",
+      "question": "What is the impact of changing a public API?",
+      "search_query": "pub",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    }
+  ]
+}

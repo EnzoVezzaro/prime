@@ -1241,7 +1241,7 @@ fn benchmark_repo(repo: &RepoConfig, bench_storage: &PathBuf, _root: &Path) -> a
         retrieval.cold.median, retrieval.warm.median, retrieval.search.median, retrieval.lookup.median, retrieval.context.median);
 
     println!("  Running knowledge benchmarks...");
-    let knowledge = benchmark_knowledge(&storage_path)?;
+    let knowledge = benchmark_knowledge(&storage_path, &repo.name)?;
     println!("    Accuracy: {:.1}%, Source-free accuracy: {:.1}%",
         knowledge.accuracy * 100.0, knowledge.source_free_accuracy * 100.0);
 
@@ -1593,7 +1593,7 @@ fn question_to_tool_intent(q: &KnowledgeQuestion) -> ToolIntent {
     }
 }
 
-fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> {
+fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<KnowledgeMetrics> {
     let storage_config = StorageConfig {
         path: storage_path.to_path_buf(),
         use_mmap: true,
@@ -1604,7 +1604,7 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
     let graph = storage.load()?;
     let executor = ToolExecutor::from_graph(graph);
 
-    let questions = load_questions()?;
+    let questions = load_questions_for_repo(repo_name)?;
     let mut total = 0;
     let mut correct = 0;
     let mut source_free_correct = 0;
@@ -1993,47 +1993,68 @@ fn extract_relationships_from_response(results: &[serde_json::Value], tool_inten
     rels
 }
 
+fn load_questions_for_repo(repo_name: &str) -> anyhow::Result<Vec<KnowledgeQuestion>> {
+    // Try to load repo-specific questions first
+    let repo_questions_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join(format!("../../benchmarks/corpus/questions/{}.json", repo_name));
+    if let Ok(content) = fs::read_to_string(&repo_questions_path) {
+        if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&content) {
+            if let Some(arr) = parsed.get("questions").and_then(|v| v.as_array()) {
+                let questions = parse_questions_from_array(arr);
+                if !questions.is_empty() {
+                    return Ok(questions);
+                }
+            }
+        }
+    }
+    // Fall back to generic questions
+    load_questions()
+}
+
+fn parse_questions_from_array(arr: &[serde_json::Value]) -> Vec<KnowledgeQuestion> {
+    let mut questions = Vec::new();
+    for q in arr {
+        if let (Some(id), Some(category), Some(question), Some(search_query)) = (
+            q.get("id").and_then(|v| v.as_str()),
+            q.get("category").and_then(|v| v.as_str()),
+            q.get("question").and_then(|v| v.as_str()),
+            q.get("search_query").and_then(|v| v.as_str()),
+        ) {
+            let expected_entities = q.get("expected_entities")
+                .and_then(|v| v.as_array())
+                .map(|arr| arr.iter().filter_map(|v| v.as_str()).map(|s| s.to_string()).collect())
+                .unwrap_or_default();
+            let expected_relationships = q.get("expected_relationships")
+                .and_then(|v| v.as_array())
+                .map(|arr| arr.iter().filter_map(|v| v.as_array()).map(|a| a.iter().filter_map(|v| v.as_str()).map(|s| s.to_string()).collect()).collect())
+                .unwrap_or_default();
+            let expected_kind = q.get("expected_kind").and_then(|v| v.as_str()).map(|s| s.to_string());
+            let evaluation = q.get("evaluation").and_then(|v| v.as_str()).map(|s| s.to_string()).unwrap_or("keyword".to_string());
+            
+            questions.push(KnowledgeQuestion {
+                id: id.to_string(),
+                category: category.to_string(),
+                question: question.to_string(),
+                search_query: search_query.to_string(),
+                expected_entities,
+                expected_relationships,
+                expected_kind,
+                evaluation,
+                source_allowed: q.get("source_allowed").and_then(|v| v.as_bool()).unwrap_or(false),
+            });
+        }
+    }
+    questions
+}
+
 fn load_questions() -> anyhow::Result<Vec<KnowledgeQuestion>> {
-    // Try to load from file first - use absolute path from workspace root
     let questions_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../benchmarks/corpus/questions/knowledge.json");
     
     if let Ok(content) = fs::read_to_string(&questions_path) {
         if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&content) {
             if let Some(arr) = parsed.get("questions").and_then(|v| v.as_array()) {
-                let mut questions = Vec::new();
-                for q in arr {
-                    if let (Some(id), Some(category), Some(question), Some(search_query)) = (
-                        q.get("id").and_then(|v| v.as_str()),
-                        q.get("category").and_then(|v| v.as_str()),
-                        q.get("question").and_then(|v| v.as_str()),
-                        q.get("search_query").and_then(|v| v.as_str()),
-                    ) {
-                        let expected_entities = q.get("expected_entities")
-                            .and_then(|v| v.as_array())
-                            .map(|arr| arr.iter().filter_map(|v| v.as_str()).map(|s| s.to_string()).collect())
-                            .unwrap_or_default();
-                        // Fix: Parse expected_relationships as Vec<Vec<String>> - inner elements are strings, not arrays
-                        let expected_relationships = q.get("expected_relationships")
-                            .and_then(|v| v.as_array())
-                            .map(|arr| arr.iter().filter_map(|v| v.as_array()).map(|a| a.iter().filter_map(|v| v.as_str()).map(|s| s.to_string()).collect()).collect())
-                            .unwrap_or_default();
-                        let expected_kind = q.get("expected_kind").and_then(|v| v.as_str()).map(|s| s.to_string());
-                        let evaluation = q.get("evaluation").and_then(|v| v.as_str()).map(|s| s.to_string()).unwrap_or("keyword".to_string());
-                        
-                        questions.push(KnowledgeQuestion {
-                            id: id.to_string(),
-                            category: category.to_string(),
-                            question: question.to_string(),
-                            search_query: search_query.to_string(),
-                            expected_entities,
-                            expected_relationships,
-                            expected_kind,
-                            evaluation,
-                            source_allowed: q.get("source_allowed").and_then(|v| v.as_bool()).unwrap_or(false),
-                        });
-                    }
-                }
+                let questions = parse_questions_from_array(arr);
                 if !questions.is_empty() {
                     return Ok(questions);
                 }
@@ -2041,11 +2062,9 @@ fn load_questions() -> anyhow::Result<Vec<KnowledgeQuestion>> {
         }
     }
 
-    // Built-in fallback questions (minimal set for when file not found)
+    // Built-in fallback questions
     Ok(vec![
         KnowledgeQuestion { id: "arch-001".to_string(), category: "architecture".to_string(), question: "What is the main entry point?".to_string(), search_query: "main".to_string(), expected_entities: vec!["main".to_string()], expected_relationships: vec![], expected_kind: None, evaluation: "entity_match".to_string(), source_allowed: false },
-        KnowledgeQuestion { id: "arch-002".to_string(), category: "architecture".to_string(), question: "What are the top-level modules?".to_string(), search_query: "mod".to_string(), expected_entities: vec![], expected_relationships: vec![vec!["contains".to_string()]], expected_kind: None, evaluation: "relationship_recall".to_string(), source_allowed: false },
-        KnowledgeQuestion { id: "sym-001".to_string(), category: "symbols".to_string(), question: "List all public functions".to_string(), search_query: "fn".to_string(), expected_entities: vec![], expected_relationships: vec![], expected_kind: Some("function".to_string()), evaluation: "entity_recall".to_string(), source_allowed: false },
     ])
 }
 

@@ -1,0 +1,239 @@
+{
+  "version": "1.0.0",
+  "repo": "httpx",
+  "description": "Benchmark questions for httpx (Python) with verified ground truth",
+  "questions": [
+    {
+      "id": "httpx-sym-001",
+      "category": "symbols",
+      "question": "What functions exist in the project?",
+      "search_query": "def",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "function"
+    },
+    {
+      "id": "httpx-sym-002",
+      "category": "symbols",
+      "question": "What classes are defined?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall",
+      "expected_kind": "class"
+    },
+    {
+      "id": "httpx-sym-003",
+      "category": "symbols",
+      "question": "What modules exist?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "httpx-call-001",
+      "category": "calls",
+      "question": "What functions call other functions?",
+      "search_query": "def",
+      "expected_entities": [],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-call-002",
+      "category": "calls",
+      "question": "What is the call graph?",
+      "search_query": "def",
+      "expected_entities": [],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-call-003",
+      "category": "calls",
+      "question": "What functions are called frequently?",
+      "search_query": "def",
+      "expected_entities": [],
+      "expected_relationships": [["calls"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-imp-001",
+      "category": "imports",
+      "question": "What modules import other modules?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-imp-002",
+      "category": "imports",
+      "question": "What external dependencies are used?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-imp-003",
+      "category": "imports",
+      "question": "What is the import graph structure?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-exp-001",
+      "category": "exports",
+      "question": "What public APIs are exposed?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "httpx-exp-002",
+      "category": "exports",
+      "question": "What symbols are exported from modules?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "httpx-flow-001",
+      "category": "flows_to",
+      "question": "Where does data flow through the program?",
+      "search_query": "return",
+      "expected_entities": [],
+      "expected_relationships": [["flows_to"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-flow-002",
+      "category": "flows_to",
+      "question": "What functions return values used by others?",
+      "search_query": "return",
+      "expected_entities": [],
+      "expected_relationships": [["flows_to"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-inst-001",
+      "category": "instantiates",
+      "question": "Where are objects or instances created?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [["instantiates"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-inst-002",
+      "category": "instantiates",
+      "question": "What constructors or factory methods exist?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [["instantiates"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-dep-001",
+      "category": "dependencies",
+      "question": "What are the direct dependencies?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-dep-002",
+      "category": "dependencies",
+      "question": "What modules depend on each other?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-dep-003",
+      "category": "dependencies",
+      "question": "What is the dependency graph?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [["imports"]],
+      "source_allowed": false,
+      "evaluation": "relationship_recall"
+    },
+    {
+      "id": "httpx-arch-001",
+      "category": "architecture",
+      "question": "What is the project structure?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "httpx-arch-002",
+      "category": "architecture",
+      "question": "What are the main components?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "httpx-impact-001",
+      "category": "impact",
+      "question": "What would be affected if a core type changes?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "httpx-impact-002",
+      "category": "impact",
+      "question": "What functions would break if a module changes?",
+      "search_query": "import",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    },
+    {
+      "id": "httpx-impact-003",
+      "category": "impact",
+      "question": "What is the impact of changing a public API?",
+      "search_query": "class",
+      "expected_entities": [],
+      "expected_relationships": [],
+      "source_allowed": false,
+      "evaluation": "entity_recall"
+    }
+  ]
+}
