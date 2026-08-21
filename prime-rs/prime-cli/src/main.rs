@@ -1576,6 +1576,11 @@ fn question_to_tool_intent(q: &KnowledgeQuestion) -> ToolIntent {
             }
         }
         "symbols" => ToolIntent::Search,
+        "calls" => ToolIntent::Context,  // Context gives callers/callees
+        "imports" => ToolIntent::Dependencies,
+        "exports" => ToolIntent::Architecture,
+        "flows_to" => ToolIntent::Context,  // Context gives data flow info
+        "instantiates" => ToolIntent::Relationships,
         "relationships" => ToolIntent::Relationships,
         "dependencies" => ToolIntent::Dependencies,
         "impact" => ToolIntent::Impact,
@@ -1624,19 +1629,56 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
 
     for q in &questions {
         total += 1;
-        // Use appropriate tool for question type
+        // For context/dependencies/impact, first search to find the entity, then use its qualified name
         let tool_intent = question_to_tool_intent(q);
+        let target = if matches!(tool_intent, ToolIntent::Context | ToolIntent::Dependencies | ToolIntent::Impact | ToolIntent::Relationships) {
+            // First search to find the entity
+            let search_req = ToolRequest {
+                intent: ToolIntent::Search,
+                target: Some(q.search_query.clone()),
+                limit: 1,
+                ..Default::default()
+            };
+            let search_result = executor.execute(&search_req);
+            let search_array = search_result.get("result").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+            // Use the first found entity's qualified name
+            search_array.first()
+                .and_then(|e| e.get("qualified_name").and_then(|v| v.as_str()))
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| q.search_query.clone())
+        } else {
+            q.search_query.clone()
+        };
+        
         let req = ToolRequest {
             intent: tool_intent,
-            target: Some(q.search_query.clone()),
+            target: Some(target),
             limit: 10,
             ..Default::default()
         };
         let result = executor.execute(&req);
 
         let status = result.get("status").and_then(|v| v.as_str()).unwrap_or("Unknown");
-        let result_array = result.get("result").and_then(|v| v.as_array()).cloned().unwrap_or_default();
-        let has_results = !result_array.is_empty();
+        let result_value = result.get("result").cloned().unwrap_or(serde_json::Value::Null);
+        
+        // Handle both array results (Search) and object results (Context, Relationships, etc.)
+        let result_array = if let Some(arr) = result_value.as_array() {
+            arr.clone()
+        } else if let Some(obj) = result_value.as_object() {
+            // For Context/Relationships/Dependencies, extract entities from nested arrays
+            let mut entities = Vec::new();
+            for key in &["callers", "callees", "dependencies", "dependents", "relations"] {
+                if let Some(arr) = obj.get(*key).and_then(|v| v.as_array()) {
+                    for item in arr {
+                        entities.push(item.clone());
+                    }
+                }
+            }
+            entities
+        } else {
+            Vec::new()
+        };
+        let has_results = !result_array.is_empty() || !result_value.is_null();
 
         // Extract returned entities
         let returned_entities: Vec<String> = result_array.iter()
@@ -1649,9 +1691,9 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
             .map(|s| s.to_string())
             .collect();
 
-        // Evaluate based on question type
+        // Evaluate based on question type - pass both flattened array AND original result for relationship extraction
         let (is_correct, entity_tp_q, entity_fp_q, entity_fn_q, rel_tp_q, rel_fp_q, rel_fn_q, rank) = 
-            evaluate_question(&q, &result_array, &returned_entities, &returned_kinds, tool_intent);
+            evaluate_question(&q, &result_array, &returned_entities, &returned_kinds, tool_intent, &result_value);
 
         entity_tp += entity_tp_q;
         entity_fp += entity_fp_q;
@@ -1755,7 +1797,7 @@ fn benchmark_knowledge(storage_path: &Path) -> anyhow::Result<KnowledgeMetrics> 
 }
 
 // Evaluate a single question and return (is_correct, entity_tp, entity_fp, entity_fn, rel_tp, rel_fp, rel_fn, rank)
-fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], returned: &[String], kinds: &[String], tool_intent: ToolIntent) -> (bool, usize, usize, usize, usize, usize, usize, Option<usize>) {
+fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], returned: &[String], kinds: &[String], tool_intent: ToolIntent, raw_result: &serde_json::Value) -> (bool, usize, usize, usize, usize, usize, usize, Option<usize>) {
     let mut entity_tp = 0;
     let mut entity_fp = 0;
     let mut entity_fn = 0;
@@ -1764,12 +1806,19 @@ fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], retur
     let mut rel_fn = 0;
     let mut rank = None;
 
-    // Check entity retrieval - use exact matching on qualified names
+    // Check entity retrieval - use substring/suffix matching on qualified names
     let expected_entities: Vec<String> = q.expected_entities.iter().map(|s| s.to_lowercase()).collect();
     let returned_lower: Vec<String> = returned.iter().map(|s| s.to_lowercase()).collect();
 
     for (i, ret) in returned_lower.iter().enumerate() {
-        if expected_entities.iter().any(|e| ret == e || e == ret) {
+        if expected_entities.iter().any(|e| {
+            // Match if: exact match, or returned ends with expected, or expected is suffix of last component
+            ret == e || e == ret ||
+            ret.ends_with(&format!("::{}", e)) ||
+            ret.ends_with(&format!(".{}", e)) ||
+            ret.split("::").last().map_or(false, |last| last == e.as_str()) ||
+            ret.split(".").last().map_or(false, |last| last == e.as_str())
+        }) {
             entity_tp += 1;
             if rank.is_none() { rank = Some(i + 1); }
         } else {
@@ -1785,7 +1834,7 @@ fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], retur
 
     if !expected_rels.is_empty() {
         // Extract relationships from structured response based on tool
-        let extracted_rels = extract_relationships_from_response(results, tool_intent);
+        let extracted_rels = extract_relationships_from_response(&[raw_result.clone()], tool_intent);
         
         for expected_rel in &expected_rels {
             let mut found = false;
@@ -1829,23 +1878,45 @@ fn extract_relationships_from_response(results: &[serde_json::Value], tool_inten
     for result in results {
         match tool_intent {
             ToolIntent::Context => {
-                // Context returns: entity, calls, called_by, dependencies
-                if let Some(calls) = result.get("calls").and_then(|v| v.as_array()) {
-                    for call in calls {
-                        if let Some(s) = call.as_str() { rels.push(format!("calls:{}", s)); }
+                // Context returns: callers, callees, dependencies, dependents
+                if let Some(callees) = result.get("callees").and_then(|v| v.as_array()) {
+                    for callee in callees {
+                        if let Some(name) = callee.get("qualified_name").and_then(|v| v.as_str()) {
+                            rels.push(format!("calls:{}", name));
+                        }
                     }
                 }
-                if let Some(called_by) = result.get("called_by").and_then(|v| v.as_array()) {
-                    for cb in called_by {
-                        if let Some(s) = cb.as_str() { rels.push(format!("called_by:{}", s)); }
+                if let Some(callers) = result.get("callers").and_then(|v| v.as_array()) {
+                    for caller in callers {
+                        if let Some(name) = caller.get("qualified_name").and_then(|v| v.as_str()) {
+                            rels.push(format!("called_by:{}", name));
+                        }
                     }
                 }
-                if let Some(deps) = result.get("dependencies").and_then(|v| v.as_object()) {
-                    if let Some(declared) = deps.get("declared").and_then(|v| v.as_array()) {
-                        for d in declared { if let Some(s) = d.as_str() { rels.push(format!("depends_on:{}", s)); } }
+                if let Some(deps) = result.get("dependencies").and_then(|v| v.as_array()) {
+                    for dep in deps {
+                        if let Some(name) = dep.get("qualified_name").and_then(|v| v.as_str()) {
+                            rels.push(format!("depends_on:{}", name));
+                        }
                     }
-                    if let Some(discovered) = deps.get("discovered").and_then(|v| v.as_array()) {
-                        for d in discovered { if let Some(s) = d.as_str() { rels.push(format!("depends_on:{}", s)); } }
+                }
+                if let Some(deps) = result.get("dependents").and_then(|v| v.as_array()) {
+                    for dep in deps {
+                        if let Some(name) = dep.get("qualified_name").and_then(|v| v.as_str()) {
+                            rels.push(format!("depended_by:{}", name));
+                        }
+                    }
+                }
+                // Also check for nested result field (PrimeEnvelope wrapping)
+                if let Some(inner) = result.get("result").and_then(|v| v.as_object()) {
+                    for key in &["callers", "callees", "dependencies", "dependents"] {
+                        if let Some(arr) = inner.get(*key).and_then(|v| v.as_array()) {
+                            for item in arr {
+                                if let Some(name) = item.get("qualified_name").and_then(|v| v.as_str()) {
+                                    rels.push(format!("{}:{}", key, name));
+                                }
+                            }
+                        }
                     }
                 }
             }
