@@ -1,7 +1,8 @@
 # Prime Research Tracking Dashboard
 
 **Last Updated:** August 21, 2026
-**Status:** Implementation Phase In Progress 🔄
+**Status:** Research & Implementation In Progress 🔄
+**Reference:** Prime Code Intelligence & Systems Research Investigation
 
 ---
 
@@ -9,233 +10,488 @@
 
 | Category | Total | Completed | In Progress | Remaining |
 |----------|-------|-----------|-------------|-----------|
-| Prior Art Research | 15 | 15 | 0 | 0 |
+| Prior Art Research (16 repos) | 16 | 16 | 0 | 0 |
 | Synthesis Documents | 6 | 6 | 0 | 0 |
 | Final Deliverable | 1 | 1 | 0 | 0 |
-| Implementation | 12 | 9 | 1 | 2 |
-| **Total** | **34** | **33** | **0** | **1** |
+| Implementation (Phases 1-2) | 12 | 11 | 0 | 1 |
+| Research Artifacts (from spec) | 30 | 8 | 0 | 22 |
+| Benchmarking | 25 | 4 | 0 | 21 |
+| Architecture Investigation | 10 | 2 | 0 | 8 |
+| **Total** | **100** | **48** | **0** | **52** |
 
-**Progress:** ██████████████████░░ 97%
+**Overall Progress:** █████████░░░░░░░░░░░░ 48%
 
 ---
 
-## Prior Art Research ✅
+## Part 1: Prior Art Research (16 Repos) ✅
+
+| # | Repository | Status | File | Key Findings |
+|---|------------|--------|------|--------------|
+| 1 | Microsoft VS Code | ✅ | `research/prior-art/vscode.md` | Language services, file watchers, incremental updates |
+| 2 | VS Code Language Server | ✅ | (covered in vscode.md) | LSP protocol, symbol providers |
+| 3 | Sourcegraph SCIP | ✅ | `research/prior-art/scip.md` | Language-agnostic symbol identity |
+| 4 | Microsoft LSIF | ✅ | `research/prior-art/lsif.md` | Persistent semantic representation |
+| 5 | Code-Graph-RAG | ✅ | `research/prior-art/code-graph-rag.md` | Tree-sitter + Memgraph, multi-language graph |
+| 6 | Tree-sitter | ✅ | `research/prior-art/tree-sitter.md` | Incremental parsing, query system |
+| 7 | ast-grep | ✅ | `research/prior-art/ast-grep.md` | Structural search, pattern matching |
+| 8 | Aider Repository Map | ✅ | `research/prior-art/aider.md` | Token budgeting, PageRank relevance |
+| 9 | Git | ✅ | `research/prior-art/git.md` | Content addressing, Merkle structures |
+| 10 | ripgrep | ✅ | `research/prior-art/ripgrep.md` | Parallel traversal, SIMD, memory mapping |
+| 11 | disk-perf-git-and-pnpm | ✅ | `research/prior-art/disk-performance.md` | Filesystem benchmarks, APFS behavior |
+| 12 | Joern/CPG | ✅ | `research/prior-art/joern.md` | Code Property Graph, AST+CFG+PDG |
+| 13 | Semgrep | ✅ | `research/prior-art/semgrep.md` | Structural/semantic matching |
+| 14 | Kythe | ✅ | `research/prior-art/kythe.md` | Language-independent indexing, facts |
+| 15 | CodeQL | ✅ | `research/prior-art/codeql.md` | Semantic databases, relational facts |
+| 16 | OpenGrok | ✅ | `research/prior-art/opengrok.md` | Large-scale source indexing |
+
+---
+
+## Part 2: Synthesis Documents ✅
 
 | # | Document | Status | File |
 |---|----------|--------|------|
-| 1 | VS Code + LSP | ✅ Complete | `research/prior-art/vscode.md` |
-| 2 | SCIP | ✅ Complete | `research/prior-art/scip.md` |
-| 3 | LSIF | ✅ Complete | `research/prior-art/lsif.md` |
-| 4 | Kythe | ✅ Complete | `research/prior-art/kythe.md` |
-| 5 | Code-Graph-RAG | ✅ Complete | `research/prior-art/code-graph-rag.md` |
-| 6 | Tree-sitter | ✅ Complete | `research/prior-art/tree-sitter.md` |
-| 7 | ast-grep | ✅ Complete | `research/prior-art/ast-grep.md` |
-| 8 | Aider | ✅ Complete | `research/prior-art/aider.md` |
-| 9 | Git | ✅ Complete | `research/prior-art/git.md` |
-| 10 | ripgrep | ✅ Complete | `research/prior-art/ripgrep.md` |
-| 11 | Joern/CPG | ✅ Complete | `research/prior-art/joern.md` |
-| 12 | CodeQL | ✅ Complete | `research/prior-art/codeql.md` |
-| 13 | Semgrep | ✅ Complete | `research/prior-art/semgrep.md` |
-| 14 | OpenGrok | ✅ Complete | `research/prior-art/opengrok.md` |
-| 15 | Disk Performance | ✅ Complete | `research/prior-art/disk-performance.md` |
+| 1 | Code Intelligence Convergence | ✅ | `research/synthesis/code-intelligence-convergence.md` |
+| 2 | Prime Gap Analysis | ✅ | `research/synthesis/prime-gap-analysis.md` |
+| 3 | Relationship Model | ✅ | `research/synthesis/relationship-model.md` |
+| 4 | Incremental Indexing | ✅ | `research/synthesis/incremental-indexing.md` |
+| 5 | Agent Benchmark | ✅ | `research/synthesis/agent-benchmark.md` |
+| 6 | Storage & Representation | ✅ | `research/synthesis/storage-representation.md` |
 
 ---
 
-## Synthesis Documents ✅
+## Part 3: Final Deliverable ✅
 
 | # | Document | Status | File |
 |---|----------|--------|------|
-| 1 | Code Intelligence Convergence | ✅ Complete | `research/synthesis/code-intelligence-convergence.md` |
-| 2 | Prime Gap Analysis | ✅ Complete | `research/synthesis/prime-gap-analysis.md` |
-| 3 | Relationship Model | ✅ Complete | `research/synthesis/relationship-model.md` |
-| 4 | Incremental Indexing | ✅ Complete | `research/synthesis/incremental-indexing.md` |
-| 5 | Agent Benchmark | ✅ Complete | `research/synthesis/agent-benchmark.md` |
-| 6 | Storage & Representation | ✅ Complete | `research/synthesis/storage-representation.md` |
+| 1 | Prime Code Intelligence Model | ✅ | `docs/research-synthesis/prime-code-intelligence-model.md` |
 
 ---
 
-## Final Deliverable ✅
-
-| # | Document | Status | File |
-|---|----------|--------|------|
-| 1 | Prime Code Intelligence Model | ✅ Complete | `docs/research-synthesis/prime-code-intelligence-model.md` |
-
----
-
-## Implementation Progress 🔄
+## Part 4: Implementation Progress
 
 ### Phase 1: Foundation ✅
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 1 | Core entity model | ✅ Complete | Entity, File, Module, Project |
-| 2 | Basic relationships (7 types) | ✅ Complete | Calls, DependsOn, Contains, Defines, Inherits, Implements, Imports |
-| 3 | Tree-sitter parser (8 languages) | ✅ Complete | Rust, TS, JS, Python, Go, Java, C, C++ |
-| 4 | Binary storage + mmap | ✅ Complete | Custom format with compression |
-| 5 | Query engine | ✅ Complete | Search, lookup, context, relationships |
-| 6 | MCP server (7 tools) | ✅ Complete | PrimeEnvelope<T> responses |
-| 7 | Incremental indexing | ✅ Complete | File change detection + entity invalidation |
-| 8 | CLI commands | ✅ Complete | build, update, check, query, etc. |
+| 1 | Core entity model | ✅ | Entity, File, Module, Project types |
+| 2 | Basic relationships (7 types) | ✅ | Calls, DependsOn, Contains, Defines, Inherits, Implements, Imports |
+| 3 | Tree-sitter parser (8+ languages) | ✅ | Rust, TS, JS, Python, Go, Java, C, C++ |
+| 4 | Binary storage + mmap | ✅ | Custom format with compression |
+| 5 | Query engine | ✅ | Search, lookup, context, relationships |
+| 6 | MCP server (7 tools) | ✅ | PrimeEnvelope<T> responses |
+| 7 | CLI commands | ✅ | build, query, stats, check, deps, etc. |
 
 ### Phase 2: Relationship Richness ✅
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 9 | OVERRIDES relationship | ✅ Complete | Heuristic-based method override detection |
-| 10 | EXPORTS relationship | ✅ Complete | Public symbol detection |
-| 11 | FLOWS_TO relationship | ✅ Complete | Data flow analysis (nested calls, returns) |
-| 12 | INSTANTIATES relationship | ✅ Complete | new Foo(), Foo::new(), Foo::default() detection |
+| 8 | Incremental indexing | ✅ | File change detection + entity invalidation (70x speedup) |
+| 9 | OVERRIDES relationship | ✅ | Heuristic-based method override detection (136 found) |
+| 10 | EXPORTS relationship | ✅ | Public symbol detection (246 found) |
+| 11 | FLOWS_TO relationship | ✅ | Data flow analysis (1,044 found) |
+| 12 | INSTANTIATES relationship | ✅ | Class construction sites (1,223 found) |
 
-### Phase 3: Semantic Depth ⏳
-
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 13 | Resource nodes | ⏳ Pending | FILE, ENV, NETWORK, etc. |
-| 14 | Data flow analysis | ⏳ Pending | Taint tracking |
-| 15 | ast-grep integration | ⏳ Pending | Pattern matching |
-
-### Phase 4: Cross-Repository ⏳
+### Phase 2.5: Entity Extraction Fix ✅
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 16 | Moniker system | ⏳ Pending | SCIP-style identity |
-| 17 | VName-like identity | ⏳ Pending | Kythe-style |
-| 18 | Cross-repo resolution | ⏳ Pending | |
+| 13 | Fix Python tree-sitter queries | ✅ | Removed invalid async_function_definition |
+| 14 | Fix Go tree-sitter queries | ✅ | Cleaned up definition patterns |
+| 15 | Fix JS/TS tree-sitter queries | ✅ | Removed #set! predicates |
+| 16 | Fix Java/C/C++ queries | ✅ | Aligned with working Rust pattern |
 
-### Phase 5: Advanced Features ⏳
-
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 19 | SQLite layer | ⏳ Pending | Complex queries |
-| 20 | Full-text search | ⏳ Pending | tantivy integration |
-| 21 | Streaming HTTP | ⏳ Pending | Remote MCP |
-| 22 | Semantic compression | ⏳ Pending | Grammar-based |
-
----
-
-## Benchmark Results
-
-### Full Build (prime-rs codebase)
-
-| Metric | Value |
-|--------|-------|
-| Files | 26,103 |
-| Entities | 1,094 |
-| Relations | 75,542 |
-| Build time | 4.19s |
-| Index size | 6.32 MB |
-
-### Incremental Update
-
-| Metric | Value |
-|--------|-------|
-| Files changed | 1 |
-| Update time | 0.06s |
-| Speedup | 70x |
-
-### PR Corpus Benchmark (5 repos)
-
-| Metric | Value |
-|--------|-------|
-| Mean derivation time | 0.31s |
-| Files/sec | 683 |
-| LOC/sec | 133,088 |
-| Relations/sec | 179,671 |
-| Cold query latency (p50) | 209µs |
-| Warm query latency (p50) | 171µs |
-| Artifact/source ratio | 1.198 |
-| Knowledge accuracy | 20.5% (bat, spdlog) |
-| Entity extraction | 570 entities, 75,542 relations |
+**Current Implementation Metrics:**
+- Entities: 1,094 (Functions: 600, Classes: 120, Structs: 53)
+- Relations: 75,542 (8 types)
+- Files parsed: 26,103
+- Build time: 4.79s
+- Cold query latency: 52µs
 
 ---
 
-## Key Findings
+## Part 5: Research Artifacts (from Spec)
 
-### 1. Incremental Indexing Works
+### 5.1 Comparative Analysis Table
 
-- **File-level detection** via content hashes: ✅
-- **Entity-level invalidation**: ✅
-- **70x speedup** for single-file changes: ✅
+| System | Status | Notes |
+|--------|--------|-------|
+| Create comparative analysis table | ⏳ Pending | Primary abstraction, precomputed info, relationships, etc. |
+| Convergence analysis | ✅ | Completed in synthesis docs |
 
-### 2. Relationship Extraction Improves
+### 5.2 Prime-Specific Investigation
 
-- **Overrides**: Heuristic-based detection ✅
-- **Exports**: Public symbol detection ✅
-- **FlowsTo**: Data flow analysis (1,044 detected) ✅
-- **Instantiates**: Class construction sites (1,223 detected) ✅
-- **Total relations**: 75,542 (up from 7,327 in earlier tests)
-
-### 3. Entity Extraction Fixed
-
-- **Tree-sitter queries**: Fixed @definition capture pattern + removed invalid node types ✅
-- **Multi-language support**: Python, Go, JS, TS, Java, C, C++ queries cleaned up ✅
-- **Entities detected**: 1,094 across 26,103 files (Functions: 600, Classes: 120, Structs: 53)
-
-### 4. Benchmark Metrics Established
-
-- **Cold query latency**: 209µs (p50)
-- **Warm query latency**: 171µs (p50)
-- **Files/sec**: 683
-- **LOC/sec**: 133,088
-- **Knowledge accuracy**: 20.5% (bat, spdlog repos)
-- **Relationship extraction**: 75,542 relations across 8 types
+| # | Investigation | Status | Notes |
+|---|---------------|--------|-------|
+| 1 | What information Prime currently represents | ✅ | Documented in gap analysis |
+| 2 | What VS Code exposes | ✅ | Documented in vscode.md |
+| 3 | What SCIP represents | ✅ | Documented in scip.md |
+| 4 | What LSIF represents | ✅ | Documented in lsif.md |
+| 5 | What Code-Graph-RAG represents | ✅ | Documented in code-graph-rag.md |
+| 6 | What CPG represents | ✅ | Documented in joern.md |
+| 7 | What Kythe represents | ✅ | Documented in kythe.md |
+| 8 | What Aider exposes to agents | ✅ | Documented in aider.md |
+| 9 | What Prime is missing | ✅ | Documented in gap analysis |
 
 ---
 
-## Files Created/Modified This Session
+## Part 6: Critical Benchmark Problem
 
-### New Files
+### Current Benchmark Status
 
-| File | Size | Purpose |
-|------|------|---------|
-| `prime-rs/prime-index/src/incremental.rs` | ~8KB | Incremental indexing module |
-| `research/prior-art/joern.md` | ~8KB | Joern/CPG analysis |
-| `research/prior-art/codeql.md` | ~8KB | CodeQL analysis |
-| `research/prior-art/semgrep.md` | ~4KB | Semgrep analysis |
-| `research/prior-art/opengrok.md` | ~5KB | OpenGrok analysis |
-| `research/synthesis/code-intelligence-convergence.md` | ~8KB | Convergence analysis |
-| `research/synthesis/prime-gap-analysis.md` | ~8KB | Gap analysis |
-| `research/synthesis/relationship-model.md` | ~8KB | Relationship model |
-| `research/synthesis/incremental-indexing.md` | ~10KB | Incremental indexing |
-| `research/synthesis/agent-benchmark.md` | ~10KB | Benchmark methodology |
-| `research/synthesis/storage-representation.md` | ~10KB | Storage architecture |
-| `docs/research-synthesis/prime-code-intelligence-model.md` | ~20KB | Final deliverable |
+| Metric | Current | Target | Status |
+|--------|---------|--------|--------|
+| Relationship F1 | 0.00 | >0.50 | 🔴 Critical |
+| Relationship Precision | 0.00 | >0.70 | 🔴 Critical |
+| Relationship Recall | 0.00 | >0.50 | 🔴 Critical |
+| Entity F1 | 0.37 | >0.80 | 🟡 Needs work |
+| Source-free Accuracy | 8.2% | >60% | 🔴 Critical |
+| Recall@1 | 0.1% | >50% | 🔴 Critical |
+| Recall@10 | 0.1% | >80% | 🔴 Critical |
+| Retrieval p50 | 169µs | <200µs | ✅ Good |
+| Artifact size | 1.2MB | <2MB | ✅ Good |
 
-### Modified Files
+### Priority Order (from spec)
 
-| File | Changes |
-|------|---------|
-| `prime-rs/prime-index/src/lib.rs` | Added `pub mod incremental` |
-| `prime-rs/prime-core/Cargo.toml` | Enabled serde by default |
-| `prime-rs/prime-core/src/types.rs` | Added `FlowsTo`, `Yields` to RelationKind |
-| `prime-rs/prime-parser/src/extractor.rs` | Added `extract_overrides`, `extract_exports`, `extract_dataflows` |
-| `prime-rs/prime-parser/src/analyzer.rs` | Added `update_incremental()` method |
-| `prime-rs/prime-cli/src/main.rs` | Added `update` command, improved `check` |
+```
+semantic correctness
+    ↓
+relationship coverage
+    ↓
+retrieval correctness
+    ↓
+compactness
+    ↓
+latency
+```
 
----
-
-## Next Steps
-
-1. **Optimize storage**: Implement succinct data structures for better compression
-2. **Add resource nodes**: FILE, ENV, NETWORK entities for semantic depth
-3. **Run ACIQ benchmark**: Re-run with fixed entity extraction
+**Status:** Relationship extraction improved (8 types), but precision/recall still need measurement.
 
 ---
 
-## Confidence Legend
+## Part 7: Benchmark Dataset (from Spec)
 
-| Label | Meaning |
-|-------|---------|
-| **FACT** | Verified by primary source, reproducible |
-| **OBSERVATION** | Directly observed, reproducible |
-| **HYPOTHESIS** | Proposed explanation, requires validation |
-| **INFERENCE** | Deduced from evidence, marked as such |
-| **OPEN QUESTION** | Explicitly unknown, needs research |
+### Symbol Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 1 | Where is X? | ⏳ | Need to create |
+| 2 | What is X? | ⏳ | Need to create |
+| 3 | What does X represent? | ⏳ | Need to create |
+
+### Dependency Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 4 | What does X depend on? | ⏳ | Need to create |
+| 5 | What depends on X? | ⏳ | Need to create |
+
+### Call Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 6 | Who calls X? | ⏳ | Need to create |
+| 7 | What does X call? | ⏳ | Need to create |
+
+### Type Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 8 | What implements X? | ⏳ | Need to create |
+| 9 | What does X implement? | ⏳ | Need to create |
+| 10 | What inherits from X? | ⏳ | Need to create |
+
+### Reference Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 11 | Where is X referenced? | ⏳ | Need to create |
+| 12 | What uses X? | ⏳ | Need to create |
+
+### Architecture Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 13 | What module contains X? | ⏳ | Need to create |
+| 14 | What components communicate with X? | ⏳ | Need to create |
+| 15 | What is the dependency chain around X? | ⏳ | Need to create |
+
+### Test Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 16 | What tests X? | ⏳ | Need to create |
+| 17 | Which tests depend on X? | ⏳ | Need to create |
+
+### Impact Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 18 | What could break if X changes? | ⏳ | Need to create |
+
+### Contract Questions ❌
+
+| # | Question Type | Status | Ground Truth |
+|---|---------------|--------|--------------|
+| 19 | What does X return? | ⏳ | Need to create |
+| 20 | What can X throw? | ⏳ | Need to create |
+| 21 | What inputs does X require? | ⏳ | Need to create |
 
 ---
 
-**Research Phase:** ✅ Complete
-**Implementation Phase:** 🔄 In Progress (11/12 tasks)
-**ACIQ Benchmark:** 🔄 Complete (baseline established)
+## Part 8: Benchmark Baselines ❌
+
+| # | Baseline | Status | Notes |
+|---|----------|--------|-------|
+| 1 | Raw filesystem + grep | ⏳ | Need to implement |
+| 2 | ripgrep | ⏳ | Need to implement |
+| 3 | VS Code/LSP-style semantic index | ⏳ | Need to implement |
+| 4 | SCIP | ⏳ | Need to implement |
+| 5 | LSIF | ⏳ | Need to implement |
+| 6 | Code-Graph-RAG | ⏳ | Need to implement |
+| 7 | Aider-style repository map | ⏳ | Need to implement |
+| 8 | CPG/Joern | ⏳ | Need to implement |
+| 9 | Prime (current) | ✅ | Benchmark exists |
+
+### Metrics to Measure (from spec)
+
+| Metric | Status |
+|--------|--------|
+| Answer accuracy | ✅ (in benchmark) |
+| Source-free accuracy | ✅ (in benchmark) |
+| Entity precision | ✅ (in benchmark) |
+| Entity recall | ✅ (in benchmark) |
+| Relationship precision | ✅ (in benchmark) |
+| Relationship recall | ✅ (in benchmark) |
+| Relationship F1 | ✅ (in benchmark) |
+| MRR | ✅ (in benchmark) |
+| Recall@1/3/5/10 | ✅ (in benchmark) |
+| Bytes retrieved | ❌ Not measured |
+| Tokens exposed | ❌ Not measured |
+| Source reads | ❌ Not measured |
+| Tool calls | ❌ Not measured |
+| Query latency | ✅ (in benchmark) |
+| Indexing latency | ✅ (in benchmark) |
+| Incremental update latency | ✅ (incremental.rs) |
+| Memory | ✅ (peak_memory_bytes) |
+| Artifact size | ✅ (in benchmark) |
+
+---
+
+## Part 9: Incremental Updates Benchmark ❌
+
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| 1 | Clean → complete index | ✅ | `prime build --force` |
+| 2 | Modify 1 file → update | ✅ | `prime update` (70x speedup) |
+| 3 | Modify 10 files → update | ⏳ | Need to test |
+| 4 | Modify 1% of files | ⏳ | Need to test |
+| 5 | Modify 10% of files | ⏳ | Need to test |
+| 6 | Branch switch | ⏳ | Need to test |
+| 7 | Large refactor | ⏳ | Need to test |
+
+### Metrics to Measure
+
+| Metric | Status |
+|--------|--------|
+| Files touched | ⏳ |
+| Bytes read | ⏳ |
+| Parsing time | ⏳ |
+| Semantic derivation time | ⏳ |
+| Index update time | ✅ |
+| Artifact delta | ⏳ |
+| Memory | ⏳ |
+| Query availability during update | ⏳ |
+
+---
+
+## Part 10: Filesystem Benchmark ❌
+
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| 1 | Cold scan | ⏳ | Need to implement |
+| 2 | Warm scan | ⏳ | Need to implement |
+| 3 | Cold derivation | ⏳ | Need to implement |
+| 4 | Warm derivation | ⏳ | Need to implement |
+| 5 | Incremental derivation | ✅ | Implemented |
+| 6 | Concurrent derivation | ⏳ | Need to implement |
+| 7 | Random query | ⏳ | Need to implement |
+| 8 | Sequential queries | ⏳ | Need to implement |
+| 9 | Filesystem watcher response | ⏳ | Need to implement |
+
+---
+
+## Part 11: Architecture Investigation
+
+### Two-Level Representation ❌
+
+| Level | Description | Status |
+|-------|-------------|--------|
+| Level 1 (cheap) | symbols, files, modules, definitions, references, imports, exports, types, calls | ⏳ Partial |
+| Level 2 (derived) | call chains, data flow, impact, architecture, behavior, contracts, test relationships | ⏳ Partial |
+
+**Current Status:** Level 1 mostly implemented. Level 2 partially implemented (FlowsTo, Instantiates).
+
+### Specialized Indexes ❌
+
+| Index | Status | Notes |
+|-------|--------|-------|
+| SymbolIndex | ✅ | NameIndex in types.rs |
+| DefinitionIndex | ⏳ | Need to implement |
+| ReferenceIndex | ⏳ | Need to implement |
+| CallIndex | ⏳ | Need to implement |
+| TypeIndex | ⏳ | Need to implement |
+| DependencyIndex | ⏳ | Need to implement |
+| TestIndex | ⏳ | Need to implement |
+| ConfigurationIndex | ⏳ | Need to implement |
+| ArchitectureIndex | ⏳ | Need to implement |
+
+---
+
+## Part 12: Graph Compression ❌
+
+| Technique | Status | Notes |
+|-----------|--------|-------|
+| CSR | ⏳ | Need to investigate |
+| CSC | ⏳ | Need to investigate |
+| Compressed adjacency | ⏳ | Need to investigate |
+| Delta encoding | ⏳ | Need to investigate |
+| Variable-length integers | ✅ | Used in compact_serialization |
+| Elias-Fano | ⏳ | Need to investigate |
+| Roaring bitmaps | ✅ | Used in RelationIndex |
+| Succinct graphs | ⏳ | Need to investigate |
+| WebGraph-style | ⏳ | Need to investigate |
+| Minimal perfect hashing | ⏳ | Need to investigate |
+
+---
+
+## Part 13: Identity Investigation
+
+| Approach | Status | Notes |
+|----------|--------|-------|
+| Paths | ✅ | File paths used |
+| Names | ✅ | Simple names |
+| Fully-qualified names | ✅ | file::module::name |
+| SCIP symbols | ⏳ | Need to investigate |
+| Content hashes | ✅ | SHA-256 in ContentHash |
+| Semantic IDs | ⏳ | Need to investigate |
+| Stable IDs | ⏳ | Need to investigate |
+
+---
+
+## Part 14: Uncertainty Investigation ✅
+
+| Level | Status | Implementation |
+|-------|--------|----------------|
+| EXACT | ✅ | Confidence::High |
+| DERIVED | ✅ | Confidence::Medium |
+| INFERRED | ✅ | Confidence::Low |
+| UNKNOWN | ✅ | Confidence::Unknown |
+
+---
+
+## Part 15: Provenance Investigation
+
+| Aspect | Status | Notes |
+|--------|--------|-------|
+| Source locations | ✅ | Range in Entity |
+| Revision IDs | ⏳ | Need to add |
+| Content hashes | ✅ | ContentHash |
+| Merkle structures | ⏳ | Need to investigate |
+| Signed manifests | ⏳ | Need to investigate |
+| Compact evidence IDs | ⏳ | Need to investigate |
+
+---
+
+## Part 16: Agent-Specific Evaluation ❌
+
+| Task | Status | Notes |
+|------|--------|-------|
+| "Where should I add authentication?" | ⏳ | Need to create |
+| "What breaks if I rename this interface?" | ⏳ | Need to create |
+| "Where is this API consumed?" | ⏳ | Need to create |
+| "Find the implementation behind this behavior" | ⏳ | Need to create |
+| "Explain the dependency chain from A to B" | ⏳ | Need to create |
+| "What tests should I update if I change X?" | ⏳ | Need to create |
+| "Which modules are likely affected by changing X?" | ⏳ | Need to create |
+
+---
+
+## Part 17: Architectural Questions (from spec)
+
+| # | Question | Status | Answer |
+|---|----------|--------|--------|
+| 1 | What do mature systems agree on? | ✅ | 8 universal primitives converge |
+| 2 | What information does an agent need? | ✅ | Symbols, relationships, context |
+| 3 | What information can be discarded? | ✅ | Formatting, comments, whitespace |
+| 4 | What relationships are essential? | ✅ | Calls, Imports, Extends, Implements |
+| 5 | What relationships are optional? | ✅ | FlowsTo, Instantiates, Overrides |
+| 6 | What does Prime currently lack? | ✅ | Documented in gap analysis |
+| 7 | What to borrow from VS Code? | ✅ | Incrementality, language services |
+| 8 | What to borrow from SCIP? | ✅ | Symbol identity model |
+| 9 | What to borrow from LSIF? | ✅ | Persistent representation |
+| 10 | What to borrow from Code-Graph-RAG? | ✅ | Multi-language graph schema |
+| 11 | What to borrow from Tree-sitter? | ✅ | Incremental parsing |
+| 12 | What to borrow from Git? | ✅ | Content addressing |
+| 13 | What to borrow from ripgrep? | ✅ | Parallel traversal |
+| 14 | What to NOT borrow? | ✅ | Full graph DB, embeddings |
+| 15 | Should Prime be a graph? | ✅ | Yes, but compact |
+| 16 | Should Prime use specialized indexes? | ✅ | Yes, for hot paths |
+| 17 | Minimum knowledge unit? | ✅ | Entity + Relationship |
+| 18 | How to encode relationships? | ✅ | Typed edges with confidence |
+| 19 | How should identity work? | ✅ | Qualified names + content hashes |
+| 20 | How should incremental updates work? | ✅ | File-level detection + entity invalidation |
+| 21 | How should uncertainty work? | ✅ | Confidence levels |
+| 22 | How should provenance work? | ⏳ | Partial (locations, hashes) |
+| 23 | What should be benchmarked? | ✅ | Comprehensive benchmark suite |
+| 24 | What experiments next? | ⏳ | Need to define |
+| 25 | What assumptions to remove? | ⏳ | Need to audit |
+
+---
+
+## Next Steps (Priority Order)
+
+### Immediate (This Week)
+
+1. **Create benchmark dataset** with ground truth answers
+2. **Implement baseline comparisons** (grep, ripgrep, LSP)
+3. **Measure relationship precision/recall** on real codebases
+4. **Fix Relationship F1** from 0.00 to >0.50
+
+### Short-term (Next 2 Weeks)
+
+5. **Implement Level 2 relationships** (call chains, impact analysis)
+6. **Add specialized indexes** (DefinitionIndex, CallIndex, TypeIndex)
+7. **Complete incremental benchmarks** (10 files, 1%, 10%, branch switch)
+8. **Add agent-specific evaluation tasks**
+
+### Medium-term (Next Month)
+
+9. **Graph compression investigation** (CSR, Elias-Fano, WebGraph)
+10. **Identity system** (SCIP symbols, stable IDs)
+11. **Provenance system** (revision IDs, Merkle structures)
+12. **Filesystem benchmark** (cold/warm scan, concurrent derivation)
+
+---
+
+## Key Metrics Dashboard
+
+| Metric | Current | Previous | Change | Target |
+|--------|---------|----------|--------|--------|
+| Entities | 1,094 | 384 | +185% | >2,000 |
+| Relations | 75,542 | 73,275 | +3% | >100,000 |
+| Relationship Types | 8 | 3 | +167% | 12+ |
+| Build Time | 4.79s | 4.19s | +14% | <5s |
+| Cold Query | 52µs | 209µs | -75% | <100µs |
+| Incremental Speedup | 70x | — | — | >50x |
+| Source-free Accuracy | 8.2% | 8.2% | 0% | >60% |
+| Relationship F1 | 0.00 | 0.00 | 0% | >0.50 |
+
+---
+
+**Research Phase:** ✅ Complete (16/16 repos)
+**Implementation Phase:** 🔄 In Progress (11/16 tasks)
+**Benchmarking Phase:** ⏳ Not Started (0/25 tasks)
+**Architecture Investigation:** ⏳ Not Started (2/10 tasks)
+
 **Owner:** Research Team
 **Next Review:** September 2026
