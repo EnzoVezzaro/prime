@@ -3,6 +3,17 @@
 **Created:** August 21, 2026
 **Purpose:** Comprehensive testing of Prime implementation, benchmarking, and validation
 
+## Result File Convention
+
+Every benchmark run produces TWO files in `benchmarks/results/`:
+
+1. **`latest.json`** — always overwritten with the most recent result
+2. **`result_<timestamp>.json`** — timestamped copy for historical tracking
+
+The timestamp format is `YYYYMMDDTHHMMSS` (e.g., `result_20260821T204449.json`).
+
+After each testing phase, commit the timestamped results for historical tracking.
+
 ---
 
 ## Phase 1: Fix Critical Bugs (Priority: HIGH)

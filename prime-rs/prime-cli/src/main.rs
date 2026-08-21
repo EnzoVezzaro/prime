@@ -2065,8 +2065,22 @@ fn write_result(result: &BenchmarkResult, output: &PathBuf) -> anyhow::Result<()
         fs::create_dir_all(parent)?;
     }
     let json = serde_json::to_string_pretty(result)?;
-    fs::write(output, json)?;
+    
+    // Write latest.json
+    fs::write(output, &json)?;
     println!("\nResult written to: {}", output.display());
+    
+    // Write timestamped copy: result_<timestamp>.json
+    if let Some(parent) = output.parent() {
+        // Extract a filename-safe timestamp from the result timestamp
+        let ts = result.timestamp.replace(":", "").replace("-", "").replace(" ", "_");
+        // Use just the date-time portion (first 15 chars: 20260821T204449)
+        let ts_safe = if ts.len() >= 15 { &ts[..15] } else { &ts };
+        let timestamped = parent.join(format!("result_{}.json", ts_safe));
+        fs::write(&timestamped, &json)?;
+        println!("Result also written to: {}", timestamped.display());
+    }
+    
     Ok(())
 }
 
