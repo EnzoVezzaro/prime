@@ -33,7 +33,7 @@ impl<'a> Extractor<'a> {
 
         // Extract definitions
         if let Err(e) = self.extract_definitions(tree.root_node(), &mut entities) {
-            eprintln!("  [extract] definitions ERROR: {}", e);
+            eprintln!("  [extract] definitions ERROR ({}): {}", self.config.language, e);
             errors.push(crate::ParseError {
                 message: format!("Failed to extract definitions: {}", e),
                 range: None,
