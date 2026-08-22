@@ -19,7 +19,20 @@
 | Architecture Investigation | 10 | 2 | 0 | 8 |
 | **Total** | **102** | **52** | **0** | **50** |
 
-**Overall Progress:** ██████████░░░░░░░░░░░ 51%
+**Overall Progress:** ████████████░░░░░░░░░ 63%
+
+### Latest Benchmark Results (August 22, 2026)
+
+| Repo | Accuracy | Change from Baseline |
+|------|----------|---------------------|
+| express | **83.3%** | +83.3% |
+| httpx | **73.9%** | +69.9% |
+| gin | **73.9%** | +73.9% |
+| bat | **56.0%** | +52.0% |
+| spdlog | **26.1%** | +22.1% |
+| **Overall** | **62.7%** | **+60.3%** |
+
+Retrieval: Search 351µs, Lookup 26µs, Context 9µs
 
 ---
 
@@ -436,27 +449,33 @@ The benchmark questions are **repo-agnostic** (generic queries), not **repo-spec
 
 ## Next Steps (Priority Order)
 
-### Immediate (This Week)
+### Immediate (This Week) ✅ DONE
 
-1. **Fix entity extraction** for JS (express=0 entities) — tree-sitter query issues
-2. **Increase Relationship F1** from 0.14 to >0.30
-3. **Create repo-specific benchmark questions** with ground truth answers
-4. **Test incremental updates** at scale (10 files, 1%, 10%, branch switch)
+1. ~~Fix entity extraction for JS (express=0 entities)~~ ✅ express now has 109 entities
+2. ~~Increase Relationship F1~~ ✅ bat 0.500, httpx 0.818, express 0.818, gin 0.818
+3. ~~Create repo-specific benchmark questions~~ ✅ All 5 repos rewritten
+4. ~~Fix benchmark evaluation bugs~~ ✅ Accuracy 2.4% → 62.7%
 
-### Short-term (Next 2 Weeks)
+### Short-term (Next Week)
 
-5. **Implement Level 2 relationships** (call chains, impact analysis)
-6. **Add specialized indexes** (DefinitionIndex, CallIndex, TypeIndex)
-7. **Complete incremental benchmarks** (10 files, 1%, 10%, branch switch)
-8. **Add agent-specific evaluation tasks**
+5. **Fix spdlog C++ extraction** (26.1% accuracy)
+6. **Fix flows_to extraction** (add keyword to Context extraction)
+7. **Fix instantiates for bat/express** (Relationships tool returns empty)
+8. **Fix bat imports/dependencies** (Dependencies tool returns empty)
 
-### Medium-term (Next Month)
+### Medium-term (Next 2 Weeks)
 
-9. **Graph compression investigation** (CSR, Elias-Fano, WebGraph)
-10. **Identity system** (SCIP symbols, stable IDs)
-11. **Provenance system** (revision IDs, Merkle structures)
-12. **Filesystem benchmark** (cold/warm scan, concurrent derivation)
-13. **OpenWiki-style incremental maintenance** (Git-aware knowledge compiler)
+9. **Implement Level 2 relationships** (call chains, impact analysis)
+10. **Add specialized indexes** (DefinitionIndex, CallIndex, TypeIndex)
+11. **Add agent-specific evaluation tasks**
+12. **Test incremental updates** at scale (10 files, 1%, 10%, branch switch)
+
+### Long-term (Next Month)
+
+13. **Graph compression investigation** (CSR, Elias-Fano, WebGraph)
+14. **Identity system** (SCIP symbols, stable IDs)
+15. **Provenance system** (revision IDs, Merkle structures)
+16. **Filesystem benchmark** (cold/warm scan, concurrent derivation)
 
 ---
 
@@ -464,15 +483,20 @@ The benchmark questions are **repo-agnostic** (generic queries), not **repo-spec
 
 | Metric | Current | Previous | Change | Target |
 |--------|---------|----------|--------|--------|
+| **Knowledge Accuracy** | **62.7%** | 2.4% | **+2500%** | >50% ✅ |
+| Source-free Accuracy | 61.0% | 2.4% | +2442% | >60% ✅ |
+| express Accuracy | 83.3% | 0% | +∞ | >70% ✅ |
+| httpx Accuracy | 73.9% | 4% | +1748% | >70% ✅ |
+| gin Accuracy | 73.9% | 0% | +∞ | >70% ✅ |
+| bat Accuracy | 56.0% | 4% | +1300% | >50% ✅ |
+| spdlog Accuracy | 26.1% | 4% | +553% | >50% |
 | Entities | 1,094 | 384 | +185% | >2,000 |
-| Relations | 75,542 | 73,275 | +3% | >100,000 |
+| Relations | 50,110 | 73,275 | -32% | >100,000 |
 | Relationship Types | 8 | 3 | +167% | 12+ |
-| Build Time | 4.79s | 4.19s | +14% | <5s |
-| Cold Query | 52µs | 209µs | -75% | <100µs |
-| Incremental Speedup | 70x | — | — | >50x |
-| Source-free Accuracy | 1.6% | 8.2% | -80% | >60% |
-| Relationship F1 | 0.14 | 0.00 | +∞ | >0.50 |
-| Entity F1 | 0.57 | 0.37 | +54% | >0.80 |
+| Search p50 | 351µs | 365µs | -4% | <1ms ✅ |
+| Lookup p50 | 26µs | 27µs | -4% | <100µs ✅ |
+| Context p50 | 9µs | 3µs | +200% | <10µs ✅ |
+| Build Time | 0.52s | 4.79s | -89% | <5s ✅ |
 
 ---
 
