@@ -1,9 +1,9 @@
 //! Entity and relation extraction from Tree-sitter parse trees
 
-use tree_sitter::{Node, Query, QueryCursor, Tree, Language as TSLanguage};
-use tree_sitter::{StreamingIterator, StreamingIteratorMut};
-use prime_core::{SymbolKind, RelationKind, Confidence, Language as PrimeLanguage, Range, Position, HashEntityId};
-use crate::{ExtractedEntity, ExtractedRelation, ParseError, LanguageConfig};
+use tree_sitter::{Node, Query, QueryCursor, Tree};
+use tree_sitter::StreamingIterator;
+use prime_core::{SymbolKind, Confidence, Range, Position, HashEntityId};
+use crate::LanguageConfig;
 use std::collections::HashMap;
 
 /// Entity extractor using Tree-sitter queries
@@ -11,7 +11,7 @@ pub struct Extractor<'a> {
     config: &'a LanguageConfig,
     source: &'a [u8],
     file_path: &'a std::path::Path,
-    entity_counter: u64,
+    _entity_counter: u64,
     entity_map: HashMap<String, u64>,  // qualified_name -> EntityId (u64)
 }
 
@@ -21,7 +21,7 @@ impl<'a> Extractor<'a> {
             config,
             source,
             file_path,
-            entity_counter: 0,
+            _entity_counter: 0,
             entity_map: HashMap::new(),
         }
     }
@@ -326,7 +326,7 @@ impl<'a> Extractor<'a> {
             "method_definition" | "method_declaration" | "function_item" => {
                 if let Some(method_name) = self.extract_name_from_node(node) {
                     // Check if parent class has inheritance
-                    if let Some(parent_class) = class_stack.last() {
+                    if let Some(_parent_class) = class_stack.last() {
                         // Heuristic: if method exists in parent, it's likely an override
                         // In a full implementation, we'd resolve the parent class
                         let from_qualified = self.current_function_qualified(node);
@@ -596,7 +596,7 @@ impl<'a> Extractor<'a> {
 
     fn extract_exports(&mut self, node: Node, relations: &mut Vec<crate::ExtractedRelation>) -> anyhow::Result<()> {
         // Look for export statements and public visibility
-        let query_str = match self.config.language {
+        let _query_str = match self.config.language {
             prime_core::Language::Rust => {
                 // Rust: pub items are exported
                 "(visibility_modifier) @visibility"
@@ -686,7 +686,7 @@ impl<'a> Extractor<'a> {
         self.qualify_name("file")
     }
 
-    fn current_module_qualified(&self, node: Node) -> String {
+    fn current_module_qualified(&self, _node: Node) -> String {
         self.file_path.to_string_lossy().to_string()
     }
 
@@ -721,56 +721,42 @@ impl<'a> Extractor<'a> {
 
     fn parse_symbol_kind(&self, kind_str: &str) -> SymbolKind {
         match kind_str {
-            // Functions
-            "function" | "function_item" | "function_declaration" | "function_definition" | "async_function_definition" => SymbolKind::Function,
+            // Functions (all languages)
+            "function" | "function_item" | "function_declaration" | "function_definition"
+            | "async_function_definition" | "function_declarator" | "function_expression"
+            | "arrow_function" => SymbolKind::Function,
             // Methods
-            "method" | "method_definition" | "method_declaration" | "method_declaration" => SymbolKind::Method,
-            // Classes/Structs/Enums
-            "class" | "class_declaration" | "class_item" | "class_specifier" | "class_definition" => SymbolKind::Class,
-            "struct" | "struct_item" | "struct_specifier" | "struct_declaration" => SymbolKind::Struct,
+            "method" | "method_definition" | "method_declaration" => SymbolKind::Method,
+            // Classes
+            "class" | "class_declaration" | "class_item" | "class_specifier"
+            | "class_definition" => SymbolKind::Class,
+            // Structs
+            "struct" | "struct_item" | "struct_specifier"
+            | "struct_declaration" => SymbolKind::Struct,
+            // Enums
             "enum" | "enum_item" | "enum_declaration" | "enum_specifier" => SymbolKind::Enum,
             // Traits/Interfaces
-            "trait" | "trait_item" | "trait_declaration" | "interface_declaration" => SymbolKind::Trait,
-            "interface" => SymbolKind::Interface,
-            "impl" | "impl_item" => SymbolKind::Trait,
+            "trait" | "trait_item" | "trait_declaration" => SymbolKind::Trait,
+            "interface" | "interface_declaration" => SymbolKind::Interface,
+            // Impl blocks (implementation, not trait)
+            "impl" | "impl_item" => SymbolKind::Unknown,
             // Types
-            "type_alias" | "type_item" | "type_declaration" => SymbolKind::TypeAlias,
+            "type_alias" | "type_item" | "type_declaration" | "alias_declaration"
+            | "type_definition" | "type_alias_declaration" => SymbolKind::TypeAlias,
             // Macros
             "macro" | "macro_definition" | "macro_rules" => SymbolKind::Macro,
-            // Modules
+            // Modules/Namespaces
             "module" | "mod_item" | "namespace_definition" => SymbolKind::Module,
-            // Constants/Variables
+            // Constants
             "const" | "const_item" | "const_declaration" => SymbolKind::Constant,
+            // Static variables
             "static" | "static_item" => SymbolKind::StaticVariable,
+            // Fields
             "field" | "field_declaration" => SymbolKind::Field,
+            // Parameters
             "parameter" => SymbolKind::Parameter,
-            "variable" | "var_declaration" => SymbolKind::Variable,
-            // Python-specific
-            "function_definition" => SymbolKind::Function,
-            "async_function_definition" => SymbolKind::Function,
-            "class_definition" => SymbolKind::Class,
-            "async_function_definition" => SymbolKind::Function,
-            // JavaScript/TypeScript
-            "function_declaration" => SymbolKind::Function,
-            "function_expression" => SymbolKind::Function,
-            "arrow_function" => SymbolKind::Function,
-            "method_definition" => SymbolKind::Method,
-            "class_declaration" => SymbolKind::Class,
-            "interface_declaration" => SymbolKind::Interface,
-            "type_alias_declaration" => SymbolKind::TypeAlias,
-            "enum_declaration" => SymbolKind::Enum,
-            // Go
-            "function_declaration" => SymbolKind::Function,
-            "method_declaration" => SymbolKind::Method,
-            "struct_declaration" => SymbolKind::Struct,
-            "interface_declaration" => SymbolKind::Interface,
-            "type_declaration" => SymbolKind::TypeAlias,
-            // Python-specific
-            "async_function_definition" => SymbolKind::Function,
-            "class_definition" => SymbolKind::Class,
-            "type_alias_declaration" => SymbolKind::TypeAlias,
             // Variables
-            "variable_declaration" => SymbolKind::Variable,
+            "variable" | "var_declaration" | "variable_declaration" => SymbolKind::Variable,
             _ => SymbolKind::Unknown,
         }
     }

@@ -10,13 +10,15 @@ pub mod language;
 pub mod agent;
 pub mod par;
 pub mod projection;
+pub mod semantic;
 
 pub use types::*;
 pub use hash::{ContentHash, EntityId, HashChain, FileHashTracker, EntityId as HashEntityId};
 pub use confidence::*;
-pub use language::*;
+pub use language::{Language, LanguageCapabilities, LanguageRegistry};
 pub use agent::*;
 pub use par::*;
 pub use projection::*;
+pub use semantic::{Effect, SemanticMetadata, EvidenceRef, EvidenceKind, SemanticEntity};
 
 pub use serde_json;

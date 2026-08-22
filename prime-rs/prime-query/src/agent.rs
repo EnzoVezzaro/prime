@@ -1,9 +1,8 @@
 //! Agent-optimized query interface
 
-use prime_core::{KnowledgeGraph, Entity, EntityId, Relation, RelationKind, SymbolKind, Confidence, Range, Language};
-use prime_index::query::{QueryEngine, QueryOptions, QueryResult, EntitySummary, RelationSummary, ProgressiveContextBuilder as IndexProgressiveContextBuilder};
+use prime_core::KnowledgeGraph;
+use prime_index::query::QueryOptions;
 use std::sync::Arc;
-use std::collections::HashMap;
 
 /// Agent-facing query interface
 pub struct AgentQuery {

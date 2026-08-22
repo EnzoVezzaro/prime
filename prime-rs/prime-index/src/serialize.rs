@@ -1,9 +1,7 @@
 //! Serialization for the knowledge graph
 
 use prime_core::{KnowledgeGraph, Entity, Relation, File, Module, Project, EntityId, ContentHash, Range, Position, SymbolKind, RelationKind, Confidence, Provenance, Language};
-use flatbuffers::{FlatBufferBuilder, WIPOffset as FbWIPOffset};
 use anyhow::{Result, Context};
-use std::collections::{HashMap, HashSet};
 use serde::{Serialize, Deserialize};
 use std::io::Write;
 use indexmap::IndexMap;
@@ -74,6 +72,11 @@ pub struct CompactEntity {
     pub confidence: String,
     pub signature: Option<String>,
     pub documentation: Option<String>,
+    // SCIP-inspired identity fields
+    pub parent_id: Option<u64>,
+    pub disambiguator: Option<String>,
+    pub stability: String,
+    pub aliases: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -132,6 +135,10 @@ impl From<&KnowledgeGraph> for CompactKnowledgeGraph {
                 confidence: format!("{:?}", entity.confidence),
                 signature: entity.signature.clone(),
                 documentation: entity.documentation.clone(),
+                parent_id: entity.parent_id.map(|p| p.0),
+                disambiguator: entity.disambiguator.clone(),
+                stability: format!("{:?}", entity.stability),
+                aliases: entity.aliases.clone(),
             }
         }).collect();
 
@@ -195,7 +202,7 @@ impl From<CompactKnowledgeGraph> for KnowledgeGraph {
         let mut entities = IndexMap::new();
         for entity in compact.entities {
             let id = EntityId(entity.id);
-            let entity = Entity {
+            let e = Entity {
                 id,
                 kind: entity.kind.parse().unwrap_or(SymbolKind::Unknown),
                 name: entity.name,
@@ -209,10 +216,15 @@ impl From<CompactKnowledgeGraph> for KnowledgeGraph {
                 confidence: entity.confidence.parse().unwrap_or(Confidence::Unknown),
                 signature: entity.signature,
                 documentation: entity.documentation,
+                parent_id: entity.parent_id.map(|p| EntityId(p)),
+                disambiguator: entity.disambiguator,
+                stability: entity.stability.parse().unwrap_or(prime_core::Stability::Unknown),
+                aliases: entity.aliases,
                 children: Vec::new(),
                 relations: Vec::new(),
+                semantic: None,
             };
-            entities.insert(id, entity);
+            entities.insert(id, e);
         }
 
         let mut relations = Vec::new();
@@ -268,66 +280,6 @@ impl From<CompactKnowledgeGraph> for KnowledgeGraph {
         };
         graph.build_indexes();
         graph
-    }
-}
-
-/// FlatBuffers serialization (for zero-copy access)
-pub mod fb {
-    use super::*;
-    use flatbuffers::{FlatBufferBuilder, WIPOffset};
-
-    // This would use a generated FlatBuffers schema
-    // For now, we provide a placeholder structure
-
-    pub struct GraphSerializer<'a> {
-        builder: FlatBufferBuilder<'a>,
-    }
-
-    impl<'a> GraphSerializer<'a> {
-        pub fn new() -> Self {
-            Self {
-                builder: FlatBufferBuilder::new(),
-            }
-        }
-
-        pub fn serialize(&mut self, graph: &KnowledgeGraph) -> Vec<u8> {
-            // Serialize project
-            let project_offset = self.serialize_project(&graph.project);
-
-            // Serialize entities
-            let entity_offsets: Vec<_> = graph.entities.values()
-                .map(|e| self.serialize_entity(e))
-                .collect();
-
-            // Serialize relations
-            let relation_offsets: Vec<_> = graph.relations.iter()
-                .map(|r| self.serialize_relation(r))
-                .collect();
-
-            // Build vectors
-            let entities_vec = self.builder.create_vector(&entity_offsets);
-            let relations_vec = self.builder.create_vector(&relation_offsets);
-
-            // Create root table
-            // This would use generated FlatBuffers code
-            // For now, return placeholder
-            self.builder.finished_data().to_vec()
-        }
-
-        fn serialize_project(&mut self, project: &Project) -> flatbuffers::WIPOffset<u32> {
-            // Placeholder
-            flatbuffers::WIPOffset::new(0)
-        }
-
-        fn serialize_entity(&mut self, entity: &Entity) -> flatbuffers::WIPOffset<u32> {
-            // Placeholder
-            flatbuffers::WIPOffset::new(0)
-        }
-
-        fn serialize_relation(&mut self, relation: &Relation) -> flatbuffers::WIPOffset<u32> {
-            // Placeholder
-            flatbuffers::WIPOffset::new(0)
-        }
     }
 }
 

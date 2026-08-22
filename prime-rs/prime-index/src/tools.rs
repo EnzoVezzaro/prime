@@ -3,14 +3,13 @@
 //! Each operation corresponds to an MCP tool and returns `PrimeEnvelope<T>`.
 
 use prime_core::{
-    KnowledgeGraph, Entity, EntityId, RelationKind, SymbolKind, Language,
-    Confidence, Range, Position,
-    PrimeEnvelope, ResponseStatus, AgentConfidence, AgentProvenance,
-    TelemetryData, ToolRequest, ToolIntent, DetailLevel, RelationScope,
+    KnowledgeGraph, Entity, EntityId, RelationKind,
+    Confidence,
+    PrimeEnvelope, ResponseStatus, AgentConfidence,
+    TelemetryData, ToolRequest, ToolIntent, RelationScope,
     EntityDetail, ContextResult, DependencyResult, ImpactResult, ImpactRisk,
     ArchitectureResult, ModuleInfo,
 };
-use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Instant;
 
@@ -195,7 +194,7 @@ impl ToolExecutor {
     }
 
     /// prime_context — Get knowledge neighborhood for an entity
-    pub fn prime_context(&self, qualified_name: &str, depth: usize, token_budget: usize) -> PrimeEnvelope<Option<ContextResult>> {
+    pub fn prime_context(&self, qualified_name: &str, _depth: usize, _token_budget: usize) -> PrimeEnvelope<Option<ContextResult>> {
         let start = Instant::now();
 
         let entity_id = match self.engine.graph().find_by_qualified(qualified_name) {
@@ -276,7 +275,7 @@ impl ToolExecutor {
             (true, true, false) => 0.9,
             (true, false, true) => 0.8,
             (true, false, false) => 0.7,
-            (false, _, true) => 0.6,
+            (false, true, true) => 0.6,
             (false, true, false) => 0.5,
             (false, false, true) => 0.4,
             (false, false, false) => 0.3,
@@ -329,7 +328,7 @@ impl ToolExecutor {
         &self,
         qualified_name: &str,
         dimensions: &[String],
-        scope: RelationScope,
+        _scope: RelationScope,
         limit: usize,
     ) -> PrimeEnvelope<Vec<EntityDetail>> {
         let start = Instant::now();
@@ -385,10 +384,16 @@ impl ToolExecutor {
             }
         }
 
+        // Always include the target entity as the first result
+        if let Some(entity) = self.engine.graph().entities.get(&entity_id) {
+            let target_detail = entity_to_detail(&entity_id, entity);
+            results.insert(0, target_detail);
+        }
+
         results.truncate(limit);
 
         let elapsed = start.elapsed().as_secs_f64() * 1000.0;
-        let coverage = if results.is_empty() { 0.5 } else { 1.0 };
+        let coverage = if results.len() <= 1 { 0.5 } else { 1.0 };
 
         PrimeEnvelope {
             status: ResponseStatus::Complete,
@@ -414,8 +419,8 @@ impl ToolExecutor {
     pub fn prime_dependencies(
         &self,
         qualified_name: &str,
-        scope: RelationScope,
-        depth: usize,
+        _scope: RelationScope,
+        _depth: usize,
     ) -> PrimeEnvelope<Option<DependencyResult>> {
         let start = Instant::now();
 

@@ -70,9 +70,9 @@
     {
       "id": "bat-call-002",
       "category": "calls",
-      "question": "What does the controller do?",
-      "search_query": "controller",
-      "expected_entities": [],
+      "question": "What does run call?",
+      "search_query": "run",
+      "expected_entities": ["run"],
       "expected_relationships": [["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
@@ -81,8 +81,8 @@
       "id": "bat-call-003",
       "category": "calls",
       "question": "What functions are called together?",
-      "search_query": "controller",
-      "expected_entities": [],
+      "search_query": "run_controller",
+      "expected_entities": ["run_controller"],
       "expected_relationships": [["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"

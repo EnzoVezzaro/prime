@@ -1,12 +1,9 @@
 //! Storage layer for the Prime knowledge graph
 
-use prime_core::{KnowledgeGraph, EntityId, Entity, Relation, File, Module, Project, ContentHash, Range, Position, SymbolKind, RelationKind, Confidence, Provenance, Language};
+use prime_core::{KnowledgeGraph, EntityId, Entity, Relation, RelationKind};
 use anyhow::Result;
-use std::path::{Path, PathBuf};
-use std::collections::HashMap;
+use std::path::PathBuf;
 use std::io::Write;
-use indexmap::IndexMap;
-use roaring::RoaringBitmap;
 use serde::{Serialize, Deserialize};
 
 /// Storage configuration
@@ -153,7 +150,8 @@ impl StorageBackend for FlatBufferStorage {
 
 /// Memory-mapped storage for zero-copy reads
 pub struct MmapStorage {
-    config: StorageConfig,
+    #[allow(dead_code)]
+    _config: StorageConfig,
     path: PathBuf,
     mmap: Option<memmap2::Mmap>,
 }
@@ -162,7 +160,7 @@ impl MmapStorage {
     pub fn new(config: StorageConfig) -> Self {
         let path = config.path.join("graph.bin");
         Self {
-            config,
+            _config: config,
             path,
             mmap: None,
         }
@@ -268,7 +266,7 @@ impl StorageBackend for CompositeStorage {
 /// Storage manager for the knowledge graph
 pub struct StorageManager {
     backend: Box<dyn StorageBackend>,
-    config: StorageConfig,
+    _config: StorageConfig,
 }
 
 impl StorageManager {
@@ -279,14 +277,14 @@ impl StorageManager {
             Box::new(BinaryStorage::new(config.clone()))
         };
 
-        Self { backend, config }
+        Self { backend, _config: config }
     }
 
     pub fn with_composite(config: StorageConfig) -> Self {
         let primary = Box::new(MmapStorage::new(config.clone()));
         let secondary = Box::new(BinaryStorage::new(config.clone()));
         let composite = CompositeStorage::new(primary).with_secondary(secondary);
-        Self { backend: Box::new(composite), config }
+        Self { backend: Box::new(composite), _config: config }
     }
 
     pub fn save(&mut self, graph: &KnowledgeGraph) -> Result<()> {
@@ -313,7 +311,7 @@ impl StorageManager {
 
 /// Incremental storage for partial updates
 pub struct IncrementalStorage {
-    base_path: PathBuf,
+    _base_path: PathBuf,
     delta_path: PathBuf,
     base_version: u64,
 }
@@ -322,7 +320,7 @@ impl IncrementalStorage {
     pub fn new(base_path: PathBuf) -> Self {
         let delta_path = base_path.with_extension("delta.bin");
         Self {
-            base_path,
+            _base_path: base_path,
             delta_path,
             base_version: 0,
         }

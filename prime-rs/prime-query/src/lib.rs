@@ -5,5 +5,5 @@ pub mod context;
 pub mod streaming;
 
 pub use agent::*;
-pub use context::*;
+pub use context::{AgentContext};
 pub use streaming::*;

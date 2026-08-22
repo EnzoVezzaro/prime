@@ -1,9 +1,8 @@
 //! Memory-mapped file access for zero-copy reads
 
-use memmap2::{Mmap, MmapOptions, MmapMut};
+use memmap2::{Mmap, MmapMut};
 use std::fs::{File, OpenOptions};
-use std::io::{Read, Write, Seek, SeekFrom};
-use std::path::Path;
+use std::io::Write;
 use anyhow::Result;
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
@@ -24,17 +23,19 @@ extern "C" {
 pub struct ReadOnlyMmap {
     mmap: Mmap,
     file: File,
-    path: std::path::PathBuf,
+    _path: std::path::PathBuf,
 }
 
 impl ReadOnlyMmap {
     /// Open a file for memory-mapped reading
     pub fn open<P: AsRef<std::path::Path>>(path: P) -> Result<Self> {
-        let path = path.as_ref().to_path_buf();
-        let file = File::open(&path)?;
+        let path = path.as_ref().to_path_buf();        let file = File::open(&path)?;
         let mmap = unsafe { Mmap::map(&file)? };
-        Ok(Self { mmap, file, path })
+        Ok(Self { mmap, file, _path: path })
     }
+
+
+
 
     /// Get a slice of the mmap
     pub fn slice(&self, offset: usize, len: usize) -> Option<&[u8]> {
@@ -117,7 +118,7 @@ impl ReadOnlyMmap {
 pub struct ReadWriteMmap {
     mmap: MmapMut,
     file: File,
-    path: std::path::PathBuf,
+    _path: std::path::PathBuf,
 }
 
 impl ReadWriteMmap {
@@ -131,22 +132,26 @@ impl ReadWriteMmap {
             .truncate(true)
             .open(&path)?;
 
-        file.set_len(size as u64)?;
-        let mmap = unsafe { MmapMut::map_mut(&file)? };
+        file.set_len(size as u64)?;        let mmap = unsafe { MmapMut::map_mut(&file)? };
 
-        Ok(Self { mmap, file, path })
+        Ok(Self { mmap, file, _path: path })
     }
+
+
+
 
     /// Open existing file for read/write
     pub fn open<P: AsRef<std::path::Path>>(path: P) -> Result<Self> {
         let path = path.as_ref().to_path_buf();
         let file = OpenOptions::new()
             .read(true)
-            .write(true)
-            .open(&path)?;
+            .write(true)            .open(&path)?;
         let mmap = unsafe { MmapMut::map_mut(&file)? };
-        Ok(Self { mmap, file, path })
+        Ok(Self { mmap, file, _path: path })
     }
+
+
+
 
     /// Get mutable slice
     pub fn slice_mut(&mut self, offset: usize, len: usize) -> Option<&mut [u8]> {
@@ -196,7 +201,7 @@ impl ReadWriteMmap {
 /// Thread-safe shared memory-mapped file
 pub struct SharedMmap {
     mmap: Arc<Mutex<Mmap>>,
-    path: std::path::PathBuf,
+    _path: std::path::PathBuf,
 }
 
 impl SharedMmap {
@@ -206,7 +211,7 @@ impl SharedMmap {
         let mmap = unsafe { Mmap::map(&file)? };
         Ok(Self {
             mmap: Arc::new(Mutex::new(mmap)),
-            path,
+            _path: path,
         })
     }
 
@@ -235,6 +240,7 @@ impl SharedMmap {
 }
 
 /// Mmap-based index for fast lookups
+#[allow(dead_code)]
 pub struct MmapIndex<T> {
     mmap: ReadOnlyMmap,
     index_offset: usize,
@@ -279,7 +285,7 @@ impl<T> MmapIndex<T> {
 /// Mmap-based key-value store
 pub struct MmapKV {
     mmap: ReadWriteMmap,
-    index: HashMap<Vec<u8>, (usize, usize)>, // key -> (offset, len)
+    _index: HashMap<Vec<u8>, (usize, usize)>, // key -> (offset, len)
 }
 
 impl MmapKV {
@@ -287,7 +293,7 @@ impl MmapKV {
         let mmap = ReadWriteMmap::create(path, estimated_size)?;
         Ok(Self {
             mmap,
-            index: HashMap::new(),
+            _index: HashMap::new(),
         })
     }
 
@@ -295,7 +301,7 @@ impl MmapKV {
         let mmap = ReadWriteMmap::open(path)?;
         let mut kv = Self {
             mmap,
-            index: HashMap::new(),
+            _index: HashMap::new(),
         };
         kv.rebuild_index()?;
         Ok(kv)
@@ -332,7 +338,7 @@ impl MmapKV {
         Ok(())
     }
 
-    pub fn get(&self, key: &[u8]) -> Option<Vec<u8>> {
+    pub fn get(&self, _key: &[u8]) -> Option<Vec<u8>> {
         // Simplified - would need proper index
         None
     }

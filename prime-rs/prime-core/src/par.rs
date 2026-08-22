@@ -433,7 +433,7 @@ impl Tokenizer for GenericTokenizer {
 /// Token-aware PAR renderer
 pub struct ParRenderer<'a> {
     vocab: &'a ParVocabulary,
-    aliases: &'a ParAliases,
+    _aliases: &'a ParAliases,
     tokenizer: std::sync::Arc<dyn Tokenizer>,
 }
 
@@ -441,7 +441,7 @@ impl<'a> ParRenderer<'a> {
     pub fn new(vocab: &'a ParVocabulary, aliases: &'a ParAliases, tokenizer: std::sync::Arc<dyn Tokenizer>) -> Self {
         Self {
             vocab,
-            aliases,
+            _aliases: aliases,
             tokenizer,
         }
     }
@@ -509,7 +509,7 @@ impl<'a> ParRenderer<'a> {
         tokens_used += header_tokens;
 
         // Vocabulary
-        if let Some(vocab) = &doc.vocabulary {
+        if let Some(_vocab) = &doc.vocabulary {
             let vocab_str = Self::render_vocab_static(&self.vocab);
             let vocab_tokens = self.tokenizer.count_tokens(&vocab_str);
             if tokens_used + vocab_tokens > token_budget {

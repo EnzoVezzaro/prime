@@ -6,15 +6,14 @@
 use prime_core::KnowledgeGraph;
 use prime_index::tools::ToolExecutor;
 use rmcp::{
-    ErrorData as McpError, RoleServer, ServerHandler, ServiceExt,
+    ErrorData as McpError, ServerHandler, ServiceExt,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
-    model::{CallToolResult, ContentBlock, Implementation, ListToolsResult, PaginatedRequestParams, ProtocolVersion, ServerCapabilities, ServerInfo},
+    model::{CallToolResult, ContentBlock, Implementation, ProtocolVersion, ServerCapabilities, ServerInfo},
     schemars,
-    service::RequestContext,
     tool, tool_handler, tool_router,
     transport::stdio,
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::sync::Arc;
 
 // ─── Tool Parameters ────────────────────────────────────────────────────────────
@@ -97,14 +96,14 @@ fn default_scope() -> String { "direct".to_string() }
 #[derive(Clone)]
 pub struct PrimeMcpServer {
     executor: Arc<ToolExecutor>,
-    tool_router: ToolRouter<PrimeMcpServer>,
+    _tool_router: ToolRouter<PrimeMcpServer>,
 }
 
 impl PrimeMcpServer {
     pub fn new(graph: KnowledgeGraph) -> Self {
         Self {
             executor: Arc::new(ToolExecutor::from_graph(graph)),
-            tool_router: Self::tool_router(),
+            _tool_router: Self::tool_router(),
         }
     }
 

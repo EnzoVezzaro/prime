@@ -10,7 +10,7 @@ pub use extractor::*;
 pub use language_config::*;
 pub use walker::*;
 
-use prime_core::{Language, EntityId, ContentHash};
+use prime_core::{Language, ContentHash};
 use std::path::Path;
 use std::sync::Arc;
 

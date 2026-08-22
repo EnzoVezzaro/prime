@@ -1,7 +1,6 @@
 //! Context building for agent consumption
 
-use prime_core::{KnowledgeGraph, Entity, EntityId, Relation, RelationKind, SymbolKind, Confidence, Range, Language, File};
-use prime_index::query::{QueryEngine, QueryOptions};
+use prime_core::KnowledgeGraph;
 use std::collections::HashMap;
 use std::sync::Arc;
 

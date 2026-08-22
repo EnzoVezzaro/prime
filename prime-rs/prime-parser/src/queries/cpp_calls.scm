@@ -1,22 +1,19 @@
-; C++ calls query (extends C)
+; C++ calls query
 
-; Method calls
+; Function calls via identifier
+(call_expression
+  function: (identifier) @callee) @call
+
+; Method calls via field access (obj.method())
 (call_expression
   function: (field_expression
     field: (field_identifier) @callee)) @call
 
-; Template calls
+; Template function calls
 (call_expression
   function: (template_function
     name: (identifier) @callee)) @call
 
-; Operator calls
+; Constructor calls (ClassName())
 (call_expression
-  function: (operator_name) @callee) @call
-
-; New/delete
-(new_expression
-  type: (_) @callee) @call
-
-(delete_expression
-  argument: (_) @callee) @call
+  function: (type_identifier) @callee) @call

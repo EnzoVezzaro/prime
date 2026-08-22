@@ -3,7 +3,7 @@
 //! Provides file-level change detection and entity-level invalidation
 //! for efficient updates without full rebuilds.
 
-use prime_core::{ContentHash, EntityId, Entity, KnowledgeGraph, File, Range, Position};
+use prime_core::{ContentHash, EntityId, KnowledgeGraph};
 use anyhow::Result;
 use std::path::{Path, PathBuf};
 use std::collections::{HashMap, HashSet};
@@ -326,6 +326,7 @@ impl IncrementalIndexer {
 }#[cfg(test)]
 mod tests {
     use super::*;
+    use prime_core::{Entity, File, Range, Position};
     use std::fs;
     use std::path::PathBuf;
 
@@ -402,8 +403,13 @@ mod tests {
             confidence: prime_core::Confidence::Medium,
             signature: None,
             documentation: None,
+            parent_id: None,
+            disambiguator: None,
+            stability: prime_core::Stability::Public,
+            aliases: vec![],
             children: vec![],
             relations: vec![],
+            semantic: None,
         });
 
         invalidator.build_index(&graph);

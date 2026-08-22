@@ -210,17 +210,6 @@ impl Language {
                 architecture: Capability::Inferred,
                 runtime_behavior: Capability::Unknown,
             },
-            Language::Go => LanguageCapabilities {
-                parsing: Capability::Exact,
-                symbols: Capability::Exact,
-                references: Capability::Exact,
-                types: Capability::High,
-                calls: Capability::Exact,
-                data_flow: Capability::High,
-                control_flow: Capability::High,
-                architecture: Capability::Inferred,
-                runtime_behavior: Capability::Unknown,
-            },
             _ => LanguageCapabilities::default(),
         }
     }

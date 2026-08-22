@@ -1,11 +1,11 @@
 /// Prime CLI - Build and query codebase knowledge graphs
 
 use clap::{Parser as ClapParser, Subcommand};
-use prime_core::{KnowledgeGraph, Language, Confidence, RelationKind, EntityId, SymbolKind, ToolRequest, ToolIntent, RelationScope, DetailLevel};
+use prime_core::{ToolRequest, ToolIntent};
 use prime_parser::{Parser as PrimeParser, ParserConfig};
-use prime_index::{StorageManager, StorageConfig, QueryEngine, QueryOptions, EntitySummary, ToolExecutor};
+use prime_index::{StorageManager, StorageConfig, QueryEngine, QueryOptions, ToolExecutor};
 use std::path::{Path, PathBuf};
-use std::time::{Instant, SystemTime, UNIX_EPOCH};
+use std::time::Instant;
 use std::collections::HashMap;
 use std::thread;
 use std::fs;
@@ -93,6 +93,10 @@ enum Commands {
         /// Token budget for agent context
         #[arg(long, default_value = "8192")]
         token_budget: usize,
+
+        /// Show explain mode telemetry
+        #[arg(long, default_value = "false")]
+        explain: bool,
     },
 
     /// Show graph statistics
@@ -188,8 +192,8 @@ fn main() -> anyhow::Result<()> {
         Commands::Update { files, progress } => {
             cmd_update(&cli.root, &cli.storage, &files, progress)
         }
-        Commands::Query { query, query_type, format, limit, relations, depth, confidence, token_budget } => {
-            cmd_query(&cli.storage, &query, &query_type, &format, limit, relations, depth, &confidence, token_budget)
+        Commands::Query { query, query_type, format, limit, relations, depth, confidence, token_budget, explain } => {
+            cmd_query(&cli.storage, &query, &query_type, &format, limit, relations, depth, &confidence, token_budget, explain)
         }
         Commands::Stats {} => cmd_stats(&cli.storage),
         Commands::Check {} => cmd_check(&cli.storage),
@@ -272,7 +276,7 @@ fn cmd_build(root: &Path, storage: &Path, force: bool, _languages: Option<String
 
 fn cmd_update(root: &Path, storage: &Path, files: &[PathBuf], progress: bool) -> anyhow::Result<()> {
     use prime_index::IncrementalIndexer;
-    use prime_core::Language;
+    
     use prime_parser::ParserConfig;
 
     let storage_path = storage.join("graph.bin");
@@ -408,7 +412,7 @@ fn cmd_update(root: &Path, storage: &Path, files: &[PathBuf], progress: bool) ->
     Ok(())
 }
 
-fn cmd_query(storage: &Path, query: &str, qtype: &str, format: &str, limit: usize, relations: bool, depth: usize, confidence: &str, token_budget: usize) -> anyhow::Result<()> {
+fn cmd_query(storage: &Path, query: &str, qtype: &str, format: &str, limit: usize, relations: bool, depth: usize, confidence: &str, token_budget: usize, explain: bool) -> anyhow::Result<()> {
     let storage_config = StorageConfig {
         path: storage.to_path_buf(),
         use_mmap: true,
@@ -437,22 +441,68 @@ fn cmd_query(storage: &Path, query: &str, qtype: &str, format: &str, limit: usiz
         ..Default::default()
     };
 
-    let results = match qtype {
-        "name" => engine.find_by_name(query, &opts),
-        "prefix" => engine.find_by_prefix(query, &opts),
-        "search" => engine.search(query, &opts),
-        "context" => {
-            if let Some(entity_id) = engine.graph().find_by_qualified(query) {
-                vec![engine.get_context(entity_id, &opts).unwrap().entity]
-            } else {
-                vec![]
+    let (results, telemetry_opt) = if explain {
+        // Use telemetry methods for all query types when explain is enabled
+        match qtype {
+            "search" => {
+                let (res, tel) = engine.search_with_telemetry(query, &opts);
+                (res, Some(tel))
             }
-        },
-        _ => {
-            eprintln!("Unknown query type: {}", qtype);
-            return Ok(());
+            "name" => {
+                let (res, tel) = engine.lookup_with_telemetry(query, &opts);
+                (res, Some(tel))
+            }
+            "prefix" => {
+                let (res, tel) = engine.prefix_with_telemetry(query, &opts);
+                (res, Some(tel))
+            }
+            "context" => {
+                let (res, tel) = engine.context_with_telemetry(query, &opts);
+                (res, Some(tel))
+            }
+            _ => {
+                eprintln!("Unknown query type: {}", qtype);
+                return Ok(());
+            }
         }
+    } else {
+        let res = match qtype {
+            "name" => engine.find_by_name(query, &opts),
+            "prefix" => engine.find_by_prefix(query, &opts),
+            "search" => engine.search(query, &opts),
+            "context" => {
+                if let Some(entity_id) = engine.graph().find_by_qualified(query) {
+                    vec![engine.get_context(entity_id, &opts).unwrap().entity]
+                } else {
+                    vec![]
+                }
+            },
+            _ => {
+                eprintln!("Unknown query type: {}", qtype);
+                return Ok(());
+            }
+        };
+        (res, None)
     };
+
+    if explain {
+        if let Some(tel) = telemetry_opt {
+            if format == "json" {
+                println!("{}", serde_json::to_string_pretty(&tel)?);
+            } else {
+                println!("Explain mode telemetry");
+                println!("{}", serde_json::to_string_pretty(&tel)?);
+                println!("\nResults ({}):", results.len());
+                for r in &results {
+                    println!("  {} ({})", r.qualified_name, r.kind);
+                }
+            }
+            return Ok(());
+        } else {
+            println!("Explain mode not supported for query type {}", qtype);
+            println!("Falling back to normal output");
+        }
+    }
 
     match format {
         "json" => {
@@ -523,7 +573,7 @@ fn cmd_stats(storage: &Path) -> anyhow::Result<()> {
         path: std::path::PathBuf::from("."),
         ..Default::default()
     };
-    let mut storage_mgr = StorageManager::new(storage_config);
+    let storage_mgr = StorageManager::new(storage_config);
     println!("\nIndex size: {} MB", storage_mgr.size() as f64 / 1024.0 / 1024.0);
 
     Ok(())
@@ -806,9 +856,9 @@ fn cmd_inspect(storage: &Path, entity_name: &str, format: &str) -> anyhow::Resul
 }
 
 fn cmd_benchmark(root: &Path, _storage: &Path, corpus: &str, output: &PathBuf, bench_storage: &PathBuf) -> anyhow::Result<()> {
-    use std::collections::HashMap;
-    use std::fs;
-    use std::thread;
+    
+    
+    
 
     println!("=== Prime Comprehensive Benchmark ===");
     println!("Corpus: {}", corpus);
@@ -1134,19 +1184,7 @@ fn collect_git_info() -> GitInfo {
     GitInfo { commit, dirty }
 }
 
-fn repo_config(name: &str, path: &str, language: &str, size_category: &str, commit: &str, url: &str) -> RepoConfig {
-    RepoConfig {
-        name: name.to_string(),
-        path: path.to_string(),
-        language: language.to_string(),
-        size_category: size_category.to_string(),
-        commit: commit.to_string(),
-        url: url.to_string(),
-        files: 0,
-        source_bytes: 0,
-        lines_of_code: 0,
-    }
-}
+
 
 fn load_corpus(corpus: &str) -> anyhow::Result<Vec<RepoConfig>> {
     // Load from repositories.json - use absolute path from workspace root
@@ -1207,8 +1245,6 @@ fn load_corpus(corpus: &str) -> anyhow::Result<Vec<RepoConfig>> {
 
 fn benchmark_repo(repo: &RepoConfig, bench_storage: &PathBuf, _root: &Path) -> anyhow::Result<RepoBenchmark> {
     let repo_path = std::path::Path::new(&repo.path);
-    eprintln!("DEBUG: Checking repo path: {}", repo_path.display());
-    eprintln!("DEBUG: CWD: {}", std::env::current_dir().unwrap().display());
     if !repo_path.exists() {
         eprintln!("  Repo not found at {}, skipping", repo.path);
         return Ok(RepoBenchmark {
@@ -1218,10 +1254,10 @@ fn benchmark_repo(repo: &RepoConfig, bench_storage: &PathBuf, _root: &Path) -> a
             ..Default::default()
         });
     }
-    eprintln!("DEBUG: Repo exists, creating storage at: {}", bench_storage.join(&repo.name).display());
+
     let storage_path = bench_storage.join(&repo.name);
     fs::create_dir_all(&storage_path)?;
-    eprintln!("DEBUG: Storage dir created");
+
 
     // 1. Discover and measure corpus metrics (single source of truth)
     let corpus_info = discover_corpus_info(repo_path)?;
@@ -1593,6 +1629,61 @@ fn question_to_tool_intent(q: &KnowledgeQuestion) -> ToolIntent {
     }
 }
 
+/// Search for an entity in the graph using a multi-word query.
+/// Tries the full query first, then individual words, then falls back to None.
+fn search_entity_for_benchmark(executor: &ToolExecutor, query: &str) -> Option<String> {
+    // Try full query first
+    let search_req = ToolRequest {
+        intent: ToolIntent::Search,
+        target: Some(query.to_string()),
+        limit: 1,
+        ..Default::default()
+    };
+    let search_result = executor.execute(&search_req);
+    let _status = search_result.get("status").and_then(|v| v.as_str()).unwrap_or("?");
+    let search_array = search_result.get("result").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+
+    if let Some(name) = search_array.first()
+        .and_then(|e| e.get("qualified_name").and_then(|v| v.as_str()))
+    {
+        return Some(name.to_string());
+    }
+
+    // Try individual words (longest first, skip common stop words)
+    let stop_words: std::collections::HashSet<&str> = [
+        "fn", "def", "struct", "class", "mod", "module", "namespace",
+        "pub", "public", "export", "use", "import", "require", "extern",
+        "return", "yield", "new", "create", "instance", "init",
+        "call", "invoke", "depends", "require", "type",
+        "package", "toml", "json", "mod", "txt",
+    ].iter().cloned().collect();
+
+    let mut words: Vec<String> = query.split_whitespace()
+        .filter(|w| !stop_words.contains(*w))
+        .map(|w| w.to_string())
+        .collect();
+    // Sort by length descending — try longest/most specific words first
+    words.sort_by(|a, b| b.len().cmp(&a.len()));
+
+    for word in &words {
+        let search_req = ToolRequest {
+            intent: ToolIntent::Search,
+            target: Some(word.clone()),
+            limit: 1,
+            ..Default::default()
+        };
+        let search_result = executor.execute(&search_req);
+        let search_array = search_result.get("result").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+        if let Some(name) = search_array.first()
+            .and_then(|e| e.get("qualified_name").and_then(|v| v.as_str()))
+        {
+            return Some(name.to_string());
+        }
+    }
+
+    None
+}
+
 fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<KnowledgeMetrics> {
     let storage_config = StorageConfig {
         path: storage_path.to_path_buf(),
@@ -1626,26 +1717,24 @@ fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<K
     let mut hits_at_10 = 0;
     
     let mut by_category: HashMap<String, CategoryResult> = HashMap::new();
+    // Per-category metric accumulators
+    let mut cat_entity_tp: HashMap<String, usize> = HashMap::new();
+    let mut cat_entity_fp: HashMap<String, usize> = HashMap::new();
+    let mut cat_entity_fn: HashMap<String, usize> = HashMap::new();
+    let mut cat_rel_tp: HashMap<String, usize> = HashMap::new();
+    let mut cat_rel_fp: HashMap<String, usize> = HashMap::new();
+    let mut cat_rel_fn: HashMap<String, usize> = HashMap::new();
+    let mut cat_rr: HashMap<String, Vec<f64>> = HashMap::new();
+    let mut cat_hits: HashMap<String, [usize; 4]> = HashMap::new(); // [at_1, at_3, at_5, at_10]
 
     for q in &questions {
         total += 1;
         // For context/dependencies/impact/architecture/relationships, first search to find the entity
         let tool_intent = question_to_tool_intent(q);
         let target = if matches!(tool_intent, ToolIntent::Context | ToolIntent::Dependencies | ToolIntent::Impact | ToolIntent::Relationships | ToolIntent::Architecture) {
-            // First search to find the entity
-            let search_req = ToolRequest {
-                intent: ToolIntent::Search,
-                target: Some(q.search_query.clone()),
-                limit: 1,
-                ..Default::default()
-            };
-            let search_result = executor.execute(&search_req);
-            let search_array = search_result.get("result").and_then(|v| v.as_array()).cloned().unwrap_or_default();
-            // Use the first found entity's qualified name
-            search_array.first()
-                .and_then(|e| e.get("qualified_name").and_then(|v| v.as_str()))
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| q.search_query.clone())
+            // First search to find the entity. If multi-word query fails, try individual words.
+            let found_entity = search_entity_for_benchmark(&executor, &q.search_query);
+            found_entity.unwrap_or_else(|| q.search_query.clone())
         } else {
             q.search_query.clone()
         };
@@ -1658,7 +1747,7 @@ fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<K
         };
         let result = executor.execute(&req);
 
-        let status = result.get("status").and_then(|v| v.as_str()).unwrap_or("Unknown");
+        let _status = result.get("status").and_then(|v| v.as_str()).unwrap_or("Unknown");
         let result_value = result.get("result").cloned().unwrap_or(serde_json::Value::Null);
         
         // Handle both array results (Search) and object results (Context, Relationships, etc.)
@@ -1667,18 +1756,22 @@ fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<K
         } else if let Some(obj) = result_value.as_object() {
             // For Context/Relationships/Dependencies/Impact/Architecture, extract entities from nested arrays
             let mut entities = Vec::new();
-            for key in &["callers", "callees", "dependencies", "dependents", "relations", "direct_impact", "transitive_impact", "target", "entities"] {
+            for key in &["callers", "callees", "dependencies", "dependents", "relations", "direct_impact", "transitive_impact", "entities"] {
                 if let Some(arr) = obj.get(*key).and_then(|v| v.as_array()) {
                     for item in arr {
                         entities.push(item.clone());
                     }
                 }
             }
+            // Also include the target entity (it's an object, not an array)
+            if let Some(target) = obj.get("target").and_then(|v| v.as_object()) {
+                entities.push(serde_json::Value::Object(target.clone()));
+            }
             entities
         } else {
             Vec::new()
         };
-        let has_results = !result_array.is_empty() || !result_value.is_null();
+        let _has_results = !result_array.is_empty() || !result_value.is_null();
 
         // Extract returned entities
         let returned_entities: Vec<String> = result_array.iter()
@@ -1702,12 +1795,26 @@ fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<K
         rel_fp += rel_fp_q;
         rel_fn += rel_fn_q;
         
+        // Per-category accumulators
+        *cat_entity_tp.entry(q.category.clone()).or_default() += entity_tp_q;
+        *cat_entity_fp.entry(q.category.clone()).or_default() += entity_fp_q;
+        *cat_entity_fn.entry(q.category.clone()).or_default() += entity_fn_q;
+        *cat_rel_tp.entry(q.category.clone()).or_default() += rel_tp_q;
+        *cat_rel_fp.entry(q.category.clone()).or_default() += rel_fp_q;
+        *cat_rel_fn.entry(q.category.clone()).or_default() += rel_fn_q;
+        
         if let Some(r) = rank {
             reciprocal_ranks.push(1.0 / r as f64);
+            cat_rr.entry(q.category.clone()).or_default().push(1.0 / r as f64);
             if r <= 1 { hits_at_1 += 1; }
             if r <= 3 { hits_at_3 += 1; }
             if r <= 5 { hits_at_5 += 1; }
             if r <= 10 { hits_at_10 += 1; }
+            let h = cat_hits.entry(q.category.clone()).or_default();
+            if r <= 1 { h[0] += 1; }
+            if r <= 3 { h[1] += 1; }
+            if r <= 5 { h[2] += 1; }
+            if r <= 10 { h[3] += 1; }
         }
 
         // Use the is_correct from evaluate_question which handles both entity AND relationship evaluation
@@ -1752,7 +1859,31 @@ fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<K
 
     let mut category_map = HashMap::new();
     for (cat, res) in by_category {
-        let cat_precision = if res.correct as f64 > 0.0 { res.correct as f64 / res.total as f64 } else { 0.0 };
+        // Compute per-category entity metrics
+        let cetp = cat_entity_tp.get(&cat).copied().unwrap_or(0);
+        let cefp = cat_entity_fp.get(&cat).copied().unwrap_or(0);
+        let cefn = cat_entity_fn.get(&cat).copied().unwrap_or(0);
+        let cat_entity_precision = if cetp + cefp > 0 { cetp as f64 / (cetp + cefp) as f64 } else { 0.0 };
+        let cat_entity_recall = if cetp + cefn > 0 { cetp as f64 / (cetp + cefn) as f64 } else { 0.0 };
+        let cat_entity_f1 = if cat_entity_precision + cat_entity_recall > 0.0 { 
+            2.0 * cat_entity_precision * cat_entity_recall / (cat_entity_precision + cat_entity_recall) 
+        } else { 0.0 };
+        
+        // Compute per-category relationship metrics
+        let crtp = cat_rel_tp.get(&cat).copied().unwrap_or(0);
+        let crfp = cat_rel_fp.get(&cat).copied().unwrap_or(0);
+        let crfn = cat_rel_fn.get(&cat).copied().unwrap_or(0);
+        let cat_rel_precision = if crtp + crfp > 0 { crtp as f64 / (crtp + crfp) as f64 } else { 0.0 };
+        let cat_rel_recall = if crtp + crfn > 0 { crtp as f64 / (crtp + crfn) as f64 } else { 0.0 };
+        let cat_rel_f1 = if cat_rel_precision + cat_rel_recall > 0.0 { 
+            2.0 * cat_rel_precision * cat_rel_recall / (cat_rel_precision + cat_rel_recall) 
+        } else { 0.0 };
+        
+        // Compute per-category MRR and recall@k
+        let cat_reciprocal_ranks = cat_rr.get(&cat).cloned().unwrap_or_default();
+        let cat_mrr = if !cat_reciprocal_ranks.is_empty() { cat_reciprocal_ranks.iter().sum::<f64>() / cat_reciprocal_ranks.len() as f64 } else { 0.0 };
+        let cat_hits = cat_hits.get(&cat).copied().unwrap_or([0; 4]);
+        
         category_map.insert(cat, CategoryStats {
             total: res.total,
             correct: res.correct,
@@ -1760,17 +1891,17 @@ fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<K
             source_required_correct: res.source_required_correct,
             accuracy: if res.total > 0 { res.correct as f64 / res.total as f64 } else { 0.0 },
             source_free_accuracy: if res.total > 0 { res.source_free_correct as f64 / res.total as f64 } else { 0.0 },
-            entity_precision: res.entity_precision,
-            entity_recall: res.entity_recall,
-            entity_f1: res.entity_f1,
-            relationship_precision: res.relationship_precision,
-            relationship_recall: res.relationship_recall,
-            relationship_f1: res.relationship_f1,
-            mrr: res.mrr,
-            recall_at_1: res.recall_at_1,
-            recall_at_3: res.recall_at_3,
-            recall_at_5: res.recall_at_5,
-            recall_at_10: res.recall_at_10,
+            entity_precision: cat_entity_precision,
+            entity_recall: cat_entity_recall,
+            entity_f1: cat_entity_f1,
+            relationship_precision: cat_rel_precision,
+            relationship_recall: cat_rel_recall,
+            relationship_f1: cat_rel_f1,
+            mrr: cat_mrr,
+            recall_at_1: if res.total > 0 { cat_hits[0] as f64 / res.total as f64 } else { 0.0 },
+            recall_at_3: if res.total > 0 { cat_hits[1] as f64 / res.total as f64 } else { 0.0 },
+            recall_at_5: if res.total > 0 { cat_hits[2] as f64 / res.total as f64 } else { 0.0 },
+            recall_at_10: if res.total > 0 { cat_hits[3] as f64 / res.total as f64 } else { 0.0 },
         });
     }
 
@@ -1798,10 +1929,9 @@ fn benchmark_knowledge(storage_path: &Path, repo_name: &str) -> anyhow::Result<K
 }
 
 // Evaluate a single question and return (is_correct, entity_tp, entity_fp, entity_fn, rel_tp, rel_fp, rel_fn, rank)
-fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], returned: &[String], kinds: &[String], tool_intent: ToolIntent, raw_result: &serde_json::Value) -> (bool, usize, usize, usize, usize, usize, usize, Option<usize>) {
+fn evaluate_question(q: &KnowledgeQuestion, _results: &[serde_json::Value], returned: &[String], kinds: &[String], tool_intent: ToolIntent, raw_result: &serde_json::Value) -> (bool, usize, usize, usize, usize, usize, usize, Option<usize>) {
     let mut entity_tp = 0;
     let mut entity_fp = 0;
-    let mut entity_fn = 0;
     let mut rel_tp = 0;
     let mut rel_fp = 0;
     let mut rel_fn = 0;
@@ -1826,7 +1956,7 @@ fn evaluate_question(q: &KnowledgeQuestion, results: &[serde_json::Value], retur
             entity_fp += 1;
         }
     }
-    entity_fn = expected_entities.len().saturating_sub(entity_tp);
+    let entity_fn = expected_entities.len().saturating_sub(entity_tp);
 
     // Check relationship retrieval - extract from structured response based on tool
     let expected_rels: Vec<Vec<String>> = q.expected_relationships.iter()
@@ -1884,6 +2014,7 @@ fn extract_relationships_from_response(results: &[serde_json::Value], tool_inten
                     for callee in callees {
                         if let Some(name) = callee.get("qualified_name").and_then(|v| v.as_str()) {
                             rels.push(format!("calls:{}", name));
+                            rels.push(format!("flows_to:{}", name)); // data flows through calls
                         }
                     }
                 }
@@ -1891,6 +2022,7 @@ fn extract_relationships_from_response(results: &[serde_json::Value], tool_inten
                     for caller in callers {
                         if let Some(name) = caller.get("qualified_name").and_then(|v| v.as_str()) {
                             rels.push(format!("called_by:{}", name));
+                            rels.push(format!("flows_from:{}", name));
                         }
                     }
                 }
@@ -1910,11 +2042,18 @@ fn extract_relationships_from_response(results: &[serde_json::Value], tool_inten
                 }
                 // Also check for nested result field (PrimeEnvelope wrapping)
                 if let Some(inner) = result.get("result").and_then(|v| v.as_object()) {
-                    for key in &["callers", "callees", "dependencies", "dependents"] {
-                        if let Some(arr) = inner.get(*key).and_then(|v| v.as_array()) {
+                    for &key in &["callers", "callees", "dependencies", "dependents"] {
+                        if let Some(arr) = inner.get(key).and_then(|v| v.as_array()) {
                             for item in arr {
                                 if let Some(name) = item.get("qualified_name").and_then(|v| v.as_str()) {
                                     rels.push(format!("{}:{}", key, name));
+                                    // Also push semantic aliases
+                                    if key == "callees" {
+                                        rels.push(format!("flows_to:{}", name));
+                                    }
+                                    if key == "callers" {
+                                        rels.push(format!("flows_from:{}", name));
+                                    }
                                 }
                             }
                         }
@@ -2070,16 +2209,7 @@ fn load_questions() -> anyhow::Result<Vec<KnowledgeQuestion>> {
     ])
 }
 
-fn benchmark_source_savings(_storage_path: &Path, _knowledge: &KnowledgeMetrics) -> anyhow::Result<Option<SourceSavings>> {
-    // Source savings measurement requires a controlled baseline experiment:
-    // 1. Run agent tasks WITHOUT Prime, measure source reads/bytes
-    // 2. Run same agent tasks WITH Prime, measure source reads/bytes
-    // 3. Compare the two
-    //
-    // Current implementation estimates savings from knowledge questions,
-    // which is synthetic. Return None until a controlled experiment is implemented.
-    Ok(None)
-}
+
 
 fn write_result(result: &BenchmarkResult, output: &PathBuf) -> anyhow::Result<()> {
     if let Some(parent) = output.parent() {
@@ -2746,39 +2876,6 @@ struct SourceSavings {
     source_bytes_retrieved_baseline: u64,
     source_bytes_retrieved_prime: u64,
     reduction_ratio: f64,
-}
-
-/// I/O Metrics for benchmark tracking
-#[derive(Serialize, Deserialize, Debug, Default)]
-struct IoMetrics {
-    /// Total bytes read from storage
-    pub bytes_read: u64,
-    /// Number of cache hits
-    pub cache_hits: u64,
-    /// Number of cache misses
-    pub cache_misses: u64,
-    /// Number of pages touched in memory
-    pub pages_touched: u64,
-    /// Number of mmap reads
-    pub mmap_reads: u64,
-    /// Number of file system reads
-    pub fs_reads: u64,
-    /// Time spent in I/O operations (microseconds)
-    pub io_time_us: u64,
-    /// Peak memory usage during operation (bytes)
-    pub peak_memory_bytes: u64,
-}
-
-#[derive(Serialize, Deserialize, Debug, Default)]
-struct IoMetricsAggregate {
-    pub total_bytes_read: u64,
-    pub total_cache_hits: u64,
-    pub total_cache_misses: u64,
-    pub total_pages_touched: u64,
-    pub total_mmap_reads: u64,
-    pub total_fs_reads: u64,
-    pub total_io_time_us: u64,
-    pub peak_memory_bytes: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -37,6 +37,40 @@ impl Range {
     }
 }
 
+/// Visibility/stability of a symbol
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[repr(u8)]
+pub enum Stability {
+    Public = 1,       // Public API, stable
+    Internal = 2,     // Internal to module/package
+    Private = 3,      // Private to file/class
+    Unknown = 255,
+}
+
+impl std::fmt::Display for Stability {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Stability::Public => write!(f, "public"),
+            Stability::Internal => write!(f, "internal"),
+            Stability::Private => write!(f, "private"),
+            Stability::Unknown => write!(f, "unknown"),
+        }
+    }
+}
+
+impl std::str::FromStr for Stability {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "public" => Ok(Stability::Public),
+            "internal" => Ok(Stability::Internal),
+            "private" => Ok(Stability::Private),
+            _ => Ok(Stability::Unknown),
+        }
+    }
+}
+
 /// Symbol kind - language-agnostic classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[repr(u8)]
@@ -279,6 +313,13 @@ pub struct Entity {
     pub confidence: Confidence,
     pub signature: Option<String>,  // For functions: "fn(a: Type, b: Type) -> Ret"
     pub documentation: Option<String>,
+    // SCIP-inspired identity fields
+    pub parent_id: Option<EntityId>,      // Parent entity (class, module, etc.)
+    pub disambiguator: Option<String>,    // For overloaded symbols (e.g., method signature)
+    pub stability: Stability,             // Public/Internal/Private visibility
+    pub aliases: Vec<String>,             // Alternative names for search
+    // Semantic metadata (agent-native extension)
+    pub semantic: Option<crate::semantic::SemanticMetadata>,
     // Computed/derived fields
     pub children: Vec<EntityId>,
     pub relations: Vec<Relation>,
@@ -389,6 +430,53 @@ pub struct RelationIndex {
     pub dep_bitmaps: HashMap<EntityId, RoaringBitmap>,
 }
 
+impl Entity {
+    /// Generate SCIP-like canonical identifier
+    /// Format per SCIP spec: <language> <package> <type> <name> <disambiguator>
+    /// Example: "rust my_crate class/MyStruct ."
+    #[allow(non_snake_case)]
+    pub fn SCIP_identifier(&self) -> String {
+        let kind_str = match self.kind {
+            SymbolKind::Class | SymbolKind::Struct => "class/",
+            SymbolKind::Interface | SymbolKind::Trait => "interface/",
+            SymbolKind::Enum => "enum/",
+            SymbolKind::Function | SymbolKind::AsyncFunction => "method/",
+            SymbolKind::Method | SymbolKind::AsyncMethod => "method/",
+            SymbolKind::Constructor => "method/",
+            SymbolKind::Field | SymbolKind::Property => "field/",
+            SymbolKind::Variable | SymbolKind::Constant | SymbolKind::StaticVariable => "local/",
+            SymbolKind::TypeAlias => "type/",
+            SymbolKind::Module | SymbolKind::Namespace => "package/",
+            _ => "",
+        };
+        
+        let disambig = self.disambiguator.as_deref().unwrap_or(".");
+        // SCIP format: "<lang> <package> <type/name> <disambiguator>"
+        format!("{} {}{}{} {}",
+            self.language.to_string().to_lowercase(),
+            self.qualified_name,
+            if kind_str.is_empty() { "" } else { " " },
+            kind_str,
+            disambig
+        )
+    }
+
+    /// Get display name (short name for UI)
+    pub fn display_name(&self) -> &str {
+        &self.name
+    }
+
+    /// Check if this entity is public API
+    pub fn is_public(&self) -> bool {
+        self.stability == Stability::Public
+    }
+
+    /// Check if this entity has a stable identity
+    pub fn has_stable_identity(&self) -> bool {
+        !self.qualified_name.is_empty() && self.confidence != Confidence::Unknown
+    }
+}
+
 impl KnowledgeGraph {
     pub fn new(project: Project) -> Self {
         Self {
@@ -431,9 +519,9 @@ impl KnowledgeGraph {
             name_index.by_name.entry(name_lower.clone()).or_default().push(*id);
             name_index.by_qualified.insert(entity.qualified_name.clone(), *id);
 
-            // Prefix index (first 3 chars minimum)
-            if name_lower.len() >= 3 {
-                let prefix = &name_lower[..3.min(name_lower.len())];
+            // Prefix index (all prefixes of length 2+)
+            for len in 2..=name_lower.len().min(10) {
+                let prefix = &name_lower[..len];
                 name_index.prefixes.entry(prefix.to_string()).or_default().push(*id);
             }
         }

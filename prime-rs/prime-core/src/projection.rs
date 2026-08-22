@@ -3,10 +3,8 @@
 //! This module implements the projection layer that converts a knowledge graph
 // into a minimal PAR projection tailored to a specific query.
 
-use crate::par::{ParDocument, ParVocabulary, ParAliases, ParFact, ParObject, ParMetadata, ParEntity, entity_to_par_entity};
-use crate::{KnowledgeGraph, Entity, EntityId, Relation, RelationKind, SymbolKind, Confidence, Language, Range, Confidence as Conf};
+use crate::EntityId;
 use std::collections::{HashMap, HashSet};
-use serde_json;
 
 /// Projection configuration
 #[derive(Debug, Clone)]
@@ -99,7 +97,7 @@ impl ProjectionEngine {
         let _facts: Vec<crate::par::ParFact> = Vec::new();
 
         // Build the document
-        let metadata = crate::par::ParMetadata {
+        let _metadata = crate::par::ParMetadata {
             query: config.query.clone(),
             entity_count: relevant_entities.len(),
             fact_count: 0,
@@ -144,7 +142,7 @@ impl ProjectionEngine {
     ) -> Vec<EntityId> {
         // If target entity specified, start from there and expand
         if let Some(target) = &config.target_entity {
-            if let Some(target_id) = graph.find_by_qualified(target) {
+            if let Some(_target_id) = graph.find_by_qualified(target) {
                 return self.expand_from_entity(graph, target, config.max_depth, config.max_entities);
             }
         }
@@ -266,6 +264,7 @@ impl ProjectionEngine {
     }
 
     /// Estimate token count for facts
+    #[allow(dead_code)]
     fn estimate_tokens(&self, facts: &[crate::par::ParFact]) -> usize {
         let mut tokens = 0;
         for fact in facts {

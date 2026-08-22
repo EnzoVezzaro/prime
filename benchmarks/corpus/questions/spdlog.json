@@ -1,238 +1,238 @@
 {
-  "version": "2.0.0",
-  "repo": "spdlog",
-  "description": "Benchmark questions for spdlog (C++) - using actual entity names",
-  "questions": [
-    {
-      "id": "spd-sym-001",
-      "category": "symbols",
-      "question": "What is count_digits?",
-      "search_query": "count_digits",
-      "expected_entities": ["count_digits"],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_match"
-    },
-    {
-      "id": "spd-sym-002",
-      "category": "symbols",
-      "question": "What structs are defined?",
-      "search_query": "spdlog::sinks",
-      "expected_entities": [],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_recall",
-      "expected_kind": "struct"
-    },
-    {
-      "id": "spd-sym-003",
-      "category": "symbols",
-      "question": "What classes are defined?",
-      "search_query": "logger",
-      "expected_entities": [],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_recall"
-    },
-    {
-      "id": "spd-call-001",
-      "category": "calls",
-      "question": "What does spdlog_init call?",
-      "search_query": "spdlog_init",
-      "expected_entities": ["spdlog_init"],
-      "expected_relationships": [["calls"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-call-002",
-      "category": "calls",
-      "question": "What does count_digits call?",
-      "search_query": "count_digits",
-      "expected_entities": ["count_digits"],
-      "expected_relationships": [["calls"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-call-003",
-      "category": "calls",
-      "question": "What functions call each other?",
-      "search_query": "count_digits",
-      "expected_entities": ["count_digits"],
-      "expected_relationships": [["calls"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-imp-001",
-      "category": "imports",
-      "question": "What does pattern_formatter depend on?",
-      "search_query": "pattern_formatter",
-      "expected_entities": ["pattern_formatter"],
-      "expected_relationships": [["depends_on"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-imp-002",
-      "category": "imports",
-      "question": "What does logger depend on?",
-      "search_query": "logger",
-      "expected_entities": ["logger"],
-      "expected_relationships": [["depends_on"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-imp-003",
-      "category": "imports",
-      "question": "What does async_logger depend on?",
-      "search_query": "async_logger",
-      "expected_entities": ["async_logger"],
-      "expected_relationships": [["depends_on"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-exp-001",
-      "category": "exports",
-      "question": "What public APIs are exposed?",
-      "search_query": "spdlog_init",
-      "expected_entities": [],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_recall"
-    },
-    {
-      "id": "spd-exp-002",
-      "category": "exports",
-      "question": "What symbols are exported?",
-      "search_query": "logger",
-      "expected_entities": [],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_recall"
-    },
-    {
-      "id": "spd-flow-001",
-      "category": "flows_to",
-      "question": "Where does data flow through count_digits?",
-      "search_query": "count_digits",
-      "expected_entities": ["count_digits"],
-      "expected_relationships": [["calls"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-flow-002",
-      "category": "flows_to",
-      "question": "What functions return values used by others?",
-      "search_query": "spdlog_init",
-      "expected_entities": ["spdlog_init"],
-      "expected_relationships": [["calls"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-inst-001",
-      "category": "instantiates",
-      "question": "What does spdlog_init create?",
-      "search_query": "spdlog_init",
-      "expected_entities": ["spdlog_init"],
-      "expected_relationships": [["calls"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-inst-002",
-      "category": "instantiates",
-      "question": "What objects are created by logger?",
-      "search_query": "logger",
-      "expected_entities": ["logger"],
-      "expected_relationships": [["calls"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-dep-001",
-      "category": "dependencies",
-      "question": "What are the dependencies of count_digits?",
-      "search_query": "count_digits",
-      "expected_entities": ["count_digits"],
-      "expected_relationships": [["depends_on"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-dep-002",
-      "category": "dependencies",
-      "question": "What are the dependencies of spdlog_init?",
-      "search_query": "spdlog_init",
-      "expected_entities": ["spdlog_init"],
-      "expected_relationships": [["depends_on"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-dep-003",
-      "category": "dependencies",
-      "question": "What are the dependencies of logger?",
-      "search_query": "logger",
-      "expected_entities": ["logger"],
-      "expected_relationships": [["depends_on"]],
-      "source_allowed": false,
-      "evaluation": "relationship_recall"
-    },
-    {
-      "id": "spd-arch-001",
-      "category": "architecture",
-      "question": "What is the project structure?",
-      "search_query": "logger",
-      "expected_entities": [],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_recall"
-    },
-    {
-      "id": "spd-arch-002",
-      "category": "architecture",
-      "question": "What are the main components?",
-      "search_query": "spdlog_init",
-      "expected_entities": [],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_recall"
-    },
-    {
-      "id": "spd-impact-001",
-      "category": "impact",
-      "question": "What would be affected if logger changes?",
-      "search_query": "logger",
-      "expected_entities": ["logger"],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_match"
-    },
-    {
-      "id": "spd-impact-002",
-      "category": "impact",
-      "question": "What functions would break if spdlog_init changes?",
-      "search_query": "spdlog_init",
-      "expected_entities": ["spdlog_init"],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_match"
-    },
-    {
-      "id": "spd-impact-003",
-      "category": "impact",
-      "question": "What is the impact of changing pattern_formatter?",
-      "search_query": "pattern_formatter",
-      "expected_entities": ["pattern_formatter"],
-      "expected_relationships": [],
-      "source_allowed": false,
-      "evaluation": "entity_match"
-    }
-  ]
+    "version": "2.2.0",
+    "repo": "spdlog",
+    "description": "Benchmark questions for spdlog (C++) - using verified entities with outgoing relationships",
+    "questions": [
+        {
+            "id": "spd-sym-001",
+            "category": "symbols",
+            "question": "What is count_digits?",
+            "search_query": "count_digits",
+            "expected_entities": ["count_digits"],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_match"
+        },
+        {
+            "id": "spd-sym-002",
+            "category": "symbols",
+            "question": "What structs are defined?",
+            "search_query": "spdlog::sinks",
+            "expected_entities": [],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_recall",
+            "expected_kind": "struct"
+        },
+        {
+            "id": "spd-sym-003",
+            "category": "symbols",
+            "question": "What classes are defined?",
+            "search_query": "logger",
+            "expected_entities": [],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_recall"
+        },
+        {
+            "id": "spd-call-001",
+            "category": "calls",
+            "question": "What does source_location_formatter call?",
+            "search_query": "source_location_formatter",
+            "expected_entities": ["source_location_formatter"],
+            "expected_relationships": [["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-call-002",
+            "category": "calls",
+            "question": "What does D_formatter call?",
+            "search_query": "D_formatter",
+            "expected_entities": ["D_formatter"],
+            "expected_relationships": [["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-call-003",
+            "category": "calls",
+            "question": "What does F_formatter call?",
+            "search_query": "F_formatter",
+            "expected_entities": ["F_formatter"],
+            "expected_relationships": [["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-imp-001",
+            "category": "imports",
+            "question": "What does source_location_formatter depend on?",
+            "search_query": "source_location_formatter",
+            "expected_entities": ["source_location_formatter"],
+            "expected_relationships": [["depends_on"], ["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-imp-002",
+            "category": "imports",
+            "question": "What does D_formatter depend on?",
+            "search_query": "D_formatter",
+            "expected_entities": ["D_formatter"],
+            "expected_relationships": [["depends_on"], ["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-imp-003",
+            "category": "imports",
+            "question": "What does F_formatter depend on?",
+            "search_query": "F_formatter",
+            "expected_entities": ["F_formatter"],
+            "expected_relationships": [["depends_on"], ["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-exp-001",
+            "category": "exports",
+            "question": "What are the main components of spdlog?",
+            "search_query": "logger",
+            "expected_entities": [],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_recall"
+        },
+        {
+            "id": "spd-exp-002",
+            "category": "exports",
+            "question": "What sink implementations are exported?",
+            "search_query": "sink_it_",
+            "expected_entities": [],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_recall"
+        },
+        {
+            "id": "spd-flow-001",
+            "category": "flows_to",
+            "question": "What does source_location_formatter flow to?",
+            "search_query": "source_location_formatter",
+            "expected_entities": ["source_location_formatter"],
+            "expected_relationships": [["calls"], ["flows_to"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-flow-002",
+            "category": "flows_to",
+            "question": "What does D_formatter flow to?",
+            "search_query": "D_formatter",
+            "expected_entities": ["D_formatter"],
+            "expected_relationships": [["calls"], ["flows_to"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-inst-001",
+            "category": "instantiates",
+            "question": "What does source_location_formatter instantiate?",
+            "search_query": "source_location_formatter",
+            "expected_entities": ["source_location_formatter"],
+            "expected_relationships": [["calls"], ["instantiates"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-inst-002",
+            "category": "instantiates",
+            "question": "What does F_formatter create?",
+            "search_query": "F_formatter",
+            "expected_entities": ["F_formatter"],
+            "expected_relationships": [["calls"], ["instantiates"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-dep-001",
+            "category": "dependencies",
+            "question": "What are the dependencies of source_location_formatter?",
+            "search_query": "source_location_formatter",
+            "expected_entities": ["source_location_formatter"],
+            "expected_relationships": [["depends_on"], ["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-dep-002",
+            "category": "dependencies",
+            "question": "What are the dependencies of D_formatter?",
+            "search_query": "D_formatter",
+            "expected_entities": ["D_formatter"],
+            "expected_relationships": [["depends_on"], ["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-dep-003",
+            "category": "dependencies",
+            "question": "What are the dependencies of F_formatter?",
+            "search_query": "F_formatter",
+            "expected_entities": ["F_formatter"],
+            "expected_relationships": [["depends_on"], ["calls"]],
+            "source_allowed": false,
+            "evaluation": "relationship_recall"
+        },
+        {
+            "id": "spd-arch-001",
+            "category": "architecture",
+            "question": "What is the project structure?",
+            "search_query": "logger",
+            "expected_entities": [],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_recall"
+        },
+        {
+            "id": "spd-arch-002",
+            "category": "architecture",
+            "question": "What are the main components?",
+            "search_query": "sink_it_",
+            "expected_entities": [],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_recall"
+        },
+        {
+            "id": "spd-impact-001",
+            "category": "impact",
+            "question": "What would be affected if logger changes?",
+            "search_query": "logger",
+            "expected_entities": ["logger"],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_match"
+        },
+        {
+            "id": "spd-impact-002",
+            "category": "impact",
+            "question": "What functions would break if source_location_formatter changes?",
+            "search_query": "source_location_formatter",
+            "expected_entities": ["source_location_formatter"],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_match"
+        },
+        {
+            "id": "spd-impact-003",
+            "category": "impact",
+            "question": "What is the impact of changing pattern_formatter?",
+            "search_query": "pattern_formatter",
+            "expected_entities": ["pattern_formatter"],
+            "expected_relationships": [],
+            "source_allowed": false,
+            "evaluation": "entity_match"
+        }
+    ]
 }

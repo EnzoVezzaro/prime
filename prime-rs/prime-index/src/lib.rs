@@ -9,7 +9,7 @@ pub mod compact_serialization;
 pub mod incremental;
 
 pub use storage::*;
-pub use serialize::*;
+pub use serialize::{msgpack, json, compression};
 pub use query::*;
 pub use mmap::*;
 pub use tools::*;

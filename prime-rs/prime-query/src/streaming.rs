@@ -1,10 +1,11 @@
 //! Streaming query results for large result sets
 
-use prime_core::{KnowledgeGraph, Entity, EntityId, Relation, RelationKind, SymbolKind, Confidence, Range, Language};
+use prime_core::EntityId;
 use prime_index::query::{QueryEngine, QueryOptions};
 use std::sync::Arc;
 
 /// Streaming iterator for large query results
+#[allow(dead_code)]
 pub struct StreamingQuery<'a> {
     engine: &'a QueryEngine,
     opts: QueryOptions,
@@ -31,22 +32,22 @@ impl<'a> StreamingQuery<'a> {
     }
 
     /// Stream search results
-    pub fn search(&mut self, query: &str) -> SearchStream {
+    pub fn search(&mut self, _query: &str) -> SearchStream<'_> {
         SearchStream::new(self)
     }
 
     /// Stream name matches
-    pub fn find_by_name(&mut self, name: &str) -> NameStream {
+    pub fn find_by_name(&mut self, name: &str) -> NameStream<'_> {
         NameStream::new(self, name)
     }
 
     /// Stream prefix matches
-    pub fn find_by_prefix(&mut self, prefix: &str) -> PrefixStream {
+    pub fn find_by_prefix(&mut self, prefix: &str) -> PrefixStream<'_> {
         PrefixStream::new(self, prefix)
     }
 
     /// Stream context for entities
-    pub fn context_stream(&mut self, entity_ids: Vec<EntityId>) -> ContextStream {
+    pub fn context_stream(&mut self, entity_ids: Vec<EntityId>) -> ContextStream<'_> {
         ContextStream::new(self, entity_ids)
     }
 }

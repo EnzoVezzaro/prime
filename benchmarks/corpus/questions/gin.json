@@ -1,7 +1,7 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "repo": "gin",
-  "description": "Benchmark questions for gin (Go) - using actual entity names",
+  "description": "Benchmark questions for gin (Go) - using verified entity names",
   "questions": [
     {
       "id": "gin-sym-001",
@@ -28,7 +28,7 @@
       "id": "gin-sym-003",
       "category": "symbols",
       "question": "What interfaces are defined?",
-      "search_query": "IRouter",
+      "search_query": "Routes",
       "expected_entities": [],
       "expected_relationships": [],
       "source_allowed": false,
@@ -57,9 +57,9 @@
     {
       "id": "gin-call-003",
       "category": "calls",
-      "question": "What does Engine.handleHTTPRequest call?",
-      "search_query": "handleHTTPRequest",
-      "expected_entities": ["handleHTTPRequest"],
+      "question": "What does Run call?",
+      "search_query": "Run",
+      "expected_entities": ["Run"],
       "expected_relationships": [["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
@@ -70,7 +70,7 @@
       "question": "What does gin.go::New depend on?",
       "search_query": "gin.go::New",
       "expected_entities": ["New"],
-      "expected_relationships": [["depends_on"]],
+      "expected_relationships": [["depends_on"], ["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
@@ -80,17 +80,17 @@
       "question": "What does Engine depend on?",
       "search_query": "Engine",
       "expected_entities": ["Engine"],
-      "expected_relationships": [["depends_on"]],
+      "expected_relationships": [["depends_on"], ["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
     {
       "id": "gin-imp-003",
       "category": "imports",
-      "question": "What does Context depend on?",
-      "search_query": "context.go::Context",
-      "expected_entities": ["Context"],
-      "expected_relationships": [["depends_on"]],
+      "question": "What does Routes depend on?",
+      "search_query": "Routes",
+      "expected_entities": ["Routes"],
+      "expected_relationships": [["depends_on"], ["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
@@ -117,10 +117,10 @@
     {
       "id": "gin-flow-001",
       "category": "flows_to",
-      "question": "What does Engine.handleHTTPRequest flow to?",
-      "search_query": "handleHTTPRequest",
-      "expected_entities": ["handleHTTPRequest"],
-      "expected_relationships": [["calls"]],
+      "question": "What does Run flow to?",
+      "search_query": "Run",
+      "expected_entities": ["Run"],
+      "expected_relationships": [["calls"], ["flows_to"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
@@ -130,7 +130,7 @@
       "question": "What does New flow to?",
       "search_query": "gin.go::New",
       "expected_entities": ["New"],
-      "expected_relationships": [["calls"]],
+      "expected_relationships": [["calls"], ["flows_to"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
@@ -140,17 +140,17 @@
       "question": "What does New instantiate?",
       "search_query": "gin.go::New",
       "expected_entities": ["New"],
-      "expected_relationships": [["calls"]],
+      "expected_relationships": [["calls"], ["instantiates"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
     {
       "id": "gin-inst-002",
       "category": "instantiates",
-      "question": "What does Engine.init do?",
-      "search_query": "Engine",
-      "expected_entities": ["Engine"],
-      "expected_relationships": [["calls"]],
+      "question": "What does Routes create?",
+      "search_query": "Routes",
+      "expected_entities": ["Routes"],
+      "expected_relationships": [["calls"], ["instantiates"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
@@ -160,7 +160,7 @@
       "question": "What are the dependencies of New?",
       "search_query": "gin.go::New",
       "expected_entities": ["New"],
-      "expected_relationships": [["depends_on"]],
+      "expected_relationships": [["depends_on"], ["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
@@ -170,17 +170,17 @@
       "question": "What are the dependencies of Engine?",
       "search_query": "Engine",
       "expected_entities": ["Engine"],
-      "expected_relationships": [["depends_on"]],
+      "expected_relationships": [["depends_on"], ["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
     {
       "id": "gin-dep-003",
       "category": "dependencies",
-      "question": "What are the dependencies of Context?",
-      "search_query": "context.go::Context",
-      "expected_entities": ["Context"],
-      "expected_relationships": [["depends_on"]],
+      "question": "What are the dependencies of Routes?",
+      "search_query": "Routes",
+      "expected_entities": ["Routes"],
+      "expected_relationships": [["depends_on"], ["calls"]],
       "source_allowed": false,
       "evaluation": "relationship_recall"
     },
@@ -227,9 +227,9 @@
     {
       "id": "gin-impact-003",
       "category": "impact",
-      "question": "What is the impact of changing Context?",
-      "search_query": "context.go::Context",
-      "expected_entities": ["Context"],
+      "question": "What is the impact of changing Routes?",
+      "search_query": "Routes",
+      "expected_entities": ["Routes"],
       "expected_relationships": [],
       "source_allowed": false,
       "evaluation": "entity_match"

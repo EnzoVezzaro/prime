@@ -5,14 +5,12 @@
 //! and compact relation encoding to minimize storage size.
 
 use prime_core::{
-    KnowledgeGraph, Entity, Relation, File, Module, Project, EntityId, ContentHash,
-    Range, Position, SymbolKind, RelationKind, Confidence, Provenance, Language,
+    Entity, EntityId,
 };
-use anyhow::{Result, Context};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use indexmap::IndexMap;
-use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
+use byteorder::{WriteBytesExt, ReadBytesExt};
 use std::io::{Write, Read};
 
 /// Compact representation of the knowledge graph for efficient storage
@@ -134,77 +132,77 @@ impl<W: Write> CompactWriter<W> {
         self.write_string(&graph.project.name)?;
         self.write_string(&graph.project.root_path)?;
         self.write_string(&graph.project.version)?;
-        self.write_varint(graph.project.languages.len() as u64);
+        self.write_varint(graph.project.languages.len() as u64)?;
         for lang in &graph.project.languages {
             self.write_string(lang)?;
         }
-        self.write_varint(graph.project.file_count as u64);
-        self.write_varint(graph.project.entity_count as u64);
-        self.write_varint(graph.project.relation_count as u64);
-        self.write_varint(graph.project.created_at as u64);
+        self.write_varint(graph.project.file_count as u64)?;
+        self.write_varint(graph.project.entity_count as u64)?;
+        self.write_varint(graph.project.relation_count as u64)?;
+        self.write_varint(graph.project.created_at as u64)?;
 
         // Write entities
-        self.write_varint(graph.entities.len() as u64);
+        self.write_varint(graph.entities.len() as u64)?;
         for entity in &graph.entities {
-            self.write_varint(entity.id.0);
+            self.write_varint(entity.id.0)?;
             self.writer.write_u8(entity.kind)?;
             self.write_string(&entity.name)?;
             self.write_string(&entity.qualified_name)?;
-            self.write_varint(entity.file_id.0);
-            self.write_varint(entity.range_start as u64);
-            self.write_varint(entity.range_end as u64);
+            self.write_varint(entity.file_id.0)?;
+            self.write_varint(entity.range_start as u64)?;
+            self.write_varint(entity.range_end as u64)?;
             self.writer.write_u8(entity.language)?;
             self.writer.write_u8(entity.confidence)?;
             self.write_string(entity.signature.as_deref().unwrap_or(""))?;
             self.write_string(entity.documentation.as_deref().unwrap_or(""))?;
-            self.write_varint(entity.relation_indices.len() as u64);
+            self.write_varint(entity.relation_indices.len() as u64)?;
             for &idx in &entity.relation_indices {
-                self.write_varint(idx as u64);
+                self.write_varint(idx as u64)?;
             }
         }
 
         // Write relations
-        self.write_varint(graph.relations.len() as u64);
+        self.write_varint(graph.relations.len() as u64)?;
         for rel in &graph.relations {
-            self.write_varint(rel.from as u64);
-            self.write_varint(rel.to as u64);
+            self.write_varint(rel.from as u64)?;
+            self.write_varint(rel.to as u64)?;
             self.writer.write_u8(rel.kind)?;
             self.writer.write_u8(rel.confidence)?;
         }
 
         // Write files
-        self.write_varint(graph.files.len() as u64);
+        self.write_varint(graph.files.len() as u64)?;
         for file in &graph.files {
-            self.write_varint(file.id.0);
+            self.write_varint(file.id.0)?;
             self.write_string(&file.path)?;
             self.writer.write_u8(file.language)?;
-            self.write_varint(file.size as u64);
+            self.write_varint(file.size as u64)?;
             self.writer.write_all(&file.content_hash)?;
-            self.write_varint(file.entity_indices.len() as u64);
+            self.write_varint(file.entity_indices.len() as u64)?;
             for &idx in &file.entity_indices {
-                self.write_varint(idx as u64);
+                self.write_varint(idx as u64)?;
             }
         }
 
         // Write modules
-        self.write_varint(graph.modules.len() as u64);
+        self.write_varint(graph.modules.len() as u64)?;
         for module in &graph.modules {
-            self.write_varint(module.id.0);
+            self.write_varint(module.id.0)?;
             self.write_string(&module.name)?;
             self.write_string(&module.path)?;
             self.writer.write_u8(module.language)?;
-            self.write_varint(module.file_indices.len() as u64);
+            self.write_varint(module.file_indices.len() as u64)?;
             for &idx in &module.file_indices {
-                self.write_varint(idx as u64);
+                self.write_varint(idx as u64)?;
             }
-            self.write_varint(module.parent.map(|p| p.0).unwrap_or(0));
-            self.write_varint(module.children.len() as u64);
+            self.write_varint(module.parent.map(|p| p.0).unwrap_or(0))?;
+            self.write_varint(module.children.len() as u64)?;
             for &child in &module.children {
-                self.write_varint(child.0);
+                self.write_varint(child.0)?;
             }
-            self.write_varint(module.exports.len() as u64);
+            self.write_varint(module.exports.len() as u64)?;
             for &exp in &module.exports {
-                self.write_varint(exp.0);
+                self.write_varint(exp.0)?;
             }
         }
 
@@ -422,7 +420,7 @@ impl From<&prime_core::KnowledgeGraph> for CompactKnowledgeGraph {
         }
 
         // Convert entities
-        let entities: Vec<CompactEntity> = graph.entities.values().enumerate().map(|(idx, entity)| {
+        let entities: Vec<CompactEntity> = graph.entities.values().enumerate().map(|(_idx, entity)| {
             let relation_indices: Vec<u32> = graph.relations.iter()
                 .enumerate()
                 .filter(|(_, rel)| rel.from == entity.id)
@@ -499,8 +497,8 @@ let modules: Vec<CompactModule> = graph.modules.iter().map(|(id, module)| {
 }
 
 /// Serialize a KnowledgeGraph to compact binary format with zstd compression
-pub fn serialize_compact(graph: &prime_core::KnowledgeGraph, compression_level: i32) -> anyhow::Result<Vec<u8>> {
-    let compact = CompactKnowledgeGraph::from(graph);
+pub fn serialize_compact(graph: &prime_core::KnowledgeGraph, _compression_level: i32) -> anyhow::Result<Vec<u8>> {
+    let _compact = CompactKnowledgeGraph::from(graph);
     let mut buf = Vec::new();
     let mut encoder = zstd::Encoder::new(&mut buf, 9)?; // Higher compression level
     encoder.include_checksum(true)?;
@@ -538,9 +536,58 @@ impl From<CompactKnowledgeGraph> for prime_core::KnowledgeGraph {
 
 let mut entities: IndexMap<EntityId, Entity> = IndexMap::new();
 for entity in &compact.entities {
-            let entity = prime_core::Entity {
+            let kind = match entity.kind {
+                1 => prime_core::SymbolKind::Module,
+                2 => prime_core::SymbolKind::Namespace,
+                3 => prime_core::SymbolKind::Package,
+                10 => prime_core::SymbolKind::Class,
+                11 => prime_core::SymbolKind::Struct,
+                12 => prime_core::SymbolKind::Enum,
+                13 => prime_core::SymbolKind::Trait,
+                14 => prime_core::SymbolKind::Interface,
+                15 => prime_core::SymbolKind::TypeAlias,
+                16 => prime_core::SymbolKind::Protocol,
+                20 => prime_core::SymbolKind::Function,
+                21 => prime_core::SymbolKind::Method,
+                22 => prime_core::SymbolKind::Constructor,
+                23 => prime_core::SymbolKind::Destructor,
+                24 => prime_core::SymbolKind::AsyncFunction,
+                25 => prime_core::SymbolKind::AsyncMethod,
+                30 => prime_core::SymbolKind::Variable,
+                31 => prime_core::SymbolKind::Field,
+                32 => prime_core::SymbolKind::Constant,
+                33 => prime_core::SymbolKind::StaticVariable,
+                34 => prime_core::SymbolKind::Parameter,
+                40 => prime_core::SymbolKind::Macro,
+                41 => prime_core::SymbolKind::Delegate,
+                42 => prime_core::SymbolKind::Event,
+                43 => prime_core::SymbolKind::Property,
+                44 => prime_core::SymbolKind::GenericParameter,
+                45 => prime_core::SymbolKind::ModuleImport,
+                46 => prime_core::SymbolKind::ModuleExport,
+                _ => prime_core::SymbolKind::Unknown,
+            };
+            let language = match entity.language {
+                1 => prime_core::Language::Rust,
+                2 => prime_core::Language::TypeScript,
+                3 => prime_core::Language::JavaScript,
+                4 => prime_core::Language::Python,
+                5 => prime_core::Language::Go,
+                6 => prime_core::Language::Java,
+                7 => prime_core::Language::C,
+                8 => prime_core::Language::Cpp,
+                _ => prime_core::Language::Unknown,
+            };
+            let confidence = match entity.confidence {
+                1 => prime_core::Confidence::Exact,
+                2 => prime_core::Confidence::High,
+                3 => prime_core::Confidence::Medium,
+                4 => prime_core::Confidence::Low,
+                _ => prime_core::Confidence::Unknown,
+            };
+            let e = prime_core::Entity {
                 id: entity.id,
-                kind: unsafe { std::mem::transmute(entity.kind) },
+                kind,
                 name: entity.name.clone(),
                 qualified_name: entity.qualified_name.clone(),
                 file_id: entity.file_id,
@@ -548,33 +595,83 @@ for entity in &compact.entities {
                     start: prime_core::Position { line: entity.range_start, column: 0 },
                     end: prime_core::Position { line: entity.range_end, column: 0 },
                 },
-                language: unsafe { std::mem::transmute(entity.language) },
-                confidence: unsafe { std::mem::transmute(entity.confidence) },
+                language,
+                confidence,
                 signature: entity.signature.clone().filter(|s| !s.is_empty()),
                 documentation: entity.documentation.clone().filter(|s| !s.is_empty()),
+                parent_id: None,
+                disambiguator: None,
+                stability: prime_core::Stability::Unknown,
+                aliases: Vec::new(),
                 children: Vec::new(),
                 relations: Vec::new(),
+                semantic: None,
             };
-            entities.insert(entity.id, entity);
+            entities.insert(e.id, e);
         }
 
         let mut relations = Vec::new();
         for rel in compact.relations {
+            let kind = match rel.kind {
+                1 => prime_core::RelationKind::Contains,
+                2 => prime_core::RelationKind::PartOf,
+                10 => prime_core::RelationKind::Extends,
+                11 => prime_core::RelationKind::Implements,
+                12 => prime_core::RelationKind::Inherits,
+                20 => prime_core::RelationKind::DependsOn,
+                21 => prime_core::RelationKind::Imports,
+                22 => prime_core::RelationKind::Requires,
+                30 => prime_core::RelationKind::Calls,
+                31 => prime_core::RelationKind::References,
+                32 => prime_core::RelationKind::Reads,
+                33 => prime_core::RelationKind::Writes,
+                40 => prime_core::RelationKind::Returns,
+                41 => prime_core::RelationKind::ParameterOf,
+                42 => prime_core::RelationKind::TypeOf,
+                43 => prime_core::RelationKind::GenericArgOf,
+                50 => prime_core::RelationKind::Overrides,
+                51 => prime_core::RelationKind::Overloads,
+                52 => prime_core::RelationKind::Instantiates,
+                53 => prime_core::RelationKind::Factory,
+                55 => prime_core::RelationKind::FlowsTo,
+                56 => prime_core::RelationKind::Yields,
+                60 => prime_core::RelationKind::Exports,
+                61 => prime_core::RelationKind::ReExports,
+                _ => prime_core::RelationKind::Unknown,
+            };
+            let confidence = match rel.confidence {
+                1 => prime_core::Confidence::Exact,
+                2 => prime_core::Confidence::High,
+                3 => prime_core::Confidence::Medium,
+                4 => prime_core::Confidence::Low,
+                _ => prime_core::Confidence::Unknown,
+            };
             relations.push(prime_core::Relation {
                 from: compact.entities[rel.from as usize].id,
                 to: compact.entities[rel.to as usize].id,
-                kind: unsafe { std::mem::transmute(rel.kind) },
-                confidence: unsafe { std::mem::transmute(rel.confidence) },
+                kind,
+                confidence,
                 provenance: prime_core::Provenance::Stored,
             });
         }
 
         let mut files = indexmap::IndexMap::new();
 for file in &compact.files {
+            let lang = match file.language {
+                1 => prime_core::Language::Rust,
+                2 => prime_core::Language::TypeScript,
+                3 => prime_core::Language::JavaScript,
+                4 => prime_core::Language::Python,
+                5 => prime_core::Language::Go,
+                6 => prime_core::Language::Java,
+                7 => prime_core::Language::C,
+                8 => prime_core::Language::Cpp,
+                _ => prime_core::Language::Unknown,
+            };
             let file_obj = prime_core::File {
                 id: file.id,
                 path: file.path.clone(),
-                language: unsafe { std::mem::transmute(file.language) },
+                language: lang,
                 size: file.size,
                 content_hash: prime_core::ContentHash(file.content_hash),
                 entities: file.entity_indices.iter().map(|&idx| {
@@ -584,13 +681,23 @@ for file in &compact.files {
             files.insert(file_obj.id, file_obj);
         }
 
-let mut modules = indexmap::IndexMap::new();
-for module in &compact.modules {
+let mut modules = indexmap::IndexMap::new();        for module in &compact.modules {
+            let lang = match module.language {
+                1 => prime_core::Language::Rust,
+                2 => prime_core::Language::TypeScript,
+                3 => prime_core::Language::JavaScript,
+                4 => prime_core::Language::Python,
+                5 => prime_core::Language::Go,
+                6 => prime_core::Language::Java,
+                7 => prime_core::Language::C,
+                8 => prime_core::Language::Cpp,
+                _ => prime_core::Language::Unknown,
+            };
             let module_obj = prime_core::Module {
                 id: module.id,
                 name: module.name.clone(),
                 path: module.path.clone(),
-                language: unsafe { std::mem::transmute(module.language) },
+                language: lang,
                 files: module.file_indices.iter().map(|&idx| compact.files[idx as usize].id).collect(),
                 parent: module.parent,
                 children: module.children.iter().map(|&c| c).collect(),

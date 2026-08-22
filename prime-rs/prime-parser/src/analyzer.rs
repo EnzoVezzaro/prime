@@ -1,7 +1,7 @@
 //! High-level analysis orchestration
 
-use prime_core::{Language, KnowledgeGraph, Project, Entity, Relation, File, Module, ContentHash, Range, Position, SymbolKind, RelationKind, Confidence, Provenance, EntityId};
-use crate::{Parser, ParserConfig, ParseResult, ProjectParseResult};
+use prime_core::{KnowledgeGraph, Project, Entity, Relation, File, ContentHash, SymbolKind, Provenance, EntityId, Stability};
+use crate::{ParserConfig, ParseResult};
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use anyhow::Result;
@@ -9,7 +9,7 @@ use anyhow::Result;
 /// High-level project analyzer
 pub struct ProjectAnalyzer {
     parser: crate::Parser,
-    entity_counter: u64,
+    _entity_counter: u64,
     file_id_map: HashMap<String, ContentHash>,
     /// Path to the project root
     root_path: Option<PathBuf>,
@@ -20,7 +20,7 @@ impl ProjectAnalyzer {
         let parser = crate::Parser::new(config)?;
         Ok(Self {
             parser,
-            entity_counter: 1,
+            _entity_counter: 1,
             file_id_map: HashMap::new(),
             root_path: None,
         })
@@ -72,6 +72,18 @@ impl ProjectAnalyzer {
             for extracted in &file_result.entities {
                 let entity_id = EntityId::from_str(&extracted.qualified_name);
 
+                // Determine parent_id from qualified name hierarchy
+                let parent_id = self.find_parent_id(&extracted.qualified_name, &graph);
+                
+                // Determine stability from name patterns
+                let stability = if extracted.name.starts_with('_') {
+                    Stability::Private
+                } else if extracted.kind == SymbolKind::Field || extracted.kind == SymbolKind::Variable {
+                    Stability::Internal
+                } else {
+                    Stability::Public
+                };
+
                 let entity = Entity {
                     id: entity_id,
                     kind: extracted.kind,
@@ -83,8 +95,13 @@ impl ProjectAnalyzer {
                     confidence: extracted.confidence,
                     signature: extracted.signature.clone(),
                     documentation: extracted.documentation.clone(),
+                    parent_id,
+                    disambiguator: extracted.signature.clone(),
+                    stability,
+                    aliases: Vec::new(),
                     children: Vec::new(),
                     relations: Vec::new(),
+                    semantic: None,
                 };
 
                 file_entity_ids.push(entity_id);
@@ -113,11 +130,15 @@ impl ProjectAnalyzer {
                 } else if let Some(candidates) = name_to_qualified.get(&relation.to_name) {
                     // Try to find by simple name (cross-file resolution)
                     // Prefer candidates that are NOT in the same file (cross-file calls)
+                    // Extract file prefix from from_qualified (everything before last ::)
+                    let from_file_prefix = relation.from_qualified.rsplit_once("::")
+                        .map(|(prefix, _)| prefix)
+                        .unwrap_or("");
                     let same_file_candidates: Vec<_> = candidates.iter()
-                        .filter(|qn| qn.starts_with(&relation.from_qualified.rsplit("::").next().unwrap_or("")))
+                        .filter(|qn| qn.starts_with(from_file_prefix))
                         .collect();
                     let cross_file_candidates: Vec<_> = candidates.iter()
-                        .filter(|qn| !qn.starts_with(&relation.from_qualified.rsplit("::").next().unwrap_or("")))
+                        .filter(|qn| !qn.starts_with(from_file_prefix))
                         .collect();
                     
                     if !cross_file_candidates.is_empty() {
@@ -238,6 +259,18 @@ impl ProjectAnalyzer {
         for extracted in &parse_result.entities {
             let entity_id = EntityId::from_str(&extracted.qualified_name);
 
+            // Determine parent_id from qualified name hierarchy
+            let parent_id = self.find_parent_id(&extracted.qualified_name, graph);
+            
+            // Determine stability from name patterns
+            let stability = if extracted.name.starts_with('_') {
+                Stability::Private
+            } else if extracted.kind == SymbolKind::Field || extracted.kind == SymbolKind::Variable {
+                Stability::Internal
+            } else {
+                Stability::Public
+            };
+
             let entity = Entity {
                 id: entity_id,
                 kind: extracted.kind,
@@ -249,8 +282,13 @@ impl ProjectAnalyzer {
                 confidence: extracted.confidence,
                 signature: extracted.signature.clone(),
                 documentation: extracted.documentation.clone(),
+                parent_id,
+                disambiguator: extracted.signature.clone(),
+                stability,
+                aliases: Vec::new(),
                 children: Vec::new(),
                 relations: Vec::new(),
+                semantic: None,
             };
 
             graph.add_entity(entity);
@@ -275,6 +313,27 @@ impl ProjectAnalyzer {
         graph.add_file(file_entity);
 
         Ok(())
+    }
+
+    /// Find parent entity ID from qualified name hierarchy
+    /// Note: Graph indexes aren't built yet at this point, so we scan entities directly
+    fn find_parent_id(&self, qualified_name: &str, graph: &KnowledgeGraph) -> Option<EntityId> {
+        // Split by :: to get hierarchy
+        let parts: Vec<&str> = qualified_name.split("::").collect();
+        if parts.len() < 2 {
+            return None;
+        }
+        
+        // Try to find parent by removing last component
+        let parent_qn = parts[..parts.len()-1].join("::");
+        
+        // Indexes not built yet, so scan entities directly
+        for (id, entity) in &graph.entities {
+            if entity.qualified_name == parent_qn {
+                return Some(*id);
+            }
+        }
+        None
     }
 
     /// Update an existing file's entities in the graph
@@ -317,6 +376,18 @@ impl ProjectAnalyzer {
             for extracted in &parse_result.entities {
                 let entity_id = EntityId::from_str(&extracted.qualified_name);
 
+                // Determine parent_id from qualified name hierarchy
+                let parent_id = self.find_parent_id(&extracted.qualified_name, graph);
+                
+                // Determine stability from name patterns
+                let stability = if extracted.name.starts_with('_') {
+                    Stability::Private
+                } else if extracted.kind == SymbolKind::Field || extracted.kind == SymbolKind::Variable {
+                    Stability::Internal
+                } else {
+                    Stability::Public
+                };
+
                 let entity = Entity {
                     id: entity_id,
                     kind: extracted.kind,
@@ -328,8 +399,13 @@ impl ProjectAnalyzer {
                     confidence: extracted.confidence,
                     signature: extracted.signature.clone(),
                     documentation: extracted.documentation.clone(),
+                    parent_id,
+                    disambiguator: extracted.signature.clone(),
+                    stability,
+                    aliases: Vec::new(),
                     children: Vec::new(),
                     relations: Vec::new(),
+                    semantic: None,
                 };
 
                 graph.add_entity(entity);
