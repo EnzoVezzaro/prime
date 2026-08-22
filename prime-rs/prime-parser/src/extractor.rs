@@ -138,6 +138,36 @@ impl<'a> Extractor<'a> {
                 }
             }
 
+            // Fix: for C++ classes with macro attributes (e.g., 'class SPDLOG_API logger'),
+            // the name field captures the macro instead of the actual class name.
+            // Also for template instantiations like 'template class SPDLOG_API spdlog::sinks::foo<...>;'
+            if kind == SymbolKind::Class || kind == SymbolKind::Struct {
+                if let Some(ref n) = name {
+                    if n.chars().all(|c| c.is_uppercase() || c == '_') || n.ends_with("_API") || n.ends_with("_EXPORT") {
+                        if let Some(dn) = def_node {
+                            // Extract real name from parent node text
+                            if let Some(parent) = dn.parent() {
+                                let parent_text = parent.utf8_text(self.source).unwrap_or("");
+                                // For template instantiations: 'template class SPDLOG_API ns::ClassName<...>;'
+                                // For class definitions: 'class SPDLOG_API ClassName { ... }'
+                                // In both cases, the real name comes after the macro
+                                if let Some(after_macro) = parent_text.split(n.as_str()).nth(1) {
+                                    let after_trimmed = after_macro.trim_start();
+                                    let qualified: String = after_trimmed.chars()
+                                        .take_while(|c| c.is_alphanumeric() || *c == ':' || *c == '_')
+                                        .collect();
+                                    if let Some(simple_name) = qualified.rsplit("::").next() {
+                                        if !simple_name.is_empty() && simple_name != n.as_str() {
+                                            name = Some(simple_name.to_string());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if let Some(name) = name {
                 let qualified = self.qualify_name(&name);
                 let id = HashEntityId::from_str(&qualified).0;

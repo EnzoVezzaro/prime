@@ -32,8 +32,16 @@
 | spdlog | **100.0%** | +96.0% |
 | **Overall** | **100.0%** | **+97.6%** |
 
-Retrieval: Search 721µs, Lookup 216µs, Context 55µs
+Retrieval: Search 707µs, Lookup 210µs, Context 54µs
 Artifact: 2125KB mean, 2.0x source ratio
+
+**Spdlog C++ Parser Investigation:**
+- Root cause: tree-sitter-cpp parses `class SPDLOG_API logger` with `SPDLOG_API` as the class name
+- `SPDLOG_API` macro causes class_specifier name field to capture the macro instead of the real class name
+- Partial fix: extract real name from parent node text → Classes 6→14
+- Remaining: 144 class definitions in spdlog, only 14 detected — most are in `-inl.h` files with `class Foo final : public Bar` patterns that tree-sitter-cpp doesn't fully parse as class_specifier
+- Most entities are Function (1096) — these are method declarations inside class bodies, not standalone functions
+- Header-only code has sparse outgoing relationships because methods are declarations, not implementations
 
 ---
 
