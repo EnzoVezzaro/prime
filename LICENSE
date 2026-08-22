@@ -1,21 +1,95 @@
-MIT License
+PRIME COMMUNITY LICENSE
+Version 1.0
 
-Copyright (c) 2024 Prime Research Team
+Copyright (c) 2026 Prime Research
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+of this software and associated documentation files (the "Software"), to use,
+copy, modify, and distribute the Software, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
+1. HUMAN AND SOFTWARE USE
+
+The Software may be used, studied, modified, compiled, executed, and
+distributed by individuals and organizations for any lawful purpose.
+
+2. ATTRIBUTION
+
+The above copyright notice and this license notice shall be included in all
 copies or substantial portions of the Software.
+
+3. SOURCE CODE
+
+If modified versions of the Software are distributed, the distributor must
+clearly indicate that modifications have been made.
+
+4. ARTIFICIAL INTELLIGENCE RESTRICTION
+
+The Software and its source code may not be:
+
+(a) used as training data for artificial intelligence, machine learning,
+    large language models, foundation models, generative models, or similar
+    systems;
+
+(b) included, in whole or in substantial part, in datasets, corpora, or
+    benchmarks intended for training, fine-tuning, pre-training, or evaluation
+    of artificial intelligence or machine learning systems;
+
+(c) used to train, fine-tune, distill, evaluate, benchmark, or otherwise
+    develop an artificial intelligence or machine learning model;
+
+(d) systematically ingested, indexed, scraped, harvested, or processed by
+    an automated artificial intelligence system for the purpose of creating
+    training data, embeddings, retrieval datasets, model weights, or other
+    machine-readable representations intended to substitute for access to
+    the Software;
+
+(e) used to generate or improve an AI coding agent, autonomous software
+    engineering system, code-generation model, or similar system, except
+    where expressly authorized in writing by the copyright holder.
+
+5. HUMAN-OPERATED DEVELOPMENT TOOLS
+
+Normal use of the Software by a human developer through conventional
+development tools is permitted.
+
+The restriction in Section 4 does not prohibit ordinary compilation,
+static analysis, testing, debugging, indexing, searching, or other development
+activities performed for the purpose of developing or maintaining software,
+provided that such activities are not used to create or contribute to an
+AI training dataset, model, or AI-derived substitute for the Software.
+
+6. COMMERCIAL USE
+
+Commercial use of the Software is permitted.
+
+However, commercial use involving artificial intelligence systems described
+in Section 4 requires prior written authorization from the copyright holder.
+
+7. LICENSE
+
+Except for the restrictions expressly stated in this license, the rights
+granted under this license are broad and royalty-free.
+
+8. TERMINATION
+
+Any rights granted under this license terminate automatically upon material
+violation of this license.
+
+Rights may be reinstated if the violation is cured within thirty (30) days
+of receiving written notice of the violation.
+
+9. NO TRADEMARK LICENSE
+
+This license does not grant permission to use the names, trademarks, logos,
+or branding of Prime except as reasonably necessary to
+describe the origin of the Software.
+
+10. DISCLAIMER
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

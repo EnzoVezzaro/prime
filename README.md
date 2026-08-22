@@ -36,46 +36,7 @@ If you're looking for something polished and predictable... this might be a litt
 
 ---
 
----
-
-# Prime
-
-### The smallest useful representation of a codebase for agents.
-
-[![Status: Research](https://img.shields.io/badge/status-research-red?style=for-the-badge)](#status)
-[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg?style=for-the-badge)](LICENSE)
-
-**Research into a universal, language-agnostic representation that lets next-generation agents understand and operate on codebases without retrieving the underlying source.**
-
-</div>
-
----
-
-## ⚠️ Work in Progress
-
-> **Still figuring itself out. We're just building, experimenting, chasing weird ideas, and seeing where they take us. Thanks for sticking around**
-
-This project is still very much alive and under active development.
-Some parts work. Some parts don't. Some parts work **until they suddenly don't**.
-
-Expect:
-
-* 🧪 Experimental ideas
-* 🛠️ Things being rebuilt from scratch
-* 💥 Occasional breakage
-* 🌀 Features that may change direction
-* ✨ Unexpectedly good ideas
-* 🤷 The occasional *"well, that wasn't supposed to happen"*
-
-The goal right now isn't to make everything look finished.
-
-It's to **build, experiment, break things, learn, and keep making it better.**
-
-> **If you're looking for something polished and predictable... this might be a little early. 😄**
-
----
-
-> **What is the minimum information an agent needs to understand a codebase without reading its code?**
+> **What is the minimum information an agent needs to understand a codebase and acomplish a task without reading unnecesary/unrelated code?**
 
 That is the question behind Prime.
 
@@ -83,7 +44,7 @@ Prime is a research project exploring how an entire software repository can be t
 
 Prime does **not** aim to compress source code.
 
-Prime aims to make the source code unnecessary for as many agent questions as possible.
+Prime aims to make the source code more understandable and navigatable for as many agent questions as possible.
 
 ```text
                          CODEBASE
@@ -1011,21 +972,18 @@ The repository itself is deliberately organized into three layers.
                   RESEARCH
                      │
                      ▼
-              RESEARCH FINDINGS
+              RESEARCH FINDINGS (specs)
                      │
                      ▼
                    DOCS
                      │
                      ▼
-             FUTURE PRIME PRODUCT
-                     │
-                     ▼
-                    ACC
+                   PRIME
 ```
 
-### `research/`
+### `specs/`
 
-Contains the external knowledge and experiments.
+Contains the external knowledge and research.
 
 It answers:
 
@@ -1051,25 +1009,12 @@ It answers:
 
 # Repository structure
 
-The repository intentionally begins with only two files:
-
-```text
-Prime/
-├── README.md
-└── init-prompt.md
-```
-
-`init-prompt.md` is the bootstrap specification for the research agent.
-
-After initialization, the repository is expected to evolve into:
-
 ```text
 Prime/
 │
 ├── README.md
-├── init-prompt.md
 │
-├── research/
+├── specs/
 │   ├── agents/
 │   ├── codebase-analysis/
 │   ├── prior-art/
