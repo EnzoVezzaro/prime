@@ -450,8 +450,12 @@ impl ToolExecutor {
         };
 
         let target = entity_to_detail(&entity_id, entity);
-        let deps = self.engine.graph().dependencies(entity_id);
-        let dependencies: Vec<EntityDetail> = deps.into_iter()
+        // Use ALL outgoing relationships, not just DependsOn
+        let all_out = self.engine.graph().all_outgoing(entity_id);
+        let dependencies: Vec<EntityDetail> = all_out.into_iter()
+            .map(|(_kind, id)| id)
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
             .filter_map(|id| self.engine.graph().entities.get(&id).map(|e| entity_to_detail(&id, e)))
             .collect();
 
@@ -519,11 +523,9 @@ impl ToolExecutor {
 
         let target = entity_to_detail(&entity_id, entity);
 
-        let callers = self.engine.graph().callers(entity_id);
-        let dependents = self.engine.graph().dependents(entity_id);
-
-        let mut direct_ids: Vec<EntityId> = callers.into_iter().chain(dependents).collect();
-        direct_ids.dedup();
+        // Use ALL incoming relationships, not just Calls + DependsOn
+        let all_in = self.engine.graph().all_incoming(entity_id);
+        let direct_ids: Vec<EntityId> = all_in.into_iter().map(|(_kind, from)| from).collect::<std::collections::HashSet<_>>().into_iter().collect();
 
         let direct_impact: Vec<EntityDetail> = direct_ids.iter()
             .filter_map(|id| self.engine.graph().entities.get(id).map(|e| entity_to_detail(id, e)))
