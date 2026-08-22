@@ -195,30 +195,50 @@ impl QueryEngine {
     /// Search by keyword across names and documentation
     pub fn search(&self, query: &str, opts: &QueryOptions) -> Vec<EntitySummary> {
         let query_lower = query.to_lowercase();
-        let mut results = Vec::new();
+        let mut scored_results: Vec<(u32, EntitySummary)> = Vec::new();
 
         for (id, entity) in &self.graph.entities {
-            let name_match = entity.name.to_lowercase().contains(&query_lower);
-            let qual_match = entity.qualified_name.to_lowercase().contains(&query_lower);
-            let doc_match = entity.documentation.as_ref()
-                .map(|d| d.to_lowercase().contains(&query_lower))
-                .unwrap_or(false);
+            if entity.confidence < opts.min_confidence {
+                continue;
+            }
 
-            if name_match || qual_match || doc_match {
-                if entity.confidence >= opts.min_confidence {
-                    results.push(self.to_summary(id, entity));
-                }
+            let name_lower = entity.name.to_lowercase();
+            let qual_lower = entity.qualified_name.to_lowercase();
+            let doc_lower = entity.documentation.as_ref()
+                .map(|d| d.to_lowercase())
+                .unwrap_or_default();
+
+            // Score: higher = better match
+            let score: u32 = if name_lower == query_lower {
+                100  // Exact name match
+            } else if name_lower.starts_with(&query_lower) {
+                90   // Name starts with query
+            } else if name_lower.contains(&query_lower) {
+                70   // Name contains query
+            } else if qual_lower.ends_with(&format!("::{}", query_lower)) {
+                60   // Qualified name ends with ::query
+            } else if qual_lower.contains(&query_lower) {
+                40   // Qualified name contains query
+            } else if !doc_lower.is_empty() && doc_lower.contains(&query_lower) {
+                10   // Documentation contains query (low priority)
+            } else {
+                0    // No match
+            };
+
+            if score > 0 {
+                scored_results.push((score, self.to_summary(id, entity)));
             }
         }
 
-        // Sort by relevance (exact name match > qualified match > doc match)
-        results.sort_by(|a, b| {
-            let a_exact = a.name.to_lowercase() == query_lower;
-            let b_exact = b.name.to_lowercase() == query_lower;
-            b_exact.cmp(&a_exact)
-        });
+        // Sort by score (highest first), then by name
+        scored_results.sort_by(|a, b| b.0.cmp(&a.0).then(a.1.name.cmp(&b.1.name)));
 
-        results.truncate(opts.max_results);
+        // Take top results
+        let results: Vec<EntitySummary> = scored_results.into_iter()
+            .take(opts.max_results)
+            .map(|(_, summary)| summary)
+            .collect();
+
         results
     }
 
