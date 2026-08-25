@@ -15,7 +15,7 @@
 
 ## ⚠️ Work in Progress
 
-Still figuring itself out. We're just building, experimenting, chasing weird ideas, and seeing where they take us. Thanks for sticking around.
+Still figuring this out. We're just building, experimenting, chasing weird ideas, and seeing where they take us. Thanks for sticking around.
 
 This project is still very much alive and under active development. Some parts work. Some parts don't. Some parts work until they suddenly don't.
 
