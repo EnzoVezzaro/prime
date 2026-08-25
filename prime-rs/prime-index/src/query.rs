@@ -406,53 +406,160 @@ impl QueryEngine {
     }
 
     /// Search by keyword across names and documentation
+    /// Uses index-based candidate generation + multi-signal scoring
     pub fn search(&self, query: &str, opts: &QueryOptions) -> Vec<EntitySummary> {
         let query_lower = query.to_lowercase();
-        let mut scored_results: Vec<(u32, EntitySummary)> = Vec::new();
+        let query_tokens: Vec<&str> = query_lower.split_whitespace().collect();
+        let is_multi_word = query_tokens.len() > 1;
+        let mut candidates: Vec<(f32, EntityId)> = Vec::new();
+        let mut seen = std::collections::HashSet::new();
 
-        for (id, entity) in &self.graph.entities {
-            if entity.confidence < opts.min_confidence {
-                continue;
-            }
-
-            let name_lower = entity.name.to_lowercase();
-            let qual_lower = entity.qualified_name.to_lowercase();
-            let doc_lower = entity.documentation.as_ref()
-                .map(|d| d.to_lowercase())
-                .unwrap_or_default();
-
-            // Score: higher = better match
-            let score: u32 = if name_lower == query_lower {
-                100  // Exact name match
-            } else if name_lower.starts_with(&query_lower) {
-                90   // Name starts with query
-            } else if name_lower.contains(&query_lower) {
-                70   // Name contains query
-            } else if qual_lower.ends_with(&format!("::{}", query_lower)) {
-                60   // Qualified name ends with ::query
-            } else if qual_lower.contains(&query_lower) {
-                40   // Qualified name contains query
-            } else if !doc_lower.is_empty() && doc_lower.contains(&query_lower) {
-                10   // Documentation contains query (low priority)
-            } else {
-                0    // No match
-            };
-
-            if score > 0 {
-                scored_results.push((score, self.to_summary(id, entity)));
+        // --- Stage 1: Index-based candidate generation (fast path) ---
+        // 1a: Exact name match via index
+        if let Some(ids) = self.graph.find_by_name(&query_lower) {
+            for id in ids {
+                if seen.insert(*id) {
+                    candidates.push((1000.0, *id));
+                }
             }
         }
 
-        // Sort by score (highest first), then by name
-        scored_results.sort_by(|a, b| b.0.cmp(&a.0).then(a.1.name.cmp(&b.1.name)));
+        // 1b: Prefix match via index
+        if let Some(ids) = self.graph.find_by_prefix(&query_lower) {
+            for id in ids {
+                if seen.insert(*id) {
+                    candidates.push((900.0, *id));
+                }
+            }
+        }
 
-        // Take top results
-        let results: Vec<EntitySummary> = scored_results.into_iter()
+        // 1c: For multi-word queries, try individual tokens via index
+        if is_multi_word {
+            for token in &query_tokens {
+                if token.len() < 2 { continue; }
+                if let Some(ids) = self.graph.find_by_name(token) {
+                    for id in ids {
+                        if seen.insert(*id) {
+                            candidates.push((500.0, *id));
+                        }
+                    }
+                }
+                if let Some(ids) = self.graph.find_by_prefix(token) {
+                    for id in ids {
+                        if seen.insert(*id) {
+                            candidates.push((400.0, *id));
+                        }
+                    }
+                }
+            }
+        }
+
+        // 1e: For single-word queries, also try prefix index for broader coverage
+        if !is_multi_word && query_lower.len() >= 2 {
+            if let Some(ids) = self.graph.find_by_prefix(&query_lower) {
+                for id in ids {
+                    if seen.insert(*id) {
+                        candidates.push((300.0, *id));
+                    }
+                }
+            }
+        }
+
+        // 1d: Qualified name contains match via index (for path-like queries)
+        if query.contains("::") || query.contains("/") {
+            // Treat as qualified name lookup
+            let qual_query = &query_lower;
+            for (id, entity) in &self.graph.entities {
+                if entity.confidence < opts.min_confidence { continue; }
+                let qual_lower = entity.qualified_name.to_lowercase();
+                if qual_lower.contains(qual_query) {
+                    if seen.insert(*id) {
+                        candidates.push((950.0, *id));
+                    }
+                }
+            }
+        }
+
+        // --- Stage 2: Full scan fallback (only if index yielded very few results) ---
+        if candidates.len() < 3 {
+            for (id, entity) in &self.graph.entities {
+                if entity.confidence < opts.min_confidence { continue; }
+                if seen.contains(id) { continue; }
+
+                let name_lower = entity.name.to_lowercase();
+                let qual_lower = entity.qualified_name.to_lowercase();
+                let doc_lower = entity.documentation.as_ref()
+                    .map(|d| d.to_lowercase())
+                    .unwrap_or_default();
+
+                let score: f32 = if name_lower == query_lower {
+                    1000.0
+                } else if name_lower.starts_with(&query_lower) {
+                    900.0
+                } else if name_lower.contains(&query_lower) {
+                    700.0
+                } else if qual_lower.ends_with(&format!("::{}", query_lower)) {
+                    600.0
+                } else if qual_lower.contains(&query_lower) {
+                    400.0
+                } else if !doc_lower.is_empty() && doc_lower.contains(&query_lower) {
+                    100.0
+                } else {
+                    0.0
+                };
+
+                if score > 0.0 {
+                    seen.insert(*id);
+                    candidates.push((score, *id));
+                }
+            }
+        }
+
+        // --- Stage 3: Score refinement with entity-type, path, and relationship signals ---
+        let mut scored: Vec<(f32, EntityId)> = candidates.into_iter().map(|(base_score, id)| {
+            let mut score = base_score;
+            if let Some(entity) = self.graph.entities.get(&id) {
+                // Bonus: name exactly matches query (exact match = highest confidence)
+                if entity.name.to_lowercase() == query_lower {
+                    score += 500.0;
+                }
+                // Bonus: qualified name ends with ::query (strong identifier match)
+                if entity.qualified_name.to_lowercase().ends_with(&format!("::{}", query_lower)) {
+                    score += 300.0;
+                }
+                // Bonus: path contains query tokens (file/module relevance)
+                let path_lower = entity.qualified_name.to_lowercase();
+                for token in &query_tokens {
+                    if path_lower.contains(token) {
+                        score += 50.0;
+                    }
+                }
+                // Bonus: entity has outgoing relationships (richer entities are more useful)
+                let outgoing = self.graph.all_outgoing(id);
+                if !outgoing.is_empty() {
+                    score += 100.0;
+                }
+                // Penalty: very long qualified names (likely internal/implementation details)
+                let qual_depth = entity.qualified_name.matches("::").count();
+                if qual_depth > 5 {
+                    score -= 20.0 * (qual_depth as f32 - 5.0);
+                }
+            }
+            (score, id)
+        }).collect();
+
+        // --- Stage 4: Sort and return ---
+        scored.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| {
+                let name_a = self.graph.entities.get(&a.1).map(|e| e.name.as_str()).unwrap_or("");
+                let name_b = self.graph.entities.get(&b.1).map(|e| e.name.as_str()).unwrap_or("");
+                name_a.cmp(name_b)
+            }));
+
+        scored.into_iter()
             .take(opts.max_results)
-            .map(|(_, summary)| summary)
-            .collect();
-
-        results
+            .filter_map(|(_, id)| self.graph.entities.get(&id).map(|e| self.to_summary(&id, e)))
+            .collect()
     }
 
     /// Search with retrieval telemetry for explain mode

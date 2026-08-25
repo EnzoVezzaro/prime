@@ -1,0 +1,67 @@
+[
+  {
+    "id": "httpx-lookup-client-001",
+    "repo": "httpx",
+    "query": "Client",
+    "intent": "Lookup",
+    "expected_entities": [
+      {
+        "qualified_name": "httpx._client.Client",
+        "entity_type": "Class",
+        "language": "Python",
+        "source_file": "httpx/_client.py",
+        "line": 564
+      }
+    ],
+    "acceptable_entities": [],
+    "expected_relationships": [],
+    "expected_evidence": ["definition"],
+    "notes": "Exact class name",
+    "verification_status": "verified"
+  },
+  {
+    "id": "httpx-lookup-request-001",
+    "repo": "httpx",
+    "query": "Request",
+    "intent": "Lookup",
+    "expected_entities": [
+      {
+        "qualified_name": "httpx._models.Request",
+        "entity_type": "Class",
+        "language": "Python",
+        "source_file": "httpx/_models.py",
+        "line": 308
+      }
+    ],
+    "acceptable_entities": [
+      {
+        "qualified_name": "httpx._exceptions.RequestError",
+        "entity_type": "Class"
+      }
+    ],
+    "expected_relationships": [],
+    "expected_evidence": ["definition"],
+    "notes": "Ambiguous name",
+    "verification_status": "verified"
+  },
+  {
+    "id": "bat-lookup-prettyprinter-001",
+    "repo": "bat",
+    "query": "PrettyPrinter",
+    "intent": "Lookup",
+    "expected_entities": [
+      {
+        "qualified_name": "bat::pretty_printer::PrettyPrinter",
+        "entity_type": "Struct",
+        "language": "Rust",
+        "source_file": "src/pretty_printer.rs",
+        "line": 37
+      }
+    ],
+    "acceptable_entities": [],
+    "expected_relationships": [],
+    "expected_evidence": ["definition"],
+    "notes": "Exact struct",
+    "verification_status": "verified"
+  }
+]
